@@ -48,3 +48,35 @@ augure/
 │   └── styles/                # Configuration Tailwind CSS (Gestion de la taille dynamique des polices)
 ├── package.json               # Dépendances et scripts front-end
 └── README.md                  # Présentation générale et index du dépôt (Ce fichier)
+```
+
+---
+
+## 👥 L'Équipe Augure (Groupe 6)
+Gestion de Projet & Stratégie (MD) : Louis
+
+Marketing & Traction (MKTI) : Kelly & Firdaous
+
+UX/Product & Research (UXPO) : Aurélien
+
+Web designer (WD) : Léa & Aristide
+
+Développement & Architecture (DEV) : Mathilde & Thibault
+
+---
+---
+
+## ⚙️ Installation et Lancement (Local)
+```Bash
+# 1. Cloner le dépôt officiel
+git clone [https://github.com/Poutoo/augure.git](https://github.com/Poutoo/augure.git)
+
+# 2. Accéder au dossier
+cd augure
+
+# 3. Installer les dépendances front-end
+npm install
+
+# 4. Lancer l'environnement de développement
+npm run dev
+```
