@@ -21,6 +21,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Augure - Analyse Culturelle Intergénérationnelle",
   description: "Décryptez les micro-tendances web et ne vous sentez plus jamais en décalage culturel.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Augure",
+  },
 };
 
 export const viewport = {
