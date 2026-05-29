@@ -8,7 +8,7 @@ load_dotenv()
 def main():
     print("🚀 Démarrage du scraper Augure...")
     db_user = os.getenv("DB_USER")
-    print(f"✅ Variable DB_USER lue avec succès : {db_user}")
+    db_url = os.getenv("DATABASE_URL")
     
     # On simule un script qui tourne en tâche de fond
     while True:
