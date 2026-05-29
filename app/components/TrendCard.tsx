@@ -8,7 +8,7 @@ interface TrendCardProps {
 
 export default function TrendCard({ trend }: TrendCardProps) {
   return (
-    <Link href={`/trends/${trend.id}`} className="block group">
+    <Link href={`?trendId=${trend.id}`} scroll={false} className="block group">
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow active:scale-[0.98] cursor-pointer">
         <div className="flex justify-between items-start mb-4">
           <h3 className="font-syne font-bold text-2xl text-[var(--color-text-dark)] group-hover:text-[var(--color-primary)] transition-colors">

@@ -18,7 +18,7 @@ export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
   const status = statusConfig[trend.status];
 
   return (
-    <Link href={`/trends/${trend.id}`} className="block group">
+    <Link href={`?trendId=${trend.id}`} scroll={false} className="block group">
       <div className="flex items-start gap-4 py-5 border-b border-gray-100 last:border-0 active:opacity-70 transition-opacity">
         {/* Contenu texte */}
         <div className="flex-1 min-w-0">

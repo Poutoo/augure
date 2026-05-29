@@ -18,7 +18,7 @@ export default function TrendListItem({ trend }: TrendListItemProps) {
   const status = statusConfig[trend.status];
 
   return (
-    <Link href={`/trends/${trend.id}`} className="block group">
+    <Link href={`?trendId=${trend.id}`} scroll={false} className="block group">
       <div className="bg-white rounded-2xl px-4 py-4 flex items-center gap-3 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow active:scale-[0.99]">
         <div className="flex-1 min-w-0">
           <h3 className="font-syne font-bold text-[var(--color-text-dark)] text-base truncate group-hover:text-[var(--color-primary)] transition-colors">
