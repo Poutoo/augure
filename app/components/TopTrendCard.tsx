@@ -18,7 +18,7 @@ export default function TopTrendCard({ trend }: TopTrendCardProps) {
   const status = statusConfig[trend.status];
 
   return (
-    <Link href={`/trends/${trend.id}`} className="block flex-shrink-0 w-44">
+    <Link href={`?trendId=${trend.id}`} scroll={false} className="block flex-shrink-0 w-44">
       <div className="bg-[var(--color-card-dark)] rounded-2xl p-4 h-52 flex flex-col justify-between hover:bg-[#132b1c] transition-colors">
         <div>
           <p className="font-inter text-xs text-gray-400 mb-1">N°{String(trend.rank).padStart(2, '0')}</p>

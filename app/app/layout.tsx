@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Syne, Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import TrendDetailModal from "@/components/TrendDetailModal";
+import { Suspense } from "react";
+import { PageTransitionProvider } from "@/components/PageTransition";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -38,10 +41,15 @@ export default function RootLayout({
       style={{ overflowX: 'hidden' }}
     >
       <body className="min-h-full flex flex-col font-syne bg-[var(--color-background-app)] pb-16 md:pb-0 overflow-x-hidden">
-        <div className="md:ml-20 xl:ml-56 flex-1 flex flex-col">
-          {children}
-        </div>
-        <BottomNav />
+        <PageTransitionProvider>
+          <div className="md:ml-20 xl:ml-56 flex-1 flex flex-col">
+            {children}
+          </div>
+          <Suspense fallback={null}>
+            <TrendDetailModal />
+          </Suspense>
+          <BottomNav />
+        </PageTransitionProvider>
       </body>
     </html>
   );
