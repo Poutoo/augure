@@ -9,6 +9,8 @@
 Pour garantir une lisibilité maximale du dépôt et isoler le code des analyses théoriques, l'ensemble des études comparatives et des spécifications techniques est répertorié dans le dossier parallèle `docs/` :
 
 * [**📊 Benchmark Technique Global (V1)**](./docs/benchmark_V1.md) — Analyse comparative complète et détaillée des choix de stacks (Scraping, Front, Back).
+* [**📊 Benchmark Technique V2**](./docs/benchmark_V2.md) - Consolidation du choix pour la mise en place du MVP.
+* [**📊 informations MVP**](./docs/information.md) - Informations générales sur le projet concernant les palettes de couleurs et typographie choisis.
 
 ---
 
