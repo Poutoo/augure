@@ -62,36 +62,34 @@ export default function TrendDetailModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
       {/* Backdrop overlay */}
-      <div 
+      <div
         onClick={handleClose}
-        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-out ${
-          isVisible ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'
+          }`}
       />
 
       {/* Modal Container */}
-      <div className={`relative bg-white w-full md:max-w-2xl h-[92vh] md:h-[85vh] rounded-t-[32px] md:rounded-[32px] shadow-2xl flex flex-col overflow-hidden z-10 transition-all duration-300 ease-out transform ${
-        isVisible 
-          ? 'translate-y-0 opacity-100 md:scale-100' 
+      <div className={`relative bg-white w-full md:max-w-2xl h-[92vh] md:h-[85vh] rounded-t-[32px] md:rounded-[32px] shadow-2xl flex flex-col overflow-hidden z-10 transition-all duration-300 ease-out transform ${isVisible
+          ? 'translate-y-0 opacity-100 md:scale-100'
           : 'translate-y-full opacity-0 md:translate-y-8 md:scale-95'
-      }`}>
-        
+        }`}>
+
         {/* Top Dark Cover Image/Vibe Section */}
         <div className="relative h-44 flex-shrink-0 flex flex-col justify-between p-6 overflow-hidden bg-neutral-950">
-          
+
           {/* Image d'illustration de fond avec overlay sombre */}
           <div className="absolute inset-0 z-0">
-            <img 
-              src={activeTrend.image} 
-              alt={activeTrend.title} 
-              className="w-full h-full object-cover opacity-60 filter blur-[1px]" 
+            <img
+              src={activeTrend.image}
+              alt={activeTrend.title}
+              className="w-full h-full object-cover opacity-60 filter blur-[1px]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/40 to-neutral-950/60" />
           </div>
 
           {/* Top Actions Row */}
           <div className="flex justify-between items-center w-full relative z-10">
-            <button 
+            <button
               onClick={handleClose}
               className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-md"
             >
@@ -106,13 +104,13 @@ export default function TrendDetailModal() {
                 {activeTrend.status}
               </span>
             </div>
-            <button 
+            <button
               onClick={() => setIsBookmarked(!isBookmarked)}
               className="w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-100 rounded-full transition-colors shadow-md"
             >
-              <Icon 
-                icon={isBookmarked ? "mdi:bookmark" : "mdi:bookmark-outline"} 
-                className={`text-xl ${isBookmarked ? 'text-blue-600' : 'text-gray-800'}`} 
+              <Icon
+                icon={isBookmarked ? "mdi:bookmark" : "mdi:bookmark-outline"}
+                className={`text-xl ${isBookmarked ? 'text-blue-600' : 'text-gray-800'}`}
               />
             </button>
           </div>
@@ -123,7 +121,7 @@ export default function TrendDetailModal() {
 
         {/* Bottom Sheet - White Container with Details */}
         <div className="flex-1 bg-white rounded-t-[32px] -mt-6 relative z-20 px-6 py-6 overflow-y-auto pb-12 flex flex-col gap-6">
-          
+
           {/* Subtitle / Timeline details */}
           <div>
             <p className="font-inter text-xs font-medium text-gray-400 uppercase tracking-widest mb-1.5">
@@ -154,8 +152,8 @@ export default function TrendDetailModal() {
             </h3>
             <div className="flex flex-wrap gap-2.5">
               {activeTrend.platforms.map((platform: string, i: number) => (
-                <span 
-                  key={i} 
+                <span
+                  key={i}
                   className="px-4 py-2 bg-white text-gray-800 font-inter text-sm font-semibold rounded-xl border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
                 >
                   {platform}
@@ -224,7 +222,7 @@ export default function TrendDetailModal() {
                   </p>
                 </div>
               ))}
-              
+
               {/* Extra stats to make the grid look beautiful and complete like the mockup */}
               <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
                 <p className="font-syne font-black text-3xl text-blue-600 tracking-tight mb-1">
