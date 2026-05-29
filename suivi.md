@@ -41,6 +41,18 @@
   - Restauration de la navigation interne (`BottomNav`) en liens natifs et instantanés pour maximiser la vitesse d'expérience utilisateur.
 
 
+- **29 Mai 2026** : Illustrations visuelles pour les tendances :
+  - Ajout d'un attribut `image: string` à l'interface `Trend` dans les mocks.
+  - Enrichissement des objets mocks avec des URLs d'images d'illustrations haute définition (Unsplash) thématisées selon chaque catégorie de tendance.
+  - Mise à jour de `ExplorerTrendCard` pour afficher l'image réelle dans la vignette avec un effet de micro-zoom survolé, en remplacement du fond noir temporaire.
+  - Intégration de l'image de tendance en arrière-plan de la bannière dans `TrendDetailModal` (avec un filtre de flou subtil et un dégradé de noir progressif pour maximiser le contraste des boutons).
+
+
+- **29 Mai 2026** : Transitions fluides inter-pages (PageAnimate) :
+  - Création du composant `PageAnimate` détectant les changements d'URLs.
+  - Application d'une animation d'entrée ultra-fluide mêlant fondu (`opacity`), défilement vers le haut (`translate-y-4` vers `translate-y-0`) et léger flou artistique sortant (`blur-sm` vers `blur-none`) en 300ms à chaque navigation.
+
+
 ## Bugs Fixés
 
 - **29 Mai 2026** : Correction de l'interstice blanc sub-pixel séparant les deux volets de découpe diagonale en appliquant un chevauchement de `101%` sur le polygone haut-gauche.
@@ -48,3 +60,5 @@
 - **29 Mai 2026** : Résolution de la pixellisation de l'image de chargement sur PC/Desktop en remplaçant le fichier raster `loading.png` par sa version vectorielle `loading.svg` pour assurer une netteté absolue sur tous les écrans.
 
 - **29 Mai 2026** : Résolution de l'erreur de compilation TypeScript (indexation implicite 'any') sur Vercel dans `TrendDetailModal.tsx` en important et appliquant le type d'interface strict `Trend` au lieu de `any` pour l'état `activeTrend`.
+
+- **29 Mai 2026** : Correction définitive du scintillement (flash) lors des transitions inter-pages. L'état réactif de visibilité est désormais mis à jour de manière synchrone pendant la phase de render (React State Adjustment) dès qu'un changement d'URL est détecté, empêchant la nouvelle page de s'afficher brièvement à 100% d'opacité avant de s'animer.

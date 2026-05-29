@@ -57,8 +57,12 @@ export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
         </div>
 
         {/* Vignette */}
-        <div className="flex-shrink-0 w-20 h-20 bg-[var(--color-text-dark)] rounded-xl overflow-hidden">
-          {/* Placeholder — sera remplacé par une vraie image */}
+        <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-xl overflow-hidden relative">
+          <img 
+            src={trend.image} 
+            alt={trend.title} 
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
         </div>
       </div>
     </Link>

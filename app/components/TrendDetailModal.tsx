@@ -77,12 +77,23 @@ export default function TrendDetailModal() {
       }`}>
         
         {/* Top Dark Cover Image/Vibe Section */}
-        <div className="relative bg-neutral-950 h-44 flex-shrink-0 flex flex-col justify-between p-6">
+        <div className="relative h-44 flex-shrink-0 flex flex-col justify-between p-6 overflow-hidden bg-neutral-950">
+          
+          {/* Image d'illustration de fond avec overlay sombre */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={activeTrend.image} 
+              alt={activeTrend.title} 
+              className="w-full h-full object-cover opacity-60 filter blur-[1px]" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/40 to-neutral-950/60" />
+          </div>
+
           {/* Top Actions Row */}
-          <div className="flex justify-between items-center w-full">
+          <div className="flex justify-between items-center w-full relative z-10">
             <button 
               onClick={handleClose}
-              className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-md"
             >
               <Icon icon="mdi:arrow-left" className="text-xl text-white" />
             </button>
@@ -97,7 +108,7 @@ export default function TrendDetailModal() {
             </div>
             <button 
               onClick={() => setIsBookmarked(!isBookmarked)}
-              className="w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-100 rounded-full transition-colors"
+              className="w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-100 rounded-full transition-colors shadow-md"
             >
               <Icon 
                 icon={isBookmarked ? "mdi:bookmark" : "mdi:bookmark-outline"} 

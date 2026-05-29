@@ -15,6 +15,7 @@ export interface Trend {
   ageRange: string;
   platforms: string[];
   badges: string[];
+  image: string; // URL de l'illustration
   stats: {
     label: string;
     value: string;
@@ -39,6 +40,7 @@ export const mockTrends: Trend[] = [
     ageRange: "13 - 24 ans",
     platforms: ["TikTok", "Instagram", "Pinterest"],
     badges: ["Mode"],
+    image: "/img_trends/six_seven.png",
     stats: [
       { label: "Vues TikTok", value: "4.2B" },
       { label: "Croissance", value: "+400%" }
@@ -61,6 +63,7 @@ export const mockTrends: Trend[] = [
     ageRange: "13 - 24 ans",
     platforms: ["TikTok", "Instagram"],
     badges: ["Food"],
+    image: "/img_trends/tasty_crousty.png",
     stats: [
       { label: "Mentions Instagram", value: "1.8M" },
       { label: "Engagement", value: "Très Fort" }
@@ -83,6 +86,7 @@ export const mockTrends: Trend[] = [
     ageRange: "18 - 35 ans",
     platforms: ["YouTube", "Pinterest"],
     badges: ["Mode", "Lifestyle"],
+    image: "/img_trends/matcha_coded.png",
     stats: [
       { label: "Recherches Google", value: "+300%" },
       { label: "Viralité", value: "Modérée" }
@@ -105,6 +109,7 @@ export const mockTrends: Trend[] = [
     ageRange: "22 - 38 ans",
     platforms: ["TikTok", "Instagram"],
     badges: ["Mode"],
+    image: "/img_trends/old_money_aesthetic.png",
     stats: [
       { label: "Mentions", value: "3.2M" },
       { label: "Croissance", value: "+150%" }
@@ -127,6 +132,7 @@ export const mockTrends: Trend[] = [
     ageRange: "18 - 30 ans",
     platforms: ["Pinterest", "Instagram"],
     badges: ["Mode", "Lifestyle"],
+    image: "/img_trends/cottagecore_revival.png",
     stats: [
       { label: "Recherches Google", value: "+200%" },
       { label: "Communauté Reddit", value: "450K" }
@@ -149,6 +155,7 @@ export const mockTrends: Trend[] = [
     ageRange: "20 - 35 ans",
     platforms: ["Instagram", "Pinterest"],
     badges: ["Mode"],
+    image: "/img_trends/gorpcore.png",
     stats: [
       { label: "Vues Pinterest", value: "890M" },
       { label: "Croissance", value: "+80%" }
