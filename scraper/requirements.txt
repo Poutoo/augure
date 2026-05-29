@@ -1,0 +1,5 @@
+praw>=7.7.1
+pytrends-modern
+psycopg[binary]
+SQLAlchemy>=2.0.30
+python-dotenv>=1.0.1
