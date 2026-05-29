@@ -1,0 +1,19 @@
+{
+  "name": "Augure - Analyse Culturelle",
+  "short_name": "Augure",
+  "description": "Décryptez les micro-tendances web et ne vous sentez plus jamais en décalage culturel.",
+  "categories": ["education", "social", "utilities"],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F7FA",
+  "theme_color": "#4127FF",
+  "icons": [
+    {
+      "src": "/loading.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

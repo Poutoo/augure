@@ -53,6 +53,12 @@
   - Application d'une animation d'entrée ultra-fluide mêlant fondu (`opacity`), défilement vers le haut (`translate-y-4` vers `translate-y-0`) et léger flou artistique sortant (`blur-sm` vers `blur-none`) en 300ms à chaque navigation.
 
 
+- **29 Mai 2026** : Transformation en PWA (Progressive Web App) :
+  - Configuration de la dépendance `@ducanh2912/next-pwa` dans `next.config.ts` pour générer automatiquement le Service Worker et gérer la mise en cache hors ligne en production.
+  - Création du manifeste d'application [manifest.json](file:///c:/Users/thiba/Desktop/Code/B3DEV/augure/app/public/manifest.json) déclarant les couleurs de thème (`#4127FF`), le démarrage autonome (`standalone`) et les icônes.
+  - Déclaration des balises meta de PWA compatibles iOS (Apple Web App) et Android directement dans les métadonnées de Next.js (`layout.tsx`).
+
+
 ## Bugs Fixés
 
 - **29 Mai 2026** : Correction de l'interstice blanc sub-pixel séparant les deux volets de découpe diagonale en appliquant un chevauchement de `101%` sur le polygone haut-gauche.
