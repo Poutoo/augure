@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { mockTrends, TrendStatus } from '@/lib/mocks';
+import { mockTrends, TrendStatus, Trend } from '@/lib/mocks';
 import { useEffect, useState } from 'react';
 
 const statusConfig: Record<TrendStatus, { label: string; icon: string; color: string; bg: string }> = {
@@ -17,7 +17,7 @@ export default function TrendDetailModal() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [activeTrend, setActiveTrend] = useState<any>(null);
+  const [activeTrend, setActiveTrend] = useState<Trend | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 

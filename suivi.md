@@ -46,3 +46,5 @@
 - **29 Mai 2026** : Correction de l'interstice blanc sub-pixel séparant les deux volets de découpe diagonale en appliquant un chevauchement de `101%` sur le polygone haut-gauche.
 
 - **29 Mai 2026** : Résolution de la pixellisation de l'image de chargement sur PC/Desktop en remplaçant le fichier raster `loading.png` par sa version vectorielle `loading.svg` pour assurer une netteté absolue sur tous les écrans.
+
+- **29 Mai 2026** : Résolution de l'erreur de compilation TypeScript (indexation implicite 'any') sur Vercel dans `TrendDetailModal.tsx` en important et appliquant le type d'interface strict `Trend` au lieu de `any` pour l'état `activeTrend`.
