@@ -13,6 +13,7 @@ export interface Trend {
   status: TrendStatus;
   region: string;
   ageRange: string;
+  platforms: string[];
   badges: string[];
   stats: {
     label: string;
@@ -36,6 +37,7 @@ export const mockTrends: Trend[] = [
     status: "Viral",
     region: "Monde",
     ageRange: "13 - 24 ans",
+    platforms: ["TikTok", "Instagram", "Pinterest"],
     badges: ["Mode"],
     stats: [
       { label: "Vues TikTok", value: "4.2B" },
@@ -57,6 +59,7 @@ export const mockTrends: Trend[] = [
     status: "Émergent",
     region: "France",
     ageRange: "13 - 24 ans",
+    platforms: ["TikTok", "Instagram"],
     badges: ["Food"],
     stats: [
       { label: "Mentions Instagram", value: "1.8M" },
@@ -78,6 +81,7 @@ export const mockTrends: Trend[] = [
     status: "En hausse",
     region: "États-Unis",
     ageRange: "18 - 35 ans",
+    platforms: ["YouTube", "Pinterest"],
     badges: ["Mode", "Lifestyle"],
     stats: [
       { label: "Recherches Google", value: "+300%" },
@@ -99,6 +103,7 @@ export const mockTrends: Trend[] = [
     status: "En hausse",
     region: "Europe",
     ageRange: "22 - 38 ans",
+    platforms: ["TikTok", "Instagram"],
     badges: ["Mode"],
     stats: [
       { label: "Mentions", value: "3.2M" },
@@ -120,6 +125,7 @@ export const mockTrends: Trend[] = [
     status: "Émergent",
     region: "Global",
     ageRange: "18 - 30 ans",
+    platforms: ["Pinterest", "Instagram"],
     badges: ["Mode", "Lifestyle"],
     stats: [
       { label: "Recherches Google", value: "+200%" },
@@ -141,6 +147,7 @@ export const mockTrends: Trend[] = [
     status: "Stable",
     region: "Global",
     ageRange: "20 - 35 ans",
+    platforms: ["Instagram", "Pinterest"],
     badges: ["Mode"],
     stats: [
       { label: "Vues Pinterest", value: "890M" },
