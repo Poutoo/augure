@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import bcrypt
 from fastapi import HTTPException, status
 from jose import jwt
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -36,10 +37,19 @@ def register_user(payload: RegisterRequest, db: Session) -> User:
             status_code=status.HTTP_409_CONFLICT,
             detail="An account with this email already exists",
         )
+    if payload.username:
+        taken = db.query(User).filter(
+            func.lower(User.username) == payload.username.strip().lower()
+        ).first()
+        if taken:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Ce pseudo est déjà utilisé",
+            )
     user = User(
         email=payload.email.lower(),
         hashed_password=hash_password(payload.password),
-        username=payload.username,
+        username=payload.username.strip() if payload.username else None,
     )
     db.add(user)
     db.commit()

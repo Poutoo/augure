@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models import Interest, User
-from app.schemas import OnboardingRequest
+from app.schemas import OnboardingRequest, PlanRequest
 
 
 def save_onboarding(user_id: uuid.UUID, payload: OnboardingRequest, db: Session) -> User:
@@ -29,6 +29,16 @@ def save_onboarding(user_id: uuid.UUID, payload: OnboardingRequest, db: Session)
     user.target_gender    = payload.target_gender
     user.interests        = interests
 
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def save_plan(user_id: uuid.UUID, payload: PlanRequest, db: Session) -> User:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    user.plan = payload.plan
     db.commit()
     db.refresh(user)
     return user

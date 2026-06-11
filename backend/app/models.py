@@ -68,7 +68,8 @@ class User(Base):
         String(254), unique=True, nullable=False, index=True
     )
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    username: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    username: Mapped[str | None] = mapped_column(String(100), nullable=True, unique=True)
+    plan: Mapped[str] = mapped_column(String(20), nullable=False, server_default="standard")
 
     role: Mapped[UserRole | None] = mapped_column(
         Enum(UserRole, name="user_role"), nullable=True

@@ -48,7 +48,7 @@ export default function Header() {
     <header className="flex items-start justify-between px-4 pt-6 pb-2 md:px-8">
       <div>
         <Link href="/" className="flex items-center gap-0.5">
-          <Image src="/logo.svg" alt="Augure" width={110} height={26} priority style={{ height: 'auto' }} />
+          <Image src="/logo-black.svg" alt="Augure" width={110} height={26} priority style={{ height: 'auto' }} />
         </Link>
         <p className="font-inter text-sm text-gray-500 mt-0.5 ml-0.5">Découvrez ce qui buzz</p>
       </div>

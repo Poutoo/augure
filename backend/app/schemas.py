@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -69,11 +70,16 @@ class InterestSchema(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PlanRequest(BaseModel):
+    plan: Literal["standard", "pro"]
+
+
 class OnboardingResponse(BaseModel):
     id: uuid.UUID
     email: str
     username: str | None
     role: UserRole
+    plan: str
     target_ages: list | None
     target_networks: list | None
     target_geography: list | None
