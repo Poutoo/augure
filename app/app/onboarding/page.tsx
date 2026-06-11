@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { apiRegister, apiLogin, apiSaveOnboarding, apiSavePlan } from "@/lib/api";
+import Image from "next/image";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -437,10 +438,8 @@ export default function OnboardingPage() {
           {/* STEP 7 – Succès */}
           {step === 7 && (
             <div className="flex-1 flex flex-col">
-              <div className="text-center mb-6">
-                <span className="font-syne font-bold text-4xl text-[var(--color-text-dark)]" style={{ letterSpacing: "-0.02em" }}>
-                  AUGURE.
-                </span>
+              <div className="flex justify-center mb-6">
+                <Image src="/logo-black.svg" alt="Augure" width={240} height={26} priority style={{ height: 'auto' }} />
               </div>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-3">
                 Votre espace est prêt.
@@ -450,8 +449,8 @@ export default function OnboardingPage() {
                 Les tendances qui comptent pour vous apparaissent en premier.
               </p>
               <div className="flex justify-center mb-8">
-                <div className="w-24 h-24 rounded-[22px] bg-gradient-to-br from-gray-600 to-black shadow-xl relative">
-                  <Icon icon="mdi:star-four-points" className="absolute -top-2 -left-2 text-2xl text-black" />
+                <div className="w-24 h-24 rounded-[22px] bg-gradient-to-br from-gray-300 to-black shadow-xl relative">
+                  <Icon icon="mdi:star-four-points" className="absolute -top-4 -left-1 text-4xl text-black" />
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-200 overflow-hidden">
@@ -586,20 +585,31 @@ export default function OnboardingPage() {
               {" "}pour un accès illimité
             </p>
             <button
-              onClick={() => { setPlan("pro"); setStep(6); }}
+              onClick={async () => {
+                const chosen = plan === "standard" ? "standard" : "pro";
+                if (chosen === "pro") {
+                  setPlan("pro");
+                  setStep(6);
+                } else {
+                  await callSavePlan("standard");
+                  setStep(7);
+                }
+              }}
               className="w-full py-4 rounded-full bg-white text-black font-syne font-bold text-sm hover:opacity-90 transition-opacity mb-3"
             >
-              Continuez avec Pro
+              {plan === "standard" ? "Continuer gratuitement" : "Continuez avec Pro"}
             </button>
             <p className="font-inter text-xs text-white/40 text-center mb-5">
-              Changez ou annulez à tout moment
+              {plan === "standard" ? "Passez à Pro à tout moment" : "Changez ou annulez à tout moment"}
             </p>
-            <button
-              onClick={async () => { setPlan("standard"); await callSavePlan("standard"); setStep(7); }}
-              className="w-full font-inter text-xs text-white/40 hover:text-white/70 transition-colors text-center mb-6"
-            >
-              Continuer avec Standard (gratuit)
-            </button>
+            {plan !== "standard" && (
+              <button
+                onClick={async () => { setPlan("standard"); await callSavePlan("standard"); setStep(7); }}
+                className="w-full font-inter text-xs text-white/40 hover:text-white/70 transition-colors text-center mb-6"
+              >
+                Continuer avec Standard (gratuit)
+              </button>
+            )}
             <div className="flex justify-center gap-6">
               {["Abonnement", "Termes", "Privacy"].map(l => (
                 <span key={l} className="font-inter text-xs text-white/25">{l}</span>
