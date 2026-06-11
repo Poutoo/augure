@@ -21,6 +21,7 @@ export default function LoginPage() {
     try {
       const { access_token } = await apiLogin(email, password);
       localStorage.setItem("augure_token", access_token);
+      document.cookie = "augure_session=1; path=/; SameSite=Lax";
       router.push("/");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Erreur de connexion");
