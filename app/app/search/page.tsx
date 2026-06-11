@@ -1,29 +1,39 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
-import { mockTrends, TrendCategory } from '@/lib/mocks';
+import { ApiTrend, apiGetAllTrends } from '@/lib/api';
 import ExplorerTrendCard from '@/components/ExplorerTrendCard';
 
-const CATEGORIES: (TrendCategory | 'Tous')[] = ['Tous', 'Mode', 'Food', 'Musique', 'Art', 'Tech', 'Lifestyle'];
+const CATEGORIES = ['Tous', 'Mode', 'Food', 'Musique', 'Art', 'Tech', 'Lifestyle'];
 
 type SortMode = 'default' | 'asc' | 'desc';
 
 export default function SearchPage() {
-  const [activeCategory, setActiveCategory] = useState<TrendCategory | 'Tous'>('Tous');
+  const [activeCategory, setActiveCategory] = useState<string>('Tous');
   const [sortMode, setSortMode] = useState<SortMode>('default');
   const [query, setQuery] = useState('');
+  const [trends, setTrends] = useState<ApiTrend[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiGetAllTrends({ limit: 100 })
+      .then(d => setTrends(d.items))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filteredTrends = useMemo(() => {
     let result = activeCategory === 'Tous'
-      ? [...mockTrends]
-      : mockTrends.filter(t => t.category === activeCategory);
+      ? [...trends]
+      : trends.filter(t => t.category?.toLowerCase() === activeCategory.toLowerCase());
 
     if (query.trim()) {
+      const q = query.toLowerCase();
       result = result.filter(t =>
-        t.title.toLowerCase().includes(query.toLowerCase()) ||
-        t.category.toLowerCase().includes(query.toLowerCase())
+        t.title.toLowerCase().includes(q) ||
+        (t.category ?? '').toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q)
       );
     }
 
@@ -31,23 +41,18 @@ export default function SearchPage() {
     if (sortMode === 'desc') result.sort((a, b) => b.title.localeCompare(a.title));
 
     return result;
-  }, [activeCategory, sortMode, query]);
+  }, [trends, activeCategory, sortMode, query]);
 
   const toggleSort = () => {
     setSortMode(prev => prev === 'default' ? 'asc' : prev === 'asc' ? 'desc' : 'default');
   };
 
-  const sortLabel: Record<SortMode, string> = {
-    default: 'Trier',
-    asc: 'A → Z',
-    desc: 'Z → A',
-  };
+  const sortLabel: Record<SortMode, string> = { default: 'Trier', asc: 'A → Z', desc: 'Z → A' };
 
   return (
     <main className="w-full min-h-screen overflow-x-hidden">
       <div className="max-w-2xl mx-auto md:max-w-full">
 
-        {/* ── Header ── */}
         <div className="flex items-center gap-3 px-4 pt-6 pb-4 md:px-8">
           <Link href="/" className="w-9 h-9 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors flex-shrink-0">
             <Icon icon="mdi:arrow-left" className="text-xl text-[var(--color-text-dark)]" />
@@ -55,7 +60,6 @@ export default function SearchPage() {
           <h1 className="font-syne font-bold text-2xl text-[var(--color-text-dark)]">Tendances</h1>
         </div>
 
-        {/* ── Barre de recherche ── */}
         <div className="px-4 md:px-8 mb-4">
           <div className="flex items-center bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 gap-2 focus-within:border-[var(--color-primary)]/40 transition-all">
             <Icon icon="mdi:magnify" className="text-lg text-gray-400 flex-shrink-0" />
@@ -74,7 +78,6 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* ── Onglets catégories ── */}
         <div className="flex gap-0 overflow-x-auto scrollbar-hide px-4 md:px-8 border-b border-gray-100">
           {CATEGORIES.map(cat => {
             const active = activeCategory === cat;
@@ -82,11 +85,7 @@ export default function SearchPage() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-4 py-3 font-syne font-semibold text-sm border-b-2 transition-all whitespace-nowrap ${
-                  active
-                    ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
-                    : 'border-transparent text-gray-400 hover:text-gray-700'
-                }`}
+                className={`flex-shrink-0 px-4 py-3 font-syne font-semibold text-sm border-b-2 transition-all whitespace-nowrap ${active ? 'border-[var(--color-primary)] text-[var(--color-primary)]' : 'border-transparent text-gray-400 hover:text-gray-700'}`}
               >
                 {cat}
               </button>
@@ -94,10 +93,9 @@ export default function SearchPage() {
           })}
         </div>
 
-        {/* ── Compteur + Tri ── */}
         <div className="flex items-center justify-between px-4 md:px-8 py-3">
           <p className="font-inter text-sm text-gray-500">
-            <span className="font-semibold text-[var(--color-text-dark)]">{filteredTrends.length}</span> tendance{filteredTrends.length > 1 ? 's' : ''} trouvée{filteredTrends.length > 1 ? 's' : ''}
+            {loading ? '…' : <><span className="font-semibold text-[var(--color-text-dark)]">{filteredTrends.length}</span> tendance{filteredTrends.length > 1 ? 's' : ''} trouvée{filteredTrends.length > 1 ? 's' : ''}</>}
           </p>
           <button
             onClick={toggleSort}
@@ -108,12 +106,13 @@ export default function SearchPage() {
           </button>
         </div>
 
-        {/* ── Liste des tendances ── */}
         <div className="px-4 md:px-8 pb-10">
-          {filteredTrends.length > 0 ? (
-            filteredTrends.map(trend => (
-              <ExplorerTrendCard key={trend.id} trend={trend} />
-            ))
+          {loading ? (
+            <div className="flex flex-col gap-4 pt-4">
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-24 rounded-2xl bg-gray-100 animate-pulse" />)}
+            </div>
+          ) : filteredTrends.length > 0 ? (
+            filteredTrends.map(trend => <ExplorerTrendCard key={trend.id} trend={trend} />)
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Icon icon="mdi:magnify-close" className="text-5xl text-gray-200 mb-4" />

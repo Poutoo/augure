@@ -9,9 +9,13 @@ const navItems = [
   { href: '/search', label: 'Explorer', iconActive: 'mdi:compass', iconInactive: 'mdi:compass-outline' },
 ];
 
+const HIDDEN_PATHS = ['/welcome', '/login', '/onboarding'];
+
 export default function BottomNav() {
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
+
+  if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
 
   return (
     <>
