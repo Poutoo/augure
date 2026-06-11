@@ -1,36 +1,51 @@
 import os
 import time
+import requests
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
 
 load_dotenv()
 
-def test_db_connection():
-    db_url = os.getenv("DATABASE_URL")
+def test_youtube_api():
+    print("📺 Test de connexion à l'API YouTube...", flush=True)
+    api_key = os.getenv("YOUTUBE_API_KEY")
     
-    if not db_url:
-        print("❌ ERREUR : La variable DATABASE_URL est introuvable.", flush=True)
-        return False
-        
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    if not api_key:
+        print("❌ ERREUR : La clé YOUTUBE_API_KEY est introuvable.", flush=True)
+        return
+
+    # Configuration de la requête API YouTube
+    url = "https://www.googleapis.com/youtube/v3/videos"
+    params = {
+        "part": "snippet,statistics", # On demande le titre (snippet) et les vues (statistics)
+        "chart": "mostPopular",       # Le filtre des tendances
+        "regionCode": "FR",           # Localisation : France
+        "maxResults": 5,              # On limite à 5 pour le test
+        "key": api_key
+    }
 
     try:
-        engine = create_engine(db_url)
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
-            print("✅ SUCCÈS : Connexion à Supabase validée en IPv4 !", flush=True)
-            return True
+        # On envoie la requête à Google
+        response = requests.get(url, params=params)
+        response.raise_for_status() # Déclenche une erreur si la clé est invalide ou le quota dépassé
+        
+        data = response.json()
+        print("✅ SUCCÈS : Voici les 5 vidéos tendances actuelles sur YouTube FR :", flush=True)
+        
+        # On boucle sur les résultats pour les afficher proprement
+        for item in data.get("items", []):
+            title = item["snippet"]["title"]
+            views = item["statistics"].get("viewCount", "0")
+            channel = item["snippet"]["channelTitle"]
+            print(f"   🎬 {title} | 👤 {channel} | 👀 {views} vues", flush=True)
+            
     except Exception as e:
-        print(f"❌ ERREUR de connexion : {e}", flush=True)
-        return False
+        print(f"❌ ERREUR de l'API YouTube : {e}", flush=True)
 
 def main():
-    print("🚀 Démarrage du scraper Augure...", flush=True)
+    print("🚀 Démarrage du scraper Augure (Mode test YouTube)...", flush=True)
 
     while True:
-        print("🔍 Test de connexion en cours...", flush=True)
-        test_db_connection()
+        test_youtube_api()
         print("⏳ En attente pour le prochain cycle (60s)...", flush=True)
         time.sleep(60)
 
