@@ -5,6 +5,7 @@ import BottomNav from "@/components/BottomNav";
 import TrendDetailModal from "@/components/TrendDetailModal";
 import { Suspense } from "react";
 import { PageTransitionProvider } from "@/components/PageTransition";
+import AppShell from "@/components/AppShell";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -48,9 +49,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-syne bg-[var(--color-background-app)] pb-16 md:pb-0 overflow-x-hidden">
         <PageTransitionProvider>
-          <div className="md:ml-20 xl:ml-56 flex-1 flex flex-col">
+          <AppShell>
             {children}
-          </div>
+          </AppShell>
           <Suspense fallback={null}>
             <TrendDetailModal />
           </Suspense>
@@ -60,5 +61,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

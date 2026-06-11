@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Icon } from '@iconify/react';
 
 export default function Header() {
   return (
@@ -13,12 +12,13 @@ export default function Header() {
       </div>
 
       {/* Avatar utilisateur */}
-      <button
-        className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-white font-syne font-bold text-sm flex items-center justify-center shadow-md flex-shrink-0"
-        aria-label="Profil utilisateur"
+      <Link
+        href="/onboarding"
+        className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-white font-syne font-bold text-sm flex items-center justify-center shadow-md flex-shrink-0 hover:opacity-80 transition-opacity"
+        aria-label="Créer ou configurer mon profil"
       >
         JD
-      </button>
+      </Link>
     </header>
   );
 }
