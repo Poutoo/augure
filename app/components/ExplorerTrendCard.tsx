@@ -7,11 +7,11 @@ interface ExplorerTrendCardProps {
 }
 
 const statusConfig: Record<TrendStatus, { label: string; icon: string; color: string }> = {
-  'Viral':      { label: 'Viral',      icon: 'mdi:arrow-up-bold',   color: 'text-[var(--color-secondary-green)]' },
-  'Émergent':   { label: 'Émergent',   icon: 'mdi:arrow-up-bold',   color: 'text-[var(--color-secondary-green)]' },
-  'En hausse':  { label: 'En hausse',  icon: 'mdi:arrow-up-bold',   color: 'text-[var(--color-secondary-green)]' },
+  'Viral':      { label: 'Viral',      icon: 'mdi:arrow-up-bold',   color: 'text-[var(--color-text-dark)]' },
+  'Émergent':   { label: 'Émergent',   icon: 'mdi:arrow-up-bold',   color: 'text-[var(--color-text-dark)]' },
+  'En hausse':  { label: 'En hausse',  icon: 'mdi:arrow-up-bold',   color: 'text-[var(--color-text-dark)]' },
   'Stable':     { label: 'Stable',     icon: 'mdi:arrow-right-bold', color: 'text-gray-500' },
-  'En baisse':  { label: 'En baisse',  icon: 'mdi:arrow-down-bold', color: 'text-red-500' },
+  'En baisse':  { label: 'En baisse',  icon: 'mdi:arrow-down-bold', color: 'text-gray-500' },
 };
 
 export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {

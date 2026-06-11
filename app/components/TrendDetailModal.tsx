@@ -6,11 +6,11 @@ import { mockTrends, TrendStatus, Trend } from '@/lib/mocks';
 import { useEffect, useState } from 'react';
 
 const statusConfig: Record<TrendStatus, { label: string; icon: string; color: string; bg: string }> = {
-  'Viral': { label: 'Viral', icon: 'mdi:fire', color: 'text-emerald-500', bg: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-  'Émergent': { label: 'Émergent', icon: 'mdi:trending-up', color: 'text-emerald-500', bg: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-  'En hausse': { label: 'En hausse', icon: 'mdi:arrow-up-bold', color: 'text-emerald-500', bg: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+  'Viral': { label: 'Viral', icon: 'mdi:fire', color: 'text-[var(--color-text-dark)]', bg: 'bg-gray-100 text-gray-700 border-gray-200' },
+  'Émergent': { label: 'Émergent', icon: 'mdi:trending-up', color: 'text-[var(--color-text-dark)]', bg: 'bg-gray-100 text-gray-700 border-gray-200' },
+  'En hausse': { label: 'En hausse', icon: 'mdi:arrow-up-bold', color: 'text-[var(--color-text-dark)]', bg: 'bg-gray-100 text-gray-700 border-gray-200' },
   'Stable': { label: 'Stable', icon: 'mdi:arrow-right-bold', color: 'text-gray-500', bg: 'bg-gray-50 text-gray-700 border-gray-100' },
-  'En baisse': { label: 'En baisse', icon: 'mdi:arrow-down-bold', color: 'text-red-500', bg: 'bg-red-50 text-red-700 border-red-100' },
+  'En baisse': { label: 'En baisse', icon: 'mdi:arrow-down-bold', color: 'text-gray-500', bg: 'bg-gray-50 text-gray-700 border-gray-100' },
 };
 
 export default function TrendDetailModal() {
@@ -96,10 +96,10 @@ export default function TrendDetailModal() {
               <Icon icon="mdi:arrow-left" className="text-xl text-white" />
             </button>
             <div className="flex items-center gap-2">
-              <span className="px-3.5 py-1.5 bg-blue-600 text-white font-syne font-bold text-xs rounded-full uppercase tracking-wider">
+              <span className="px-3.5 py-1.5 bg-[var(--color-text-dark)] text-white font-syne font-bold text-xs rounded-full uppercase tracking-wider">
                 {activeTrend.category}
               </span>
-              <span className="px-3.5 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 font-syne font-bold text-xs rounded-full flex items-center gap-1">
+              <span className="px-3.5 py-1.5 bg-white/20 text-white border border-white/30 font-syne font-bold text-xs rounded-full flex items-center gap-1">
                 <Icon icon="mdi:trending-up" className="text-sm" />
                 {activeTrend.status}
               </span>
@@ -110,13 +110,13 @@ export default function TrendDetailModal() {
             >
               <Icon
                 icon={isBookmarked ? "mdi:bookmark" : "mdi:bookmark-outline"}
-                className={`text-xl ${isBookmarked ? 'text-blue-600' : 'text-gray-800'}`}
+                className={`text-xl ${isBookmarked ? 'text-[var(--color-text-dark)]' : 'text-gray-800'}`}
               />
             </button>
           </div>
 
           {/* Sparkles / Abstract decoration in background */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-20 bg-emerald-500/10 blur-[80px] pointer-events-none rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-20 bg-white/10 blur-[80px] pointer-events-none rounded-full" />
         </div>
 
         {/* Bottom Sheet - White Container with Details */}
@@ -191,11 +191,11 @@ export default function TrendDetailModal() {
           {/* Comment l'utiliser Section */}
           <div>
             <h3 className="font-syne font-bold text-xl text-gray-900 mb-3 flex items-center gap-2">
-              <Icon icon="mdi:lightbulb-on" className="text-amber-500" /> Comment l'utiliser
+              <Icon icon="mdi:lightbulb-on" className="text-[var(--color-text-dark)]" /> Comment l'utiliser
             </h3>
             <div className="flex flex-col gap-3">
               {activeTrend.usageKeys.map((usage: string, idx: number) => (
-                <div key={idx} className="bg-emerald-50/40 p-4 rounded-2xl border-l-4 border-emerald-500">
+                <div key={idx} className="bg-black/5 p-4 rounded-2xl border-l-4 border-[var(--color-text-dark)]">
                   <p className="font-inter text-sm text-gray-800 leading-relaxed font-medium">
                     {usage}
                   </p>
@@ -214,7 +214,7 @@ export default function TrendDetailModal() {
             <div className="grid grid-cols-2 gap-4">
               {activeTrend.stats.map((stat: any, i: number) => (
                 <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-                  <p className="font-syne font-black text-3xl text-blue-600 tracking-tight mb-1">
+                  <p className="font-syne font-black text-3xl text-[var(--color-text-dark)] tracking-tight mb-1">
                     {stat.value}
                   </p>
                   <p className="font-inter text-xs text-gray-400 leading-tight">
@@ -225,7 +225,7 @@ export default function TrendDetailModal() {
 
               {/* Extra stats to make the grid look beautiful and complete like the mockup */}
               <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-                <p className="font-syne font-black text-3xl text-blue-600 tracking-tight mb-1">
+                <p className="font-syne font-black text-3xl text-[var(--color-text-dark)] tracking-tight mb-1">
                   18
                 </p>
                 <p className="font-inter text-xs text-gray-400 leading-tight">
@@ -233,7 +233,7 @@ export default function TrendDetailModal() {
                 </p>
               </div>
               <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-                <p className="font-syne font-black text-3xl text-blue-600 tracking-tight mb-1">
+                <p className="font-syne font-black text-3xl text-[var(--color-text-dark)] tracking-tight mb-1">
                   72%
                 </p>
                 <p className="font-inter text-xs text-gray-400 leading-tight">

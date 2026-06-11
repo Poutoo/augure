@@ -49,7 +49,7 @@ export default function Home() {
 
         {/* ── Pour votre audience ── */}
         <section className="mt-8 px-4 md:px-8">
-          <h2 className="font-syne font-bold text-xl text-[#E8A020] mb-3">Pour votre audience</h2>
+          <h2 className="font-syne font-bold text-xl text-[var(--color-text-dark)] mb-3">Pour votre audience</h2>
           <div className="flex flex-col gap-3">
             {audienceTrends.map((trend) => (
               <TrendListItem key={trend.id} trend={trend} />

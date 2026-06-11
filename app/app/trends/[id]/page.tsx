@@ -45,7 +45,7 @@ export default async function TrendDetailPage({ params }: { params: Promise<{ id
 
           <div className="grid grid-cols-2 gap-4 mb-8">
             {trend.stats.map((stat, i) => (
-              <div key={i} className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+              <div key={i} className="bg-black/5 p-4 rounded-2xl border border-black/10">
                 <p className="font-inter text-sm text-gray-500 mb-1">{stat.label}</p>
                 <p className="font-syne font-bold text-2xl text-[var(--color-primary)]">{stat.value}</p>
               </div>
@@ -54,7 +54,7 @@ export default async function TrendDetailPage({ params }: { params: Promise<{ id
 
           <section className="mb-8">
             <h3 className="font-syne font-bold text-xl text-[var(--color-text-dark)] mb-3 flex items-center gap-2">
-              <Icon icon="mdi:book-open-variant" className="text-[var(--color-secondary-red)]" /> Signification
+              <Icon icon="mdi:book-open-variant" className="text-[var(--color-text-dark)]" /> Signification
             </h3>
             <p className="font-inter text-gray-700 leading-relaxed text-lg">
               {trend.signification}
@@ -63,7 +63,7 @@ export default async function TrendDetailPage({ params }: { params: Promise<{ id
 
           <section className="mb-8 bg-[var(--color-background-app)] p-5 rounded-2xl">
             <h3 className="font-syne font-bold text-xl text-[var(--color-text-dark)] mb-3 flex items-center gap-2">
-              <Icon icon="mdi:earth" className="text-[var(--color-secondary-green)]" /> Contexte & Origine
+              <Icon icon="mdi:earth" className="text-[var(--color-text-dark)]" /> Contexte & Origine
             </h3>
             <p className="font-inter text-gray-700 leading-relaxed">
               {trend.context}
@@ -72,11 +72,11 @@ export default async function TrendDetailPage({ params }: { params: Promise<{ id
 
           <section className="mb-4">
             <h3 className="font-syne font-bold text-xl text-[var(--color-text-dark)] mb-3 flex items-center gap-2">
-              <Icon icon="mdi:lightbulb-on" className="text-yellow-500" /> Comment l'utiliser
+              <Icon icon="mdi:lightbulb-on" className="text-[var(--color-text-dark)]" /> Comment l'utiliser
             </h3>
             <div className="flex flex-col gap-3">
               {trend.usageKeys.map((usage, idx) => (
-                <div key={idx} className="bg-green-50/70 p-4 rounded-xl border-l-4 border-[var(--color-secondary-green)]">
+                <div key={idx} className="bg-black/5 p-4 rounded-xl border-l-4 border-[var(--color-text-dark)]">
                   <p className="font-syne font-medium text-gray-800 italic">{usage}</p>
                 </div>
               ))}

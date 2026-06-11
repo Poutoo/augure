@@ -3,12 +3,7 @@
 @theme inline {
   --color-background-app: #F7F7FA;
   --color-text-dark: #0C0C0E;
-  --color-primary: #4127FF;
-  --color-secondary-red: #FF0000;
-  --color-secondary-green: #00A64E;
-  --color-card-dark: #0D1F17;
-  --color-card-dark-2: #0F2D1E;
-
+  --color-primary: #0C0C0E;
   --font-syne: var(--font-syne);
   --font-inter: var(--font-inter);
 }

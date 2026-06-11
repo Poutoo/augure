@@ -35,7 +35,7 @@ export default function SearchBar() {
       {/* Bouton Filtres — largeur fixe, ne se réduit pas */}
       <button
         type="button"
-        className="flex-none px-4 py-3 bg-[var(--color-primary)] text-white font-syne font-semibold text-sm rounded-xl hover:bg-[#3318dd] active:scale-95 transition-all whitespace-nowrap"
+        className="flex-none px-4 py-3 bg-[var(--color-text-dark)] text-white font-syne font-semibold text-sm rounded-xl hover:bg-black active:scale-95 transition-all whitespace-nowrap"
         onClick={() => router.push('/search')}
       >
         Filtres

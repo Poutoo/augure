@@ -7,11 +7,11 @@ interface TrendListItemProps {
 }
 
 const statusConfig: Record<TrendStatus, { label: string; icon: string; color: string }> = {
-  'Viral': { label: 'Viral', icon: 'mdi:fire', color: 'text-red-500' },
-  'Émergent': { label: 'Émergent', icon: 'mdi:trending-up', color: 'text-[var(--color-secondary-green)]' },
-  'En hausse': { label: 'En hausse', icon: 'mdi:arrow-up-bold', color: 'text-[var(--color-secondary-green)]' },
+  'Viral': { label: 'Viral', icon: 'mdi:fire', color: 'text-[var(--color-text-dark)]' },
+  'Émergent': { label: 'Émergent', icon: 'mdi:trending-up', color: 'text-[var(--color-text-dark)]' },
+  'En hausse': { label: 'En hausse', icon: 'mdi:arrow-up-bold', color: 'text-[var(--color-text-dark)]' },
   'Stable': { label: 'Stable', icon: 'mdi:arrow-right-bold', color: 'text-gray-400' },
-  'En baisse': { label: 'En baisse', icon: 'mdi:arrow-down-bold', color: 'text-red-500' },
+  'En baisse': { label: 'En baisse', icon: 'mdi:arrow-down-bold', color: 'text-gray-400' },
 };
 
 export default function TrendListItem({ trend }: TrendListItemProps) {
