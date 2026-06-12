@@ -18,6 +18,7 @@ def scrape_youtube_and_save():
     print("📺 Récupération et sauvegarde des tendances YouTube...", flush=True)
     
     api_key = os.getenv("YOUTUBE_API_KEY")
+
     db_url = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
     
     if not api_key:
@@ -42,16 +43,17 @@ def scrape_youtube_and_save():
         
         with engine.connect() as connection:
             for item in data.get("items", []):
-                title = item["snippet"]["title"]
 
+                title = item["snippet"]["title"]
                 description = item["snippet"].get("description", "") 
                 views = int(item["statistics"].get("viewCount", 0))
+
                 slug = generate_slug(title)
                 platforms_json = json.dumps(["youtube"])
-                
+
                 query = text("""
-                    INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms)
-                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms)
+                    INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
+                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms, :status)
                     ON CONFLICT (slug) DO UPDATE 
                     SET score_base = EXCLUDED.score_base;
                 """)
@@ -61,10 +63,11 @@ def scrape_youtube_and_save():
                     "title": title,
                     "slug": slug,
                     "description": description,
-                    "context": "",          
+                    "context": "",            
                     "usage_example": "",      
                     "score": views,
-                    "platforms": platforms_json
+                    "platforms": platforms_json,
+                    "status": "pending"       
                 })
                 
             connection.commit()
