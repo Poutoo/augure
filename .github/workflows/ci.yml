@@ -36,7 +36,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+          NEXT_PUBLIC_API_URL: https://auth-augure-production.up.railway.app/api/v1
 
   # ── Backend ─────────────────────────────────────────────────────────────────
   backend:
