@@ -3,6 +3,7 @@ import time
 import re
 import json
 import requests
+import uuid
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
@@ -17,15 +18,12 @@ def scrape_youtube_and_save():
     print("📺 Récupération et sauvegarde des tendances YouTube...", flush=True)
     
     api_key = os.getenv("YOUTUBE_API_KEY")
-
     db_url = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
     
     if not api_key:
         print("❌ ERREUR : Clé YouTube manquante.", flush=True)
         return
 
-
-    url = "https://www.googleapis.com/images/v3/videos"
     url = "https://www.googleapis.com/youtube/v3/videos"
     params = {
         "part": "snippet,statistics",
@@ -50,13 +48,14 @@ def scrape_youtube_and_save():
                 platforms_json = json.dumps(["youtube"])
                 
                 query = text("""
-                    INSERT INTO trends (title, slug, score_base, platforms)
-                    VALUES (:title, :slug, :score, :platforms)
+                    INSERT INTO trends (id, title, slug, score_base, platforms)
+                    VALUES (:id, :title, :slug, :score, :platforms)
                     ON CONFLICT (slug) DO UPDATE 
                     SET score_base = EXCLUDED.score_base;
                 """)
                 
                 connection.execute(query, {
+                    "id": str(uuid.uuid4()),
                     "title": title,
                     "slug": slug,
                     "score": views,
