@@ -3,6 +3,7 @@ import time
 import re
 import json
 import requests
+import uuid
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
@@ -24,8 +25,6 @@ def scrape_youtube_and_save():
         print("❌ ERREUR : Clé YouTube manquante.", flush=True)
         return
 
-
-    url = "https://www.googleapis.com/images/v3/videos"
     url = "https://www.googleapis.com/youtube/v3/videos"
     params = {
         "part": "snippet,statistics",
@@ -39,28 +38,36 @@ def scrape_youtube_and_save():
         response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
-        
+
         engine = create_engine(db_url)
         
         with engine.connect() as connection:
             for item in data.get("items", []):
+
                 title = item["snippet"]["title"]
+                description = item["snippet"].get("description", "") 
                 views = int(item["statistics"].get("viewCount", 0))
+
                 slug = generate_slug(title)
                 platforms_json = json.dumps(["youtube"])
-                
+
                 query = text("""
-                    INSERT INTO trends (title, slug, score_base, platforms)
-                    VALUES (:title, :slug, :score, :platforms)
+                    INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
+                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms, :status)
                     ON CONFLICT (slug) DO UPDATE 
                     SET score_base = EXCLUDED.score_base;
                 """)
                 
                 connection.execute(query, {
+                    "id": str(uuid.uuid4()),
                     "title": title,
                     "slug": slug,
+                    "description": description,
+                    "context": "",            
+                    "usage_example": "",      
                     "score": views,
-                    "platforms": platforms_json
+                    "platforms": platforms_json,
+                    "status": "Viral"       
                 })
                 
             connection.commit()
