@@ -67,7 +67,7 @@ def scrape_youtube_and_save():
                     "usage_example": "",      
                     "score": views,
                     "platforms": platforms_json,
-                    "status": "viral"       
+                    "status": "Viral"       
                 })
                 
             connection.commit()
