@@ -37,19 +37,21 @@ def scrape_youtube_and_save():
         response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
-        
+
         engine = create_engine(db_url)
         
         with engine.connect() as connection:
             for item in data.get("items", []):
                 title = item["snippet"]["title"]
+
+                description = item["snippet"].get("description", "") 
                 views = int(item["statistics"].get("viewCount", 0))
                 slug = generate_slug(title)
                 platforms_json = json.dumps(["youtube"])
                 
                 query = text("""
-                    INSERT INTO trends (id, title, slug, score_base, platforms)
-                    VALUES (:id, :title, :slug, :score, :platforms)
+                    INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms)
+                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms)
                     ON CONFLICT (slug) DO UPDATE 
                     SET score_base = EXCLUDED.score_base;
                 """)
@@ -58,6 +60,9 @@ def scrape_youtube_and_save():
                     "id": str(uuid.uuid4()),
                     "title": title,
                     "slug": slug,
+                    "description": description,
+                    "context": "",          
+                    "usage_example": "",      
                     "score": views,
                     "platforms": platforms_json
                 })
