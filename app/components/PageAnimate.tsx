@@ -8,12 +8,14 @@ export default function PageAnimate({ children }: { children: React.ReactNode })
   const [isShowing, setIsShowing] = useState(false);
 
   useEffect(() => {
-    setIsShowing(false);
-    // Déclenche l'animation d'entrée au frame suivant
+    // Déclenche l'animation d'entrée au frame suivant (état initial déjà false)
     const timer = setTimeout(() => {
       setIsShowing(true);
     }, 100);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setIsShowing(false);
+    };
   }, [pathname]);
 
   return (

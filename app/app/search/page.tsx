@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { ApiTrend, apiGetAllTrends } from '@/lib/api';
@@ -10,10 +11,11 @@ const CATEGORIES = ['Tous', 'Mode', 'Food', 'Musique', 'Art', 'Tech', 'Lifestyle
 
 type SortMode = 'default' | 'asc' | 'desc';
 
-export default function SearchPage() {
+function SearchPageInner() {
+  const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string>('Tous');
   const [sortMode, setSortMode] = useState<SortMode>('default');
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const [trends, setTrends] = useState<ApiTrend[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -124,5 +126,13 @@ export default function SearchPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchPageInner />
+    </Suspense>
   );
 }

@@ -176,7 +176,7 @@ export default function TrendDetailModal() {
           {/* Comment l'utiliser */}
           <div>
             <h3 className="font-syne font-bold text-xl text-gray-900 mb-3 flex items-center gap-2">
-              <Icon icon="mdi:lightbulb-on" className="text-[var(--color-text-dark)]" /> Comment l'utiliser
+              <Icon icon="mdi:lightbulb-on" className="text-[var(--color-text-dark)]" /> Comment l&apos;utiliser
             </h3>
             <div className="flex flex-col gap-3">
               {usageKeys.map((usage, idx) => (

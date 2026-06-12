@@ -3,6 +3,7 @@
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 const navItems = [
   { href: '/', label: 'Accueil', iconActive: 'mdi:home', iconInactive: 'mdi:home-outline' },
@@ -43,8 +44,14 @@ export default function BottomNav() {
       <nav className="hidden md:flex fixed top-0 left-0 h-full w-20 xl:w-56 bg-white border-r border-gray-100 flex-col items-center xl:items-start pt-8 pb-6 gap-2 z-50 shadow-sm">
         <div className="px-4 mb-8 w-full">
           <Link href="/">
-            <span className="font-syne font-bold text-2xl text-[var(--color-text-dark)] hidden xl:block">AUGURE<span className="text-[var(--color-primary)]">.</span></span>
-            <span className="font-syne font-bold text-xl text-[var(--color-primary)] xl:hidden">A.</span>
+            <Image
+              src="/logo-black.svg"
+              alt="AUGURE"
+              width={90}
+              height={20}
+              className="xl:hidden"
+              priority
+            />
           </Link>
         </div>
         {navItems.map((item) => {
