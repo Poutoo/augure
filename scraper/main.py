@@ -40,7 +40,7 @@ def scrape_youtube_and_save():
 
                 query = text("""
                     INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
-                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms, 'Viral')
+                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms, 'VIRAL')
                     ON CONFLICT (slug) DO UPDATE SET score_base = EXCLUDED.score_base;
                 """)
                 connection.execute(query, {
@@ -83,7 +83,7 @@ def scrape_tiktok_and_save():
                 
                 query_parent = text("""
                     INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
-                    VALUES (:id, :title, :slug, '', '', '', :score, :platforms, 'Viral')
+                    VALUES (:id, :title, :slug, '', '', '', :score, :platforms, 'VIRAL')
                     ON CONFLICT (slug) DO UPDATE SET score_base = EXCLUDED.score_base;
                 """)
                 connection.execute(query_parent, {
