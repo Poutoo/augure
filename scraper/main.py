@@ -105,7 +105,7 @@ def main():
 
     scrape_youtube_and_save()
     
-    scrape_tiktok_and_save() 
+    # scrape_tiktok_and_save() 
 
     schedule.every(1).hours.do(scrape_youtube_and_save) 
     schedule.every().day.at("03:00").do(scrape_tiktok_and_save) 
