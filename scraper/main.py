@@ -32,20 +32,24 @@ def scrape_youtube_and_save():
         
         with engine.connect() as connection:
             for item in data.get("items", []):
-                title = item["snippet"]["title"]
-                description = item["snippet"].get("description", "") 
+                title = item["snippet"]["title"] 
                 views = int(item["statistics"].get("viewCount", 0))
                 slug = generate_slug(title)
                 platforms_json = json.dumps(["youtube"])
 
                 query = text("""
                     INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
-                    VALUES (:id, :title, :slug, :description, :context, :usage_example, :score, :platforms, 'VIRAL')
+                    VALUES (:id, :title, :slug, DEFAULT, :context, :usage_example, :score, :platforms, 'VIRAL')
                     ON CONFLICT (slug) DO UPDATE SET score_base = EXCLUDED.score_base;
                 """)
                 connection.execute(query, {
-                    "id": str(uuid.uuid4()), "title": title, "slug": slug, "description": description,
-                    "context": "", "usage_example": "", "score": views, "platforms": platforms_json
+                    "id": str(uuid.uuid4()), 
+                    "title": title, 
+                    "slug": slug, 
+                    "context": "", 
+                    "usage_example": "", 
+                    "score": views, 
+                    "platforms": platforms_json
                 })
                 
                 query_snapshot = text("INSERT INTO trends_snapshots (trend_slug, score) VALUES (:slug, :score);")
@@ -80,15 +84,20 @@ def scrape_tiktok_and_save():
                 
                 total_views = sum(int(p.get('statistics', p.get('stats', {})).get('playCount', 0)) for p in posts)
                 slug = generate_slug(keyword)
-                
+
                 query_parent = text("""
                     INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
-                    VALUES (:id, :title, :slug, '', '', '', :score, :platforms, 'VIRAL')
+                    VALUES (:id, :title, :slug, DEFAULT, :context, :usage_example, :score, :platforms, 'VIRAL')
                     ON CONFLICT (slug) DO UPDATE SET score_base = EXCLUDED.score_base;
                 """)
                 connection.execute(query_parent, {
-                    "id": str(uuid.uuid4()), "title": keyword.title(), "slug": slug, 
-                    "score": total_views, "platforms": json.dumps(["tiktok"])
+                    "id": str(uuid.uuid4()), 
+                    "title": keyword.title(), 
+                    "slug": slug, 
+                    "context": "", 
+                    "usage_example": "", 
+                    "score": total_views, 
+                    "platforms": json.dumps(["tiktok"])
                 })
                 
                 query_child = text("INSERT INTO trends_snapshots (trend_slug, score) VALUES (:slug, :score);")
