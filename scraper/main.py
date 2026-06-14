@@ -14,28 +14,57 @@ def generate_slug(title):
     slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
     return slug
 
-def scrape_youtube_and_save():
-    print("📺 Récupération YouTube...", flush=True)
+def scrape_youtube_shorts_and_save():
+    print("📱 Récupération YouTube Shorts...", flush=True)
     api_key = os.getenv("YOUTUBE_API_KEY")
     db_url = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
     
     if not api_key: return
     
-    url = "https://www.googleapis.com/youtube/v3/videos"
-    params = {"part": "snippet,statistics", "chart": "mostPopular", "regionCode": "FR", "maxResults": 5, "key": api_key}
+    # 1. Chercher les Shorts les plus vus récemment en France
+    search_url = "https://www.googleapis.com/youtube/v3/search"
+    search_params = {
+        "part": "snippet",
+        "q": "#shorts",
+        "type": "video",
+        "videoDuration": "short", # Filtre pour les vidéos courtes
+        "order": "viewCount",
+        "regionCode": "FR",
+        "maxResults": 5,
+        "key": api_key
+    }
 
     try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
+        search_response = requests.get(search_url, params=search_params)
+        search_response.raise_for_status()
+        search_data = search_response.json()
+        
+        video_ids = [item["id"]["videoId"] for item in search_data.get("items", [])]
+        
+        if not video_ids:
+            print("⚠️ Aucun Short trouvé.")
+            return
+
+        stats_url = "https://www.googleapis.com/youtube/v3/videos"
+        stats_params = {
+            "part": "snippet,statistics",
+            "id": ",".join(video_ids),
+            "key": api_key
+        }
+        
+        stats_response = requests.get(stats_url, params=stats_params)
+        stats_response.raise_for_status()
+        stats_data = stats_response.json()
+        
         engine = create_engine(db_url)
         
         with engine.connect() as connection:
-            for item in data.get("items", []):
+            for item in stats_data.get("items", []):
                 title = item["snippet"]["title"] 
                 views = int(item["statistics"].get("viewCount", 0))
                 slug = generate_slug(title)
-                platforms_json = json.dumps(["youtube"])
+                
+                platforms_json = json.dumps(["youtube_shorts"])
 
                 query = text("""
                     INSERT INTO trends (id, title, slug, description, context, usage_example, score_base, platforms, status)
@@ -56,9 +85,10 @@ def scrape_youtube_and_save():
                 connection.execute(query_snapshot, {"slug": slug, "score": views})
                 
             connection.commit()
-            print("✅ SUCCÈS : YouTube synchronisé !", flush=True)
+            print("✅ SUCCÈS : YouTube Shorts synchronisé !", flush=True)
+            
     except Exception as e:
-        print(f"❌ ERREUR YouTube : {e}", flush=True)
+        print(f"❌ ERREUR YouTube Shorts : {e}", flush=True)
 
 def scrape_tiktok_and_save():
     print("📱 Récupération TikTok (EnsembleData)...", flush=True)
@@ -112,11 +142,9 @@ def scrape_tiktok_and_save():
 def main():
     print("🚀 Démarrage de l'orchestrateur Augure...", flush=True)
 
-    scrape_youtube_and_save()
+    scrape_youtube_shorts_and_save()
     
-    # scrape_tiktok_and_save() 
-
-    schedule.every(1).hours.do(scrape_youtube_and_save) 
+    schedule.every(1).hours.do(scrape_youtube_shorts_and_save) 
     schedule.every().day.at("03:00").do(scrape_tiktok_and_save) 
 
     while True:
