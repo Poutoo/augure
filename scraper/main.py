@@ -63,10 +63,8 @@ def scrape_tiktok(category):
         print("❌ ERREUR: API_KEY manquante.")
         return
 
-    # Sélection du mot-clé via le mapping
     keyword = CATEGORY_MAPPING.get(category, category.lower())
-    
-    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Lancement recherche TikTok pour '{category}' (Mot-clé: {keyword})...", flush=True)
+    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Recherche TikTok pour '{category}' (Mot-clé: {keyword})...", flush=True)
     
     try:
         url = "https://ensembledata.com/apis/tt/keyword/search"
@@ -76,7 +74,6 @@ def scrape_tiktok(category):
         response.raise_for_status()
         
         raw_json = response.json()
-        
         posts = raw_json.get("data", []) if isinstance(raw_json.get("data"), list) else raw_json.get("data", {}).get("data", [])
         if not posts and isinstance(raw_json, list):
             posts = raw_json
@@ -88,27 +85,30 @@ def scrape_tiktok(category):
             raw_views = statistics.get('play_count', 0)
             title = aweme_info.get('search_desc') or aweme_info.get('desc') or f"Tendance {category}"
             
-            print(f"✅ Vidéo sélectionnée : '{title[:30]}...' | Vues lues : {raw_views}")
-            
             engine = create_engine(DB_URL)
             with engine.connect() as conn:
                 insert_to_db(conn, title, int(raw_views), "tiktok")
         else:
-            print(f"⚠️ Aucune vidéo trouvée pour la catégorie '{category}'.")
-            
+            print(f"⚠️ Aucune donnée pour '{category}'.")
     except Exception as e:
-        print(f"❌ Erreur critique sur '{category}' : {e}")
-        
+        print(f"❌ Erreur sur '{category}' : {e}")
+
+def run_all_categories():
+    """Parcourt toutes les catégories."""
+    for category in CATEGORY_MAPPING.keys():
+        scrape_tiktok(category)
+        time.sleep(5) # Sécurité pour ne pas saturer l'API
+
 def main():
     print("🚀 Orchestrateur Augure prêt.")
     get_api_stats()
     
     if not SKIP_AUTO_RUN:
-        # tester manuellement une catégorie ici, ex:
-        scrape_tiktok("Food")
-        print("⏸️ [MODE ÉCONOMIE] Lancement automatique désactivé.")
+        run_all_categories()
     else:
-        print("⏸️ Mode debug activé.")
+        print("⏸️ Mode debug : Lancement auto ignoré.")
+    
+    schedule.every().day.at("04:00").do(run_all_categories)
     
     while True:
         schedule.run_pending()
