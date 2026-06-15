@@ -58,15 +58,16 @@ def scrape_tiktok():
             posts = raw_json
 
         if posts:
-            # --- DEBUG : Vérification des vues ---
-            for i, p in enumerate(posts[:3]):
-                debug_views = p.get('statistics', {}).get('play_count', 'CLE_ABSENTE')
-                print(f"DEBUG_POST_{i}: Vues détectées = {debug_views}", flush=True)
-            # -------------------------------------
+            # DEBUG TOTAL : On affiche les clés disponibles pour le premier post
+            p = posts[0]
+            print(f"DEBUG_KEYS: {list(p.keys())}", flush=True)
+            print(f"DEBUG_STATISTICS: {p.get('statistics')}", flush=True)
 
-            top_post = max(posts, key=lambda x: int(x.get('statistics', {}).get('play_count', 0)))
+            # Si 'statistics' est None, c'est que la clé est ailleurs ou nommée différemment
+            top_post = posts[0] # On prend le premier pour tester
             
-            raw_views = top_post.get('statistics', {}).get('play_count', 0)
+            # On tente une approche plus large
+            raw_views = top_post.get('statistics', {}).get('play_count') or 0
             title = top_post.get('search_desc') or top_post.get('desc') or "Tendance Fashion"
             
             print(f"✅ Vidéo sélectionnée : '{title[:30]}...' | Vues lues : {raw_views}")
