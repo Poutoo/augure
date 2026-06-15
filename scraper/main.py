@@ -53,23 +53,23 @@ def scrape_tiktok():
         
         raw_json = response.json()
         
-        # ANALYSE : Si le JSON est une liste ou contient la liste directement
-        # On tente plusieurs chemins courants pour trouver la liste de vidéos
         posts = raw_json.get("data", []) if isinstance(raw_json.get("data"), list) else raw_json.get("data", {}).get("data", [])
-        
-        # Si toujours rien, on regarde si c'est une liste à la racine
         if not posts and isinstance(raw_json, list):
             posts = raw_json
 
         if posts:
-            # On cherche la clé 'statistics' (qui contient 'play_count')
-            # Dans ton log, c'est bien présent : 'statistics': {'play_count': 74371, ...}
+            # --- DEBUG : Vérification des vues ---
+            for i, p in enumerate(posts[:3]):
+                debug_views = p.get('statistics', {}).get('play_count', 'CLE_ABSENTE')
+                print(f"DEBUG_POST_{i}: Vues détectées = {debug_views}", flush=True)
+            # -------------------------------------
+
             top_post = max(posts, key=lambda x: int(x.get('statistics', {}).get('play_count', 0)))
             
             raw_views = top_post.get('statistics', {}).get('play_count', 0)
             title = top_post.get('search_desc') or top_post.get('desc') or "Tendance Fashion"
             
-            print(f"✅ Vidéo trouvée : '{title[:30]}...' | Vues : {raw_views}")
+            print(f"✅ Vidéo sélectionnée : '{title[:30]}...' | Vues lues : {raw_views}")
             
             engine = create_engine(DB_URL)
             with engine.connect() as conn:
