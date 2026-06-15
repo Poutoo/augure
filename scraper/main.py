@@ -48,6 +48,7 @@ def insert_to_db(connection, title, total_views, platform_name):
     print(f"✅ [{platform_name.upper()}] Enregistré : '{clean_title}' | Vues : {total_views}")
 
 def scrape_tiktok():
+    """Récupère une tendance réelle sur TikTok."""
     if not API_KEY:
         print("❌ ERREUR: API_KEY manquante.")
         return
@@ -68,18 +69,12 @@ def scrape_tiktok():
             posts = raw_json
 
         if posts:
-            # DEBUG : On confirme que les données sont dans aweme_info
             top_post = posts[0]
             aweme_info = top_post.get('aweme_info', {})
-            
-            # On cherche les statistiques DANS aweme_info
             statistics = aweme_info.get('statistics', {})
             raw_views = statistics.get('play_count', 0)
-            
-            # On récupère le titre dans aweme_info
             title = aweme_info.get('search_desc') or aweme_info.get('desc') or "Tendance Fashion"
             
-            print(f"DEBUG_AWEME_INFO_FOUND: {aweme_info is not None}", flush=True)
             print(f"✅ Vidéo sélectionnée : '{title[:30]}...' | Vues lues : {raw_views}")
             
             engine = create_engine(DB_URL)
@@ -91,54 +86,16 @@ def scrape_tiktok():
     except Exception as e:
         print(f"❌ Erreur critique : {e}")
         
-def scrape_youtube_shorts():
-    """Récupère une tendance YouTube Shorts."""
-    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Lancement recherche YouTube...", flush=True)
-    
-    try:
-        # Endpoint spécifique YouTube pour EnsembleData
-        url = "https://ensembledata.com/apis/yt/keyword/search" 
-        params = {"name": "fashion", "period": "7", "sorting": "1", "token": API_KEY}
-        
-        response = requests.get(url, params=params, timeout=20)
-        response.raise_for_status()
-        
-        raw_json = response.json()
-        
-        # Les APIs YouTube retournent souvent les données dans une liste 'items'
-        posts = raw_json.get("data", {}).get("items", [])
-        
-        if posts:
-            top_post = posts[0]
-            # YouTube utilise 'statistics' et 'snippet' comme structure standard
-            stats = top_post.get('statistics', {})
-            snippet = top_post.get('snippet', {})
-            
-            raw_views = stats.get('viewCount', 0)
-            title = snippet.get('title', "Tendance YouTube")
-            
-            print(f"✅ Vidéo YT trouvée : '{title[:30]}...' | Vues : {raw_views}")
-            
-            engine = create_engine(DB_URL)
-            with engine.connect() as conn:
-                insert_to_db(conn, title, int(raw_views), "youtube")
-        else:
-            print("⚠️ Aucune vidéo YouTube trouvée.")
-            
-    except Exception as e:
-        print(f"❌ Erreur YouTube : {e}")
-        
 def main():
     print("🚀 Orchestrateur Augure prêt.")
     get_api_stats()
-    if not SKIP_AUTO_RUN:
-        # scrape_tiktok()
-        scrape_youtube_shorts()
-    else:
-        print("⏸️ Mode debug activé : Lancement automatique ignoré.")
     
-    # schedule.every().day.at("04:00").do(scrape_tiktok)
-    schedule.every().day.at("04:00").do(scrape_youtube_shorts)
+    if not SKIP_AUTO_RUN:
+        # On garde l'appel commenté pour l'instant pour ne pas dépenser de crédits
+        # scrape_tiktok()
+        print("⏸️ [MODE ÉCONOMIE] Lancement automatique désactivé.")
+    else:
+        print("⏸️ Mode debug activé.")
     
     while True:
         schedule.run_pending()
