@@ -9,12 +9,15 @@ from datetime import datetime
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
+# Chargement de la configuration
 load_dotenv()
-
 API_KEY = os.getenv("ENSEMBLEDATA_API_KEY")
 DB_URL = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
+# Flag pour éviter les lancements intempestifs en phase de debug
+SKIP_AUTO_RUN = os.getenv("SKIP_AUTO_RUN", "false").lower() == "true"
 
 def insert_to_db(connection, title, total_views, platform_name):
+    """Insère le post dans la BDD avec gestion des champs par défaut via SQL."""
     clean_title = re.sub(r'[^a-zA-Z0-9 ]', '', title)[:50] or "Tendance Sans Nom"
     slug = re.sub(r'[^a-z0-9]+', '-', clean_title.lower()).strip('-')
 
@@ -36,49 +39,48 @@ def insert_to_db(connection, title, total_views, platform_name):
     print(f"✅ [{platform_name.upper()}] Enregistré : '{clean_title}' | Vues : {total_views}")
 
 def scrape_tiktok():
+    """Récupère une tendance réelle via le endpoint SEARCH, le plus stable."""
     if not API_KEY:
-        print("❌ ERREUR: API_KEY non trouvée dans les variables d'environnement.")
+        print("❌ ERREUR: API_KEY manquante.")
         return
 
-    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Analyse TikTok en cours...", flush=True)
+    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Lancement recherche TikTok...", flush=True)
     
     try:
-        # Timeout de 15s pour éviter de bloquer indéfiniment
-        trending_res = requests.get("https://ensembledata.com/apis/tt/hashtag/trending", 
-                                    params={"token": API_KEY}, timeout=15)
-        trending_res.raise_for_status()
+        # Utilisation de 'fashion' comme point d'entrée stable pour des tendances virales
+        url = "https://ensembledata.com/apis/tt/keyword/search"
+        params = {"name": "fashion", "period": "7", "sorting": "1", "token": API_KEY}
         
-        hashtags = trending_res.json().get("data", {}).get("hashtags", [])
-        if not hashtags: return
-
-        top_hashtag = hashtags[0].get("name")
-        print(f"🔥 Hashtag détecté : #{top_hashtag}")
-
-        search_res = requests.get("https://ensembledata.com/apis/tt/keyword/search", 
-                                  params={"name": top_hashtag, "period": "7", "sorting": "1", "token": API_KEY},
-                                  timeout=15)
-        search_res.raise_for_status()
+        response = requests.get(url, params=params, timeout=20)
+        response.raise_for_status()
         
-        posts = search_res.json().get("data", {}).get("data", [])
+        posts = response.json().get("data", {}).get("data", [])
         
         if posts:
+            # On prend la vidéo la plus vue
             top_post = max(posts, key=lambda x: int(x.get('statistics', {}).get('playCount', 0)))
             
             engine = create_engine(DB_URL)
             with engine.connect() as conn:
-                insert_to_db(conn, top_post.get("desc", "Tendance Sans Nom"), 
+                insert_to_db(conn, top_post.get("desc", "Tendance Fashion"), 
                              int(top_post.get("statistics", {}).get('playCount', 0)), "tiktok")
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Erreur réseau ou API: {e}")
+        else:
+            print("⚠️ Aucune donnée retournée par l'API.")
+            
+    except requests.exceptions.HTTPError as e:
+        print(f"❌ Erreur HTTP (vérifiez votre clé API) : {e}")
     except Exception as e:
-        print(f"❌ Erreur critique: {e}")
+        print(f"❌ Erreur critique : {e}")
 
 def main():
-    print("🚀 Orchestrateur Augure activé.")
-    # Vérification initiale de la clé
-    if not API_KEY: print("⚠️ ATTENTION: API_KEY est vide.")
+    print("🚀 Orchestrateur Augure prêt.")
     
-    scrape_tiktok()
+    # Exécution conditionnelle pour éviter de cramer des tokens en phase de debug
+    if not SKIP_AUTO_RUN:
+        scrape_tiktok()
+    else:
+        print("⏸️ Mode debug activé : Lancement automatique ignoré.")
+    
     schedule.every().day.at("04:00").do(scrape_tiktok)
     
     while True:
