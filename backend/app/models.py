@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import Enum as PyEnum
 
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, JSON, String, Table, Text
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, JSON, String, Table, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -93,6 +93,10 @@ class User(Base):
         "Interest", secondary=user_interests, back_populates="users", lazy="select"
     )
 
+    threads: Mapped[list["Thread"]] = relationship("Thread", back_populates="author")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="author")
+    likes: Mapped[list["Like"]] = relationship("Like", back_populates="user")
+
 
 class Interest(Base):
     __tablename__ = "interests"
@@ -141,6 +145,8 @@ class Trend(Base):
         cascade="all, delete-orphan",
         lazy="select",
     )
+    threads: Mapped[list["Thread"]] = relationship("Thread", back_populates="trend")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="trend")
 
 
 class TrendTag(Base):
@@ -167,3 +173,132 @@ class TrendTag(Base):
     value: Mapped[str] = mapped_column(String(100), nullable=False)
 
     trend: Mapped["Trend"] = relationship("Trend", back_populates="tags")
+
+
+# ── Community ──────────────────────────────────────────────────────────────────
+
+class Thread(Base):
+    __tablename__ = "threads"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    author_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    trend_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("trends.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    title: Mapped[str] = mapped_column(String(300), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    is_pinned: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    author: Mapped["User"] = relationship("User", back_populates="threads")
+    trend: Mapped["Trend | None"] = relationship("Trend", back_populates="threads")
+    comments: Mapped[list["Comment"]] = relationship(
+        "Comment", back_populates="thread", cascade="all, delete-orphan"
+    )
+    likes: Mapped[list["Like"]] = relationship(
+        "Like", back_populates="thread", cascade="all, delete-orphan"
+    )
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    author_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    thread_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("threads.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    trend_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("trends.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    parent_comment_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("comments.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    author: Mapped["User"] = relationship("User", back_populates="comments")
+    thread: Mapped["Thread | None"] = relationship("Thread", back_populates="comments")
+    trend: Mapped["Trend | None"] = relationship("Trend", back_populates="comments")
+    replies: Mapped[list["Comment"]] = relationship(
+        "Comment", back_populates="parent_comment", cascade="all, delete-orphan"
+    )
+    parent_comment: Mapped["Comment | None"] = relationship(
+        "Comment", back_populates="replies", remote_side=[id]
+    )
+    likes: Mapped[list["Like"]] = relationship(
+        "Like", back_populates="comment", cascade="all, delete-orphan"
+    )
+
+
+class Like(Base):
+    __tablename__ = "likes"
+    __table_args__ = (
+        UniqueConstraint("user_id", "thread_id", name="uq_like_user_thread"),
+        UniqueConstraint("user_id", "comment_id", name="uq_like_user_comment"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    thread_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("threads.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    comment_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("comments.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="likes")
+    thread: Mapped["Thread | None"] = relationship("Thread", back_populates="likes")
+    comment: Mapped["Comment | None"] = relationship("Comment", back_populates="likes")

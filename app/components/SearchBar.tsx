@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function SearchBar() {
+export default function SearchBar({ dark = false }: { dark?: boolean }) {
   const [query, setQuery] = useState('');
   const router = useRouter();
 
@@ -18,28 +18,20 @@ export default function SearchBar() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2 px-4 mt-3 mb-1 md:px-8 w-full"
+      className="flex items-center px-4 mt-3 mb-1 md:px-8 w-full"
     >
-      {/* Champ de recherche — prend tout l'espace dispo, ne peut pas dépasser */}
-      <div className="flex items-center bg-white rounded-xl border border-gray-100 shadow-sm px-3 py-3 min-w-0 flex-1 focus-within:border-[var(--color-primary)] focus-within:ring-2 focus-within:ring-[var(--color-primary)]/10 transition-all">
-        <Icon icon="mdi:magnify" className="text-xl text-gray-400 flex-shrink-0" />
+      <div className={`flex items-center rounded-xl px-3 py-3 min-w-0 flex-1 transition-all ${dark
+        ? 'bg-white/10 border border-white/10 focus-within:border-white/30'
+        : 'bg-white border border-gray-100 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-2 focus-within:ring-[var(--color-primary)]/10'}`}>
+        <Icon icon="mdi:magnify" className={`text-xl flex-shrink-0 ${dark ? 'text-white/40' : 'text-gray-400'}`} />
         <input
           type="text"
-          className="min-w-0 flex-1 bg-transparent outline-none px-2 font-inter text-[15px] text-[var(--color-text-dark)] placeholder:text-gray-400"
+          className={`min-w-0 flex-1 bg-transparent outline-none px-2 font-inter text-[15px] ${dark ? 'text-white placeholder:text-white/40' : 'text-[var(--color-text-dark)] placeholder:text-gray-400'}`}
           placeholder="Rechercher une tendance..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-
-      {/* Bouton Filtres — largeur fixe, ne se réduit pas */}
-      <button
-        type="button"
-        className="flex-none px-4 py-3 bg-[var(--color-text-dark)] text-white font-syne font-semibold text-sm rounded-xl hover:bg-black active:scale-95 transition-all whitespace-nowrap"
-        onClick={() => router.push('/search')}
-      >
-        Filtres
-      </button>
     </form>
   );
 }

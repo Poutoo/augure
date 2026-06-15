@@ -142,3 +142,83 @@ class TrendListResponse(BaseModel):
     items: list[TrendResponse]
     skip: int
     limit: int
+
+
+# ── Community ──────────────────────────────────────────────────────────────────
+
+class CommentAuthor(BaseModel):
+    id: uuid.UUID
+    username: str | None
+
+    model_config = {"from_attributes": True}
+
+
+class CommentCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+    parent_comment_id: uuid.UUID | None = None
+
+
+class CommentResponse(BaseModel):
+    id: uuid.UUID
+    author: CommentAuthor
+    body: str
+    like_count: int
+    is_deleted: bool
+    parent_comment_id: uuid.UUID | None
+    created_at: datetime
+    updated_at: datetime
+    replies: list["CommentResponse"] = []
+
+    model_config = {"from_attributes": True}
+
+
+CommentResponse.model_rebuild()
+
+
+class CommentListResponse(BaseModel):
+    total: int
+    items: list[CommentResponse]
+    skip: int
+    limit: int
+
+
+class ThreadTrendSnippet(BaseModel):
+    id: uuid.UUID
+    title: str
+    image_url: str | None
+    status: TrendStatus
+
+    model_config = {"from_attributes": True}
+
+
+class ThreadCreate(BaseModel):
+    title: str = Field(min_length=3, max_length=300)
+    body: str = Field(min_length=1, max_length=5000)
+    trend_id: uuid.UUID | None = None
+
+
+class ThreadResponse(BaseModel):
+    id: uuid.UUID
+    author: CommentAuthor
+    trend: ThreadTrendSnippet | None
+    title: str
+    body: str
+    is_pinned: bool
+    is_locked: bool
+    comment_count: int
+    like_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ThreadDetailResponse(ThreadResponse):
+    comments: list[CommentResponse] = []
+
+
+class ThreadListResponse(BaseModel):
+    total: int
+    items: list[ThreadResponse]
+    skip: int
+    limit: int
