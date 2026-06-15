@@ -1,1 +1,10 @@
 .env
+
+## fichiers md
+CHANGELOG.md
+CONVENTION.md
+GEMINI.md
+TASK.md
+bdd.sql
+doc.pdf
+doc_copy.txt
