@@ -16,7 +16,7 @@ function getInitialFromToken(token: string): string {
   }
 }
 
-export default function Header() {
+export default function Header({ dark = false }: { dark?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [initial, setInitial] = useState('');
@@ -48,9 +48,9 @@ export default function Header() {
     <header className="flex items-start justify-between px-4 pt-6 pb-2 md:px-8">
       <div>
         <Link href="/" className="flex items-center gap-0.5">
-          <Image src="/logo-black.svg" alt="Augure" width={110} height={26} priority style={{ height: 'auto' }} />
+          <Image src={dark ? '/logo-white.svg' : '/logo-black.svg'} alt="Augure" width={110} height={26} priority style={{ height: 'auto' }} />
         </Link>
-        <p className="font-inter text-sm text-gray-500 mt-0.5 ml-0.5">Découvrez ce qui buzz</p>
+        <p className={`font-inter text-sm mt-0.5 ml-0.5 ${dark ? 'text-white/50' : 'text-gray-500'}`}>Découvrez ce qui buzz</p>
       </div>
 
       <div ref={containerRef} className="relative flex-shrink-0">
@@ -58,7 +58,7 @@ export default function Header() {
           onClick={() => setOpen(o => !o)}
           aria-label="Mon profil"
           aria-expanded={open}
-          className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-white font-syne font-bold text-sm flex items-center justify-center shadow-md hover:opacity-80 transition-opacity"
+          className={`w-10 h-10 rounded-full font-syne font-bold text-sm flex items-center justify-center hover:opacity-80 transition-opacity ${dark ? 'bg-white/15 text-white border border-white/25' : 'bg-[var(--color-primary)] text-white shadow-md'}`}
         >
           {initial
             ? initial

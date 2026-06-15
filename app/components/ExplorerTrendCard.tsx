@@ -7,7 +7,7 @@ interface ExplorerTrendCardProps {
 }
 
 export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
-  const s = STATUS_CONFIG[trend.status] ?? { label: trend.status, icon: 'mdi:circle', color: 'text-gray-400' };
+  const s = STATUS_CONFIG[trend.status] ?? { label: trend.status, icon: 'mdi:circle', color: 'text-white', badge: 'badge-status badge-status-stable' };
 
   return (
     <Link href={`?trendId=${trend.id}`} scroll={false} className="block group">
@@ -34,7 +34,7 @@ export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
           )}
 
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`flex items-center gap-1 font-inter font-semibold text-sm ${s.color}`}>
+            <span className={s.badge}>
               <Icon icon={s.icon} className="text-xs" />
               {s.label}
             </span>

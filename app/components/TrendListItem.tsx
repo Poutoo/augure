@@ -7,7 +7,7 @@ interface TrendListItemProps {
 }
 
 export default function TrendListItem({ trend }: TrendListItemProps) {
-  const s = STATUS_CONFIG[trend.status] ?? { label: trend.status, icon: 'mdi:circle', color: 'text-gray-400' };
+  const s = STATUS_CONFIG[trend.status] ?? { label: trend.status, icon: 'mdi:circle', color: 'text-white', badge: 'badge-status badge-status-stable' };
 
   return (
     <Link href={`?trendId=${trend.id}`} scroll={false} className="block group">
@@ -18,7 +18,7 @@ export default function TrendListItem({ trend }: TrendListItemProps) {
           </h3>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             {trend.badges?.map((badge, i) => (
-              <span key={i} className="text-[var(--color-primary)] font-inter font-semibold text-xs uppercase tracking-wide">
+              <span key={i} className="text-gray-400 font-inter font-medium text-xs uppercase tracking-wide">
                 {badge}
               </span>
             ))}
@@ -28,10 +28,10 @@ export default function TrendListItem({ trend }: TrendListItemProps) {
           </div>
         </div>
 
-        <div className={`flex items-center gap-1 flex-shrink-0 ${s.color}`}>
+        <span className={`flex-shrink-0 ${s.badge}`}>
           <Icon icon={s.icon} className="text-sm" />
-          <span className="font-inter text-sm font-semibold whitespace-nowrap">{s.label}</span>
-        </div>
+          {s.label}
+        </span>
       </div>
     </Link>
   );

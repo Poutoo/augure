@@ -24,6 +24,34 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Status badge colors ─────────────────────────────────────────────────── */
+:root {
+  --color-status-viral:     #2c2c2ee6;
+  --color-status-en-hausse: #000000;
+  --color-status-emergent:  #6B6B7B;
+  --color-status-stable:    #D4D4D4;
+  --color-status-en-baisse: #FFFFFF;
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-family: var(--font-inter);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.badge-status-viral     { background-color: var(--color-status-viral); }
+.badge-status-en_hausse { background-color: var(--color-status-en-hausse); }
+.badge-status-emergent  { background-color: var(--color-status-emergent); }
+.badge-status-stable    { background-color: var(--color-status-stable); }
+.badge-status-en_baisse { background-color: var(--color-status-en-baisse); }
+
 /* Scrollbar horizontal masquée mais fonctionnelle */
 .scrollbar-hide {
   -ms-overflow-style: none;

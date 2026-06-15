@@ -7,7 +7,7 @@ interface TopTrendCardProps {
 }
 
 export default function TopTrendCard({ trend }: TopTrendCardProps) {
-  const s = STATUS_CONFIG[trend.status] ?? { label: trend.status, icon: 'mdi:circle', color: 'text-white' };
+  const s = STATUS_CONFIG[trend.status] ?? { label: trend.status, icon: 'mdi:circle', color: 'text-white', badge: 'badge-status badge-status-stable' };
 
   return (
     <Link href={`?trendId=${trend.id}`} scroll={false} className="block flex-shrink-0 w-44">
@@ -16,10 +16,10 @@ export default function TopTrendCard({ trend }: TopTrendCardProps) {
           <p className="font-inter text-xs text-gray-400 mb-1">
             N°{String(trend.rank ?? '–').padStart(2, '0')}
           </p>
-          <div className="flex items-center gap-1 text-white mb-3">
+          <span className={`inline-flex mb-3 ${s.badge}`}>
             <Icon icon={s.icon} className="text-xs" />
-            <span className="font-inter text-xs font-medium">{s.label}</span>
-          </div>
+            {s.label}
+          </span>
           <h3 className="font-syne font-bold text-white text-lg leading-tight line-clamp-2">
             {trend.title}
           </h3>

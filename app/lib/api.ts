@@ -27,12 +27,12 @@ export interface ApiTrend {
 /** @deprecated use ApiTrend */
 export type ScoredTrend = ApiTrend;
 
-export const STATUS_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
-  viral:     { label: 'Viral',     icon: 'mdi:fire',             color: 'text-[var(--color-text-dark)]' },
-  en_hausse: { label: 'En hausse', icon: 'mdi:arrow-up-bold',    color: 'text-[var(--color-text-dark)]' },
-  emergent:  { label: 'Émergent',  icon: 'mdi:trending-up',      color: 'text-[var(--color-text-dark)]' },
-  stable:    { label: 'Stable',    icon: 'mdi:arrow-right-bold', color: 'text-gray-500' },
-  en_baisse: { label: 'En baisse', icon: 'mdi:arrow-down-bold',  color: 'text-gray-500' },
+export const STATUS_CONFIG: Record<string, { label: string; icon: string; color: string; badge: string }> = {
+  viral:     { label: 'Viral',     icon: 'mdi:fire',             color: 'text-white', badge: 'badge-status badge-status-viral'     },
+  en_hausse: { label: 'En hausse', icon: 'mdi:arrow-up-bold',    color: 'text-white', badge: 'badge-status badge-status-en_hausse' },
+  emergent:  { label: 'Émergent',  icon: 'mdi:trending-up',      color: 'text-white', badge: 'badge-status badge-status-emergent'  },
+  stable:    { label: 'Stable',    icon: 'mdi:arrow-right-bold', color: 'text-white', badge: 'badge-status badge-status-stable'    },
+  en_baisse: { label: 'En baisse', icon: 'mdi:arrow-down-bold',  color: 'text-white', badge: 'badge-status badge-status-en_baisse' },
 };
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
