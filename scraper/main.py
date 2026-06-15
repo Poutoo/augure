@@ -71,12 +71,24 @@ def scrape_tiktok():
         print(f"❌ Erreur HTTP (vérifiez votre clé API) : {e}")
     except Exception as e:
         print(f"❌ Erreur critique : {e}")
+        
+def check_api_balance():
+    url = "https://ensembledata.com/apis/customer/get-used-units"
+    params = {"token": API_KEY}
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        # Le retour est souvent un dictionnaire des unités utilisées
+        data = response.json().get("data", {})
+        print(f"📊 [SOLDE] Unités utilisées aujourd'hui : {data}")
+    except Exception as e:
+        print(f"⚠️ Impossible de vérifier le solde : {e}")
 
 def main():
     print("🚀 Orchestrateur Augure prêt.")
     
     # Exécution conditionnelle pour éviter de cramer des tokens en phase de debug
     if not SKIP_AUTO_RUN:
+        check_api_balance()
         scrape_tiktok()
     else:
         print("⏸️ Mode debug activé : Lancement automatique ignoré.")
