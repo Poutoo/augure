@@ -105,7 +105,7 @@ def main():
     
     if not SKIP_AUTO_RUN:
         # tester manuellement une catégorie ici, ex:
-        # scrape_tiktok("Mode")
+        scrape_tiktok("Food")
         print("⏸️ [MODE ÉCONOMIE] Lancement automatique désactivé.")
     else:
         print("⏸️ Mode debug activé.")
