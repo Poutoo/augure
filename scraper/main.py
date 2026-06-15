@@ -58,18 +58,18 @@ def scrape_tiktok():
             posts = raw_json
 
         if posts:
-            # DEBUG TOTAL : On affiche les clés disponibles pour le premier post
-            p = posts[0]
-            print(f"DEBUG_KEYS: {list(p.keys())}", flush=True)
-            print(f"DEBUG_STATISTICS: {p.get('statistics')}", flush=True)
-
-            # Si 'statistics' est None, c'est que la clé est ailleurs ou nommée différemment
-            top_post = posts[0] # On prend le premier pour tester
+            # DEBUG : On confirme que les données sont dans aweme_info
+            top_post = posts[0]
+            aweme_info = top_post.get('aweme_info', {})
             
-            # On tente une approche plus large
-            raw_views = top_post.get('statistics', {}).get('play_count') or 0
-            title = top_post.get('search_desc') or top_post.get('desc') or "Tendance Fashion"
+            # On cherche les statistiques DANS aweme_info
+            statistics = aweme_info.get('statistics', {})
+            raw_views = statistics.get('play_count', 0)
             
+            # On récupère le titre dans aweme_info
+            title = aweme_info.get('search_desc') or aweme_info.get('desc') or "Tendance Fashion"
+            
+            print(f"DEBUG_AWEME_INFO_FOUND: {aweme_info is not None}", flush=True)
             print(f"✅ Vidéo sélectionnée : '{title[:30]}...' | Vues lues : {raw_views}")
             
             engine = create_engine(DB_URL)
