@@ -13,11 +13,10 @@ from sqlalchemy import create_engine, text
 load_dotenv()
 API_KEY = os.getenv("ENSEMBLEDATA_API_KEY")
 DB_URL = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
-# Flag pour éviter les lancements intempestifs en phase de debug
 SKIP_AUTO_RUN = os.getenv("SKIP_AUTO_RUN", "false").lower() == "true"
 
 def insert_to_db(connection, title, total_views, platform_name):
-    """Insère le post dans la BDD avec gestion des champs par défaut via SQL."""
+    """Insère le post dans la BDD."""
     clean_title = re.sub(r'[^a-zA-Z0-9 ]', '', title)[:50] or "Tendance Sans Nom"
     slug = re.sub(r'[^a-z0-9]+', '-', clean_title.lower()).strip('-')
 
@@ -39,7 +38,7 @@ def insert_to_db(connection, title, total_views, platform_name):
     print(f"✅ [{platform_name.upper()}] Enregistré : '{clean_title}' | Vues : {total_views}")
 
 def scrape_tiktok():
-    """Récupère une tendance réelle via le endpoint SEARCH, le plus stable."""
+    """Récupère une tendance réelle avec logs de debug ultra-précis."""
     if not API_KEY:
         print("❌ ERREUR: API_KEY manquante.")
         return
@@ -47,48 +46,41 @@ def scrape_tiktok():
     print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Lancement recherche TikTok...", flush=True)
     
     try:
-        # Utilisation de 'fashion' comme point d'entrée stable pour des tendances virales
         url = "https://ensembledata.com/apis/tt/keyword/search"
         params = {"name": "fashion", "period": "7", "sorting": "1", "token": API_KEY}
         
         response = requests.get(url, params=params, timeout=20)
         response.raise_for_status()
         
-        posts = response.json().get("data", {}).get("data", [])
+        # --- DEBUG RADICAL ---
+        raw_json = response.json()
+        print(f"DEBUG_STRUCTURE: {list(raw_json.keys())}", flush=True)
+        print(f"DEBUG_DATA_CONTENT: {raw_json.get('data')}", flush=True)
+        # ---------------------
+        
+        posts = raw_json.get("data", {}).get("data", [])
         
         if posts:
             # On prend la vidéo la plus vue
             top_post = max(posts, key=lambda x: int(x.get('statistics', {}).get('playCount', 0)))
             
+            # Debug des vues trouvées
+            raw_views = top_post.get('statistics', {}).get('playCount', 0)
+            print(f"DEBUG: Vues trouvées pour '{top_post.get('desc')[:20]}...' : {raw_views}")
+            
             engine = create_engine(DB_URL)
             with engine.connect() as conn:
                 insert_to_db(conn, top_post.get("desc", "Tendance Fashion"), 
-                             int(top_post.get("statistics", {}).get('playCount', 0)), "tiktok")
+                             int(raw_views), "tiktok")
         else:
-            print("⚠️ Aucune donnée retournée par l'API.")
+            print("⚠️ Aucune donnée retournée dans le chemin ['data']['data'].")
             
-    except requests.exceptions.HTTPError as e:
-        print(f"❌ Erreur HTTP (vérifiez votre clé API) : {e}")
     except Exception as e:
         print(f"❌ Erreur critique : {e}")
         
-def check_api_balance():
-    url = "https://ensembledata.com/apis/customer/get-used-units"
-    params = {"token": API_KEY}
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        # Le retour est souvent un dictionnaire des unités utilisées
-        data = response.json().get("data", {})
-        print(f"📊 [SOLDE] Unités utilisées aujourd'hui : {data}")
-    except Exception as e:
-        print(f"⚠️ Impossible de vérifier le solde : {e}")
-
 def main():
     print("🚀 Orchestrateur Augure prêt.")
-    
-    # Exécution conditionnelle pour éviter de cramer des tokens en phase de debug
     if not SKIP_AUTO_RUN:
-        check_api_balance()
         scrape_tiktok()
     else:
         print("⏸️ Mode debug activé : Lancement automatique ignoré.")
