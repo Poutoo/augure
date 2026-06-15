@@ -15,6 +15,16 @@ API_KEY = os.getenv("ENSEMBLEDATA_API_KEY")
 DB_URL = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
 SKIP_AUTO_RUN = os.getenv("SKIP_AUTO_RUN", "false").lower() == "true"
 
+# Mapping pour les catégories de l'application
+CATEGORY_MAPPING = {
+    "Mode": "fashion",
+    "Food": "food",
+    "Musique": "music",
+    "Art": "art",
+    "Beauté": "beauty",
+    "Tech": "tech"
+}
+
 def get_api_stats():
     """Affiche les crédits utilisés et totaux au démarrage."""
     url = "https://ensembledata.com/apis/customer/get-usage"
@@ -47,17 +57,20 @@ def insert_to_db(connection, title, total_views, platform_name):
     connection.commit()
     print(f"✅ [{platform_name.upper()}] Enregistré : '{clean_title}' | Vues : {total_views}")
 
-def scrape_tiktok():
-    """Récupère une tendance réelle sur TikTok."""
+def scrape_tiktok(category):
+    """Récupère une tendance TikTok pour une catégorie donnée."""
     if not API_KEY:
         print("❌ ERREUR: API_KEY manquante.")
         return
 
-    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Lancement recherche TikTok...", flush=True)
+    # Sélection du mot-clé via le mapping
+    keyword = CATEGORY_MAPPING.get(category, category.lower())
+    
+    print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] Lancement recherche TikTok pour '{category}' (Mot-clé: {keyword})...", flush=True)
     
     try:
         url = "https://ensembledata.com/apis/tt/keyword/search"
-        params = {"name": "fashion", "period": "7", "sorting": "1", "token": API_KEY}
+        params = {"name": keyword, "period": "7", "sorting": "1", "token": API_KEY}
         
         response = requests.get(url, params=params, timeout=20)
         response.raise_for_status()
@@ -73,7 +86,7 @@ def scrape_tiktok():
             aweme_info = top_post.get('aweme_info', {})
             statistics = aweme_info.get('statistics', {})
             raw_views = statistics.get('play_count', 0)
-            title = aweme_info.get('search_desc') or aweme_info.get('desc') or "Tendance Fashion"
+            title = aweme_info.get('search_desc') or aweme_info.get('desc') or f"Tendance {category}"
             
             print(f"✅ Vidéo sélectionnée : '{title[:30]}...' | Vues lues : {raw_views}")
             
@@ -81,18 +94,18 @@ def scrape_tiktok():
             with engine.connect() as conn:
                 insert_to_db(conn, title, int(raw_views), "tiktok")
         else:
-            print("⚠️ Aucune vidéo trouvée dans la réponse.")
+            print(f"⚠️ Aucune vidéo trouvée pour la catégorie '{category}'.")
             
     except Exception as e:
-        print(f"❌ Erreur critique : {e}")
+        print(f"❌ Erreur critique sur '{category}' : {e}")
         
 def main():
     print("🚀 Orchestrateur Augure prêt.")
     get_api_stats()
     
     if not SKIP_AUTO_RUN:
-        # On garde l'appel commenté pour l'instant pour ne pas dépenser de crédits
-        # scrape_tiktok()
+        # tester manuellement une catégorie ici, ex:
+        scrape_tiktok("Food")
         print("⏸️ [MODE ÉCONOMIE] Lancement automatique désactivé.")
     else:
         print("⏸️ Mode debug activé.")
