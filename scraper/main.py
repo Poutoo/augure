@@ -38,7 +38,6 @@ def insert_to_db(connection, title, total_views, platform_name):
     print(f"✅ [{platform_name.upper()}] Enregistré : '{clean_title}' | Vues : {total_views}")
 
 def scrape_tiktok():
-    """Récupère une tendance réelle avec logs de debug ultra-précis."""
     if not API_KEY:
         print("❌ ERREUR: API_KEY manquante.")
         return
@@ -52,28 +51,31 @@ def scrape_tiktok():
         response = requests.get(url, params=params, timeout=20)
         response.raise_for_status()
         
-        # --- DEBUG RADICAL ---
         raw_json = response.json()
-        print(f"DEBUG_STRUCTURE: {list(raw_json.keys())}", flush=True)
-        print(f"DEBUG_DATA_CONTENT: {raw_json.get('data')}", flush=True)
-        # ---------------------
         
-        posts = raw_json.get("data", {}).get("data", [])
+        # ANALYSE : Si le JSON est une liste ou contient la liste directement
+        # On tente plusieurs chemins courants pour trouver la liste de vidéos
+        posts = raw_json.get("data", []) if isinstance(raw_json.get("data"), list) else raw_json.get("data", {}).get("data", [])
         
+        # Si toujours rien, on regarde si c'est une liste à la racine
+        if not posts and isinstance(raw_json, list):
+            posts = raw_json
+
         if posts:
-            # On prend la vidéo la plus vue
-            top_post = max(posts, key=lambda x: int(x.get('statistics', {}).get('playCount', 0)))
+            # On cherche la clé 'statistics' (qui contient 'play_count')
+            # Dans ton log, c'est bien présent : 'statistics': {'play_count': 74371, ...}
+            top_post = max(posts, key=lambda x: int(x.get('statistics', {}).get('play_count', 0)))
             
-            # Debug des vues trouvées
-            raw_views = top_post.get('statistics', {}).get('playCount', 0)
-            print(f"DEBUG: Vues trouvées pour '{top_post.get('desc')[:20]}...' : {raw_views}")
+            raw_views = top_post.get('statistics', {}).get('play_count', 0)
+            title = top_post.get('search_desc') or top_post.get('desc') or "Tendance Fashion"
+            
+            print(f"✅ Vidéo trouvée : '{title[:30]}...' | Vues : {raw_views}")
             
             engine = create_engine(DB_URL)
             with engine.connect() as conn:
-                insert_to_db(conn, top_post.get("desc", "Tendance Fashion"), 
-                             int(raw_views), "tiktok")
+                insert_to_db(conn, title, int(raw_views), "tiktok")
         else:
-            print("⚠️ Aucune donnée retournée dans le chemin ['data']['data'].")
+            print("⚠️ Aucune vidéo trouvée dans la réponse.")
             
     except Exception as e:
         print(f"❌ Erreur critique : {e}")
