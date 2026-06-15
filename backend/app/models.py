@@ -262,7 +262,7 @@ class Comment(Base):
         "Comment", back_populates="parent_comment", cascade="all, delete-orphan"
     )
     parent_comment: Mapped["Comment | None"] = relationship(
-        "Comment", back_populates="replies", remote_side="Comment.id"
+        "Comment", back_populates="replies", remote_side=[id]
     )
     likes: Mapped[list["Like"]] = relationship(
         "Like", back_populates="comment", cascade="all, delete-orphan"

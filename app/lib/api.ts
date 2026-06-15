@@ -130,3 +130,185 @@ export async function apiGetTrendById(id: string, token: string): Promise<ApiTre
   if (!res.ok) throw new Error(`Trend not found: ${id}`);
   return res.json();
 }
+
+// ── Community types ───────────────────────────────────────────────────────────
+
+export interface ApiCommentAuthor {
+  id: string;
+  username: string | null;
+}
+
+export interface ApiComment {
+  id: string;
+  author: ApiCommentAuthor;
+  body: string;
+  like_count: number;
+  is_deleted: boolean;
+  parent_comment_id: string | null;
+  created_at: string;
+  updated_at: string;
+  replies: ApiComment[];
+}
+
+export interface ApiCommentList {
+  total: number;
+  items: ApiComment[];
+  skip: number;
+  limit: number;
+}
+
+export interface ApiThreadTrend {
+  id: string;
+  title: string;
+  image_url: string | null;
+  status: string;
+}
+
+export interface ApiThread {
+  id: string;
+  author: ApiCommentAuthor;
+  trend: ApiThreadTrend | null;
+  title: string;
+  body: string;
+  is_pinned: boolean;
+  is_locked: boolean;
+  comment_count: number;
+  like_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiThreadDetail extends ApiThread {
+  comments: ApiComment[];
+}
+
+export interface ApiThreadList {
+  total: number;
+  items: ApiThread[];
+  skip: number;
+  limit: number;
+}
+
+// ── Comments ──────────────────────────────────────────────────────────────────
+
+export async function apiGetTrendComments(
+  trendId: string,
+  params?: { skip?: number; limit?: number },
+): Promise<ApiCommentList> {
+  const url = new URL(`${API_BASE}/trends/${trendId}/comments`);
+  if (params?.skip != null) url.searchParams.set('skip', String(params.skip));
+  if (params?.limit != null) url.searchParams.set('limit', String(params.limit));
+  const res = await fetch(url.toString());
+  if (!res.ok) return { total: 0, items: [], skip: 0, limit: 20 };
+  return res.json();
+}
+
+export async function apiPostTrendComment(
+  trendId: string,
+  payload: { body: string; parent_comment_id?: string },
+  token: string,
+): Promise<ApiComment> {
+  const res = await fetch(`${API_BASE}/trends/${trendId}/comments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur lors de la publication');
+  }
+  return res.json();
+}
+
+export async function apiToggleCommentLike(
+  commentId: string,
+  token: string,
+): Promise<{ liked: boolean; like_count: number }> {
+  const res = await fetch(`${API_BASE}/comments/${commentId}/like`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erreur like');
+  return res.json();
+}
+
+export async function apiDeleteComment(commentId: string, token: string): Promise<void> {
+  await fetch(`${API_BASE}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// ── Community / Threads ───────────────────────────────────────────────────────
+
+export async function apiGetThreads(params?: {
+  trend_id?: string;
+  skip?: number;
+  limit?: number;
+}): Promise<ApiThreadList> {
+  const url = new URL(`${API_BASE}/community/threads`);
+  if (params?.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  if (params?.skip != null) url.searchParams.set('skip', String(params.skip));
+  if (params?.limit != null) url.searchParams.set('limit', String(params.limit));
+  const res = await fetch(url.toString());
+  if (!res.ok) return { total: 0, items: [], skip: 0, limit: 20 };
+  return res.json();
+}
+
+export async function apiCreateThread(
+  payload: { title: string; body: string; trend_id?: string },
+  token: string,
+): Promise<ApiThread> {
+  const res = await fetch(`${API_BASE}/community/threads`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur lors de la création');
+  }
+  return res.json();
+}
+
+export async function apiGetThread(threadId: string): Promise<ApiThreadDetail> {
+  const res = await fetch(`${API_BASE}/community/threads/${threadId}`);
+  if (!res.ok) throw new Error('Thread introuvable');
+  return res.json();
+}
+
+export async function apiPostThreadComment(
+  threadId: string,
+  payload: { body: string; parent_comment_id?: string },
+  token: string,
+): Promise<ApiComment> {
+  const res = await fetch(`${API_BASE}/community/threads/${threadId}/comments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur lors de la publication');
+  }
+  return res.json();
+}
+
+export async function apiToggleThreadLike(
+  threadId: string,
+  token: string,
+): Promise<{ liked: boolean; like_count: number }> {
+  const res = await fetch(`${API_BASE}/community/threads/${threadId}/like`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erreur like');
+  return res.json();
+}
+
+export async function apiDeleteThread(threadId: string, token: string): Promise<void> {
+  await fetch(`${API_BASE}/community/threads/${threadId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
