@@ -38,7 +38,7 @@ def insert_to_db(connection, title, total_views, platform_name):
     print(f"✅ [{platform_name.upper()}] Enregistré : '{clean_title}' | Vues : {total_views}")
 
 def scrape_tiktok():
-    """Récupère une tendance réelle avec log de debug pour diagnostiquer le '0 vue'."""
+    """Récupère une tendance réelle avec logs de debug ultra-précis."""
     if not API_KEY:
         print("❌ ERREUR: API_KEY manquante.")
         return
@@ -54,7 +54,8 @@ def scrape_tiktok():
         
         # --- DEBUG RADICAL ---
         raw_json = response.json()
-        print(f"DEBUG: Structure complète du JSON : {json.dumps(raw_json)[:1000]}", flush=True)
+        print(f"DEBUG_STRUCTURE: {list(raw_json.keys())}", flush=True)
+        print(f"DEBUG_DATA_CONTENT: {raw_json.get('data')}", flush=True)
         # ---------------------
         
         posts = raw_json.get("data", {}).get("data", [])
