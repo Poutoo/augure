@@ -148,9 +148,9 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
-      <div onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative bg-white w-full md:max-w-lg rounded-t-[32px] md:rounded-[32px] shadow-2xl z-10 flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
+      <div onClick={onClose} className="absolute inset-0 bg-black/60" />
+      <div className="relative bg-white w-full md:max-w-lg rounded-t-[32px] md:rounded-[32px] shadow-2xl z-10 flex flex-col mb-16 md:mb-0 max-h-[calc(90vh-4rem)] md:max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
           <h2 className="font-syne font-bold text-lg text-[var(--color-text-dark)]">Nouveau forum</h2>
@@ -198,7 +198,7 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
                 </button>
               </div>
             ) : (
-              <div className="relative">
+              <div>
                 <input
                   type="text"
                   value={trendQuery}
@@ -207,7 +207,7 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
                   className="w-full font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
                 />
                 {(trendResults.length > 0 || searching) && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-2xl border border-gray-100 shadow-lg z-10 overflow-hidden">
+                  <div className="mt-1 bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
                     {searching ? (
                       <div className="px-4 py-3 font-inter text-sm text-gray-400">Recherche…</div>
                     ) : trendResults.map(t => (
