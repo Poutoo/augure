@@ -141,6 +141,8 @@ export default function ProfilePage() {
   const [newColName, setNewColName] = useState('');
   const [newColEmoji, setNewColEmoji] = useState('🔖');
   const [creatingCol, setCreatingCol] = useState(false);
+  const [colToDelete, setColToDelete] = useState<ApiFavoriteCollection | null>(null);
+  const [deletingCol, setDeletingCol] = useState(false);
 
   // Load user
   useEffect(() => {
@@ -260,11 +262,17 @@ export default function ProfilePage() {
     } finally { setCreatingCol(false); }
   };
 
-  const handleDeleteCollection = async (col: ApiFavoriteCollection) => {
-    if (!token || !confirm(`Supprimer la collection "${col.name}" ? Les items seront perdus.`)) return;
-    await apiDeleteCollection(token, col.id);
-    setCollections(prev => prev.filter(c => c.id !== col.id));
-    if (collectionDetail?.id === col.id) setCollectionDetail(null);
+  const handleDeleteCollection = async () => {
+    if (!token || !colToDelete) return;
+    setDeletingCol(true);
+    try {
+      await apiDeleteCollection(token, colToDelete.id);
+      setCollections(prev => prev.filter(c => c.id !== colToDelete.id));
+      if (collectionDetail?.id === colToDelete.id) setCollectionDetail(null);
+      setColToDelete(null);
+    } finally {
+      setDeletingCol(false);
+    }
   };
 
   // ── Loading skeleton ───────────────────────────────────────────────────────
@@ -287,6 +295,7 @@ export default function ProfilePage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <>
     <div className="w-full max-w-2xl mx-auto pb-6">
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
@@ -629,7 +638,7 @@ export default function ProfilePage() {
                         <p className="font-inter text-xs text-gray-400 mt-0.5">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
                       </button>
                       <button
-                        onClick={() => handleDeleteCollection(col)}
+                        onClick={e => { e.stopPropagation(); setColToDelete(col); }}
                         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center transition-opacity hover:bg-red-100 md:opacity-0 md:group-hover:opacity-100"
                         aria-label="Supprimer la collection"
                       >
@@ -644,5 +653,43 @@ export default function ProfilePage() {
         </div>
       )}
     </div>
+
+      {/* ── Modale confirmation suppression collection ────────────── */}
+      {colToDelete && (
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => !deletingCol && setColToDelete(null)} />
+          <div className="relative bg-white w-full sm:max-w-sm rounded-t-[28px] sm:rounded-[28px] shadow-2xl p-6 z-10">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">{colToDelete.emoji}</span>
+              <h3 className="font-syne font-bold text-lg text-[var(--color-text-dark)] leading-tight">
+                Supprimer &ldquo;{colToDelete.name}&rdquo; ?
+              </h3>
+            </div>
+            <p className="font-inter text-sm text-gray-500 mb-6">
+              Tous les éléments enregistrés dans cette collection seront perdus. Cette action est irréversible.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setColToDelete(null)}
+                disabled={deletingCol}
+                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 font-syne font-semibold text-sm text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-40"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleDeleteCollection}
+                disabled={deletingCol}
+                className="flex-1 py-3 rounded-2xl bg-red-500 text-white font-syne font-semibold text-sm hover:bg-red-600 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+              >
+                {deletingCol
+                  ? <><Icon icon="mdi:loading" className="animate-spin" /> Suppression…</>
+                  : <><Icon icon="mdi:delete-outline" /> Supprimer</>
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
