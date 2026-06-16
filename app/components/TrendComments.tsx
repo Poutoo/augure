@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import type { ApiComment } from '@/lib/api';
@@ -59,18 +59,84 @@ function Avatar({ username, avatarUrl }: { username: string | null; avatarUrl?: 
   );
 }
 
+interface InlineReplyInputProps {
+  targetUsername: string;
+  onPost: (body: string) => Promise<void>;
+  onCancel: () => void;
+  posting: boolean;
+}
+
+function InlineReplyInput({ targetUsername, onPost, onCancel, posting }: InlineReplyInputProps) {
+  const [body, setBody] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
+
+  return (
+    <div className="mt-3 ml-0 flex flex-col gap-2">
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-xl">
+        <Icon icon="mdi:reply" className="text-gray-400 text-sm flex-shrink-0" />
+        <span className="font-inter text-xs text-gray-500 flex-1">
+          Réponse à <strong>{targetUsername}</strong>
+        </span>
+        <button onClick={onCancel}>
+          <Icon icon="mdi:close" className="text-gray-400 text-sm" />
+        </button>
+      </div>
+      <div className="flex gap-2 items-end">
+        <textarea
+          ref={textareaRef}
+          value={body}
+          onChange={e => setBody(e.target.value)}
+          placeholder={`Répondre à @${targetUsername}…`}
+          rows={2}
+          className="flex-1 resize-none font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
+          onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) onPost(body); }}
+        />
+        <button
+          onClick={() => onPost(body)}
+          disabled={!body.trim() || posting}
+          className="w-10 h-10 bg-[var(--color-text-dark)] text-white rounded-2xl flex items-center justify-center flex-shrink-0 disabled:opacity-30 transition-opacity"
+        >
+          <Icon icon={posting ? 'mdi:loading' : 'mdi:send'} className={`text-sm ${posting ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 interface CommentItemProps {
   comment: ApiComment;
   token: string | null;
   currentUserId: string | null;
+  activeReplyId: string | null;
+  postingReply: boolean;
   onReply: (id: string, username: string) => void;
+  onCancelReply: () => void;
+  onPostReply: (body: string) => Promise<void>;
   onLikeUpdate: (id: string, likeCount: number) => void;
   isReply?: boolean;
 }
 
-function CommentItem({ comment, token, currentUserId: _currentUserId, onReply, onLikeUpdate, isReply = false }: CommentItemProps) {
+function CommentItem({
+  comment,
+  token,
+  currentUserId: _currentUserId,
+  activeReplyId,
+  postingReply,
+  onReply,
+  onCancelReply,
+  onPostReply,
+  onLikeUpdate,
+  isReply = false,
+}: CommentItemProps) {
   const [likeCount, setLikeCount] = useState(comment.like_count);
+  const [liked, setLiked] = useState(false);
   const [liking, setLiking] = useState(false);
+
+  const isReplyTarget = activeReplyId === comment.id;
 
   async function handleLike() {
     if (!token || liking) return;
@@ -78,6 +144,7 @@ function CommentItem({ comment, token, currentUserId: _currentUserId, onReply, o
     try {
       const res = await apiToggleCommentLike(comment.id, token);
       setLikeCount(res.like_count);
+      setLiked(res.liked);
       onLikeUpdate(comment.id, res.like_count);
     } finally {
       setLiking(false);
@@ -104,15 +171,15 @@ function CommentItem({ comment, token, currentUserId: _currentUserId, onReply, o
             <button
               onClick={handleLike}
               disabled={!token || liking}
-              className="flex items-center gap-1 text-gray-400 hover:text-rose-500 transition-colors disabled:opacity-40"
+              className={`flex items-center gap-1 transition-colors disabled:opacity-40 ${liked ? 'text-[var(--color-text-dark)]' : 'text-gray-400 hover:text-[var(--color-text-dark)]'}`}
             >
-              <Icon icon="mdi:heart-outline" className="text-sm" />
+              <Icon icon={liked ? 'mdi:heart' : 'mdi:heart-outline'} className="text-sm" />
               <span className="font-inter text-xs">{likeCount}</span>
             </button>
             {!isReply && token && (
               <button
-                onClick={() => onReply(comment.id, comment.author.username ?? 'Utilisateur')}
-                className="flex items-center gap-1 text-gray-400 hover:text-[var(--color-text-dark)] transition-colors"
+                onClick={() => isReplyTarget ? onCancelReply() : onReply(comment.id, comment.author.username ?? 'Utilisateur')}
+                className={`flex items-center gap-1 transition-colors ${isReplyTarget ? 'text-[var(--color-text-dark)]' : 'text-gray-400 hover:text-[var(--color-text-dark)]'}`}
               >
                 <Icon icon="mdi:reply-outline" className="text-sm" />
                 <span className="font-inter text-xs">Répondre</span>
@@ -120,18 +187,34 @@ function CommentItem({ comment, token, currentUserId: _currentUserId, onReply, o
             )}
           </div>
         )}
+
+        {/* Replies */}
         {comment.replies?.map(reply => (
           <div key={reply.id} className="mt-3">
             <CommentItem
               comment={reply}
               token={token}
               currentUserId={_currentUserId}
+              activeReplyId={activeReplyId}
+              postingReply={postingReply}
               onReply={onReply}
+              onCancelReply={onCancelReply}
+              onPostReply={onPostReply}
               onLikeUpdate={onLikeUpdate}
               isReply
             />
           </div>
         ))}
+
+        {/* Inline reply input — rendered directly below this comment */}
+        {isReplyTarget && (
+          <InlineReplyInput
+            targetUsername={comment.author.username ?? 'Utilisateur'}
+            onPost={onPostReply}
+            onCancel={onCancelReply}
+            posting={postingReply}
+          />
+        )}
       </div>
     </div>
   );
@@ -151,9 +234,14 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
   const [skip, setSkip] = useState(0);
   const [token, setToken] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
+
+  // Main (top-level) comment input
   const [body, setBody] = useState('');
-  const [replyTo, setReplyTo] = useState<{ id: string; username: string } | null>(null);
   const [posting, setPosting] = useState(false);
+
+  // Reply state — which comment is being replied to
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+  const [postingReply, setPostingReply] = useState(false);
 
   useEffect(() => {
     setToken(getToken());
@@ -168,6 +256,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
     setTotal(0);
     setSkip(0);
     setFetchError(false);
+    setActiveReplyId(null);
 
     async function load() {
       try {
@@ -213,7 +302,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
     if (!body.trim() || !token || posting) return;
     setPosting(true);
     try {
-      const payload = { body: body.trim(), parent_comment_id: replyTo?.id };
+      const payload = { body: body.trim() };
       let newComment: ApiComment;
       if (trendId) {
         newComment = await apiPostTrendComment(trendId, payload, token);
@@ -221,26 +310,35 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
         newComment = await apiPostThreadComment(threadId, payload, token);
       } else return;
 
-      if (replyTo) {
-        setComments(prev =>
-          prev.map(c =>
-            c.id === replyTo.id ? { ...c, replies: [...(c.replies ?? []), newComment] } : c
-          )
-        );
-      } else {
-        setComments(prev => [newComment, ...prev]);
-        setTotal(t => t + 1);
-      }
+      setComments(prev => [newComment, ...prev]);
+      setTotal(t => t + 1);
       setBody('');
-      setReplyTo(null);
     } finally {
       setPosting(false);
     }
   }
 
-  function handleReplyStart(id: string, username: string) {
-    setReplyTo({ id, username });
-    setBody('');
+  async function handlePostReply(replyBody: string) {
+    if (!replyBody.trim() || !token || postingReply || !activeReplyId) return;
+    setPostingReply(true);
+    try {
+      const payload = { body: replyBody.trim(), parent_comment_id: activeReplyId };
+      let newComment: ApiComment;
+      if (trendId) {
+        newComment = await apiPostTrendComment(trendId, payload, token);
+      } else if (threadId) {
+        newComment = await apiPostThreadComment(threadId, payload, token);
+      } else return;
+
+      setComments(prev =>
+        prev.map(c =>
+          c.id === activeReplyId ? { ...c, replies: [...(c.replies ?? []), newComment] } : c
+        )
+      );
+      setActiveReplyId(null);
+    } finally {
+      setPostingReply(false);
+    }
   }
 
   function handleLikeUpdate(commentId: string, likeCount: number) {
@@ -262,37 +360,24 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
         )}
       </div>
 
-      {/* Input */}
+      {/* Top-level input (new comment only, not replies) */}
       {!isLocked && token ? (
-        <div className="flex flex-col gap-2">
-          {replyTo && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-xl">
-              <Icon icon="mdi:reply" className="text-gray-400 text-sm flex-shrink-0" />
-              <span className="font-inter text-xs text-gray-500 flex-1">
-                Réponse à <strong>{replyTo.username}</strong>
-              </span>
-              <button onClick={() => { setReplyTo(null); setBody(''); }}>
-                <Icon icon="mdi:close" className="text-gray-400 text-sm" />
-              </button>
-            </div>
-          )}
-          <div className="flex gap-2 items-end">
-            <textarea
-              value={body}
-              onChange={e => setBody(e.target.value)}
-              placeholder={replyTo ? `Répondre à @${replyTo.username}…` : 'Ajouter un commentaire…'}
-              rows={2}
-              className="flex-1 resize-none font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
-              onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handlePost(); }}
-            />
-            <button
-              onClick={handlePost}
-              disabled={!body.trim() || posting}
-              className="w-10 h-10 bg-[var(--color-text-dark)] text-white rounded-2xl flex items-center justify-center flex-shrink-0 disabled:opacity-30 transition-opacity"
-            >
-              <Icon icon={posting ? 'mdi:loading' : 'mdi:send'} className={`text-sm ${posting ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
+        <div className="flex gap-2 items-end">
+          <textarea
+            value={body}
+            onChange={e => setBody(e.target.value)}
+            placeholder="Ajouter un commentaire…"
+            rows={2}
+            className="flex-1 resize-none font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
+            onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handlePost(); }}
+          />
+          <button
+            onClick={handlePost}
+            disabled={!body.trim() || posting}
+            className="w-10 h-10 bg-[var(--color-text-dark)] text-white rounded-2xl flex items-center justify-center flex-shrink-0 disabled:opacity-30 transition-opacity"
+          >
+            <Icon icon={posting ? 'mdi:loading' : 'mdi:send'} className={`text-sm ${posting ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       ) : !token ? (
         <div className="bg-gray-50 rounded-2xl px-4 py-4 text-center border border-gray-100">
@@ -309,7 +394,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
         </div>
       ) : null}
 
-      {/* List */}
+      {/* Comment list */}
       {fetchError ? (
         <div className="bg-red-50 rounded-2xl px-4 py-4 text-center border border-red-100">
           <p className="font-inter text-sm text-red-400">
@@ -341,7 +426,11 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
               comment={comment}
               token={token}
               currentUserId={currentUserId}
-              onReply={handleReplyStart}
+              activeReplyId={activeReplyId}
+              postingReply={postingReply}
+              onReply={(id, username) => setActiveReplyId(id === activeReplyId ? null : id)}
+              onCancelReply={() => setActiveReplyId(null)}
+              onPostReply={handlePostReply}
               onLikeUpdate={handleLikeUpdate}
             />
           ))}

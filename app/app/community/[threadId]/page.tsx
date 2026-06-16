@@ -54,6 +54,7 @@ export default function ThreadDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState(false);
   const [liking, setLiking] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -81,6 +82,7 @@ export default function ThreadDetailPage() {
     try {
       const res = await apiToggleThreadLike(threadId, token);
       setLikeCount(res.like_count);
+      setLiked(res.liked);
     } finally {
       setLiking(false);
     }
@@ -178,7 +180,7 @@ export default function ThreadDetailPage() {
                 disabled={!token || liking}
                 className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors disabled:opacity-40"
               >
-                <Icon icon="mdi:heart-outline" className="text-white text-sm" />
+                <Icon icon={liked ? 'mdi:heart' : 'mdi:heart-outline'} className="text-white text-sm" />
                 <span className="font-inter text-xs text-white">{likeCount}</span>
               </button>
               {isOwner && (
