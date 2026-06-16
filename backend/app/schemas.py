@@ -105,6 +105,7 @@ class StatSchema(BaseModel):
 
 class TrendResponse(BaseModel):
     id: uuid.UUID
+    slug: str
     title: str
     description: str
     context: str

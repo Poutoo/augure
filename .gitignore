@@ -16,3 +16,12 @@ dist/
 node_modules/
 .next/
 out/
+
+## GEMINI md
+CHANGELOG.md
+CONVENTION.md
+GEMINI.md
+TASK.md
+bdd.sql
+doc.pdf
+doc_copy.txt

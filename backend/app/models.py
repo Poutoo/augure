@@ -135,6 +135,9 @@ class Trend(Base):
     badges: Mapped[list | None] = mapped_column(JSON, nullable=True)
     extra_stats: Mapped[list | None] = mapped_column(JSON, nullable=True)
     rank: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    weak_signals_hashtags: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    weak_signals_music: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
