@@ -40,7 +40,16 @@ function formatRelativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
-function Avatar({ username }: { username: string | null }) {
+function Avatar({ username, avatarUrl }: { username: string | null; avatarUrl?: string | null }) {
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={username ?? 'avatar'}
+        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+      />
+    );
+  }
   return (
     <div className="w-8 h-8 rounded-full bg-[var(--color-text-dark)] flex items-center justify-center flex-shrink-0">
       <span className="font-syne font-bold text-xs text-white">
@@ -77,7 +86,7 @@ function CommentItem({ comment, token, currentUserId: _currentUserId, onReply, o
 
   return (
     <div className={`flex gap-3 ${isReply ? 'ml-10' : ''}`}>
-      <Avatar username={comment.author.username} />
+      <Avatar username={comment.author.username} avatarUrl={comment.author.avatar_url} />
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           <span className="font-syne font-bold text-sm text-[var(--color-text-dark)]">

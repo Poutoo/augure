@@ -78,6 +78,7 @@ class OnboardingResponse(BaseModel):
     id: uuid.UUID
     email: str
     username: str | None
+    avatar_url: str | None = None
     role: UserRole
     plan: str
     target_ages: list | None
@@ -87,6 +88,30 @@ class OnboardingResponse(BaseModel):
     interests: list[InterestSchema]
 
     model_config = {"from_attributes": True}
+
+
+class ProfileResponse(BaseModel):
+    id: uuid.UUID
+    email: str
+    username: str | None
+    avatar_url: str | None
+    plan: str
+    role: UserRole | None
+    target_ages: list | None
+    target_networks: list | None
+    target_geography: list | None
+    target_gender: str | None
+    interests: list[InterestSchema]
+
+    model_config = {"from_attributes": True}
+
+
+class ProfileUpdateRequest(BaseModel):
+    username: str | None = Field(default=None, min_length=2, max_length=100)
+
+
+class AvatarResponse(BaseModel):
+    avatar_url: str
 
 
 # ── Trends ────────────────────────────────────────────────────────────────────
@@ -149,6 +174,7 @@ class TrendListResponse(BaseModel):
 class CommentAuthor(BaseModel):
     id: uuid.UUID
     username: str | None
+    avatar_url: str | None = None
 
     model_config = {"from_attributes": True}
 

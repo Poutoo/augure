@@ -25,7 +25,16 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function Avatar({ username }: { username: string | null }) {
+function Avatar({ username, avatarUrl }: { username: string | null; avatarUrl?: string | null }) {
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={username ?? 'avatar'}
+        className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+      />
+    );
+  }
   return (
     <div className="w-9 h-9 rounded-full bg-[var(--color-text-dark)] flex items-center justify-center flex-shrink-0">
       <span className="font-syne font-bold text-sm text-white">
@@ -154,7 +163,7 @@ export default function ThreadDetailPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Avatar username={thread.author.username} />
+              <Avatar username={thread.author.username} avatarUrl={thread.author.avatar_url} />
               <div>
                 <p className="font-syne font-bold text-sm text-white">
                   {thread.author.username ?? 'Utilisateur'}

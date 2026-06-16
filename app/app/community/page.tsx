@@ -23,10 +23,23 @@ function formatRelativeTime(dateStr: string): string {
   return days < 7 ? `il y a ${days}j` : new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
-function Avatar({ username, size = 8 }: { username: string | null; size?: number }) {
+function Avatar({ username, avatarUrl, size = 8 }: { username: string | null; avatarUrl?: string | null; size?: number }) {
+  const px = size * 4;
+  const style = { width: px, height: px, minWidth: px, minHeight: px };
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={username ?? 'avatar'}
+        style={style}
+        className="rounded-full object-cover flex-shrink-0"
+      />
+    );
+  }
   return (
     <div
-      className={`w-${size} h-${size} rounded-full bg-[var(--color-text-dark)] flex items-center justify-center flex-shrink-0`}
+      style={style}
+      className="rounded-full bg-[var(--color-text-dark)] flex items-center justify-center flex-shrink-0"
     >
       <span className="font-syne font-bold text-xs text-white">
         {username?.[0]?.toUpperCase() ?? '?'}
@@ -61,7 +74,7 @@ function ThreadCard({ thread }: { thread: ApiThread }) {
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
-            <Avatar username={thread.author.username} size={6} />
+            <Avatar username={thread.author.username} avatarUrl={thread.author.avatar_url} size={6} />
             <span className="font-inter text-xs text-gray-500">
               {thread.author.username ?? 'Utilisateur'} · {formatRelativeTime(thread.created_at)}
             </span>

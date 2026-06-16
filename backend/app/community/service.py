@@ -39,7 +39,7 @@ def _thread_response(
 ) -> ThreadResponse:
     return ThreadResponse(
         id=thread.id,
-        author=CommentAuthor(id=thread.author.id, username=thread.author.username),
+        author=CommentAuthor(id=thread.author.id, username=thread.author.username, avatar_url=thread.author.avatar_url),
         trend=_trend_snippet(thread.trend),
         title=thread.title,
         body=thread.body,
@@ -145,7 +145,7 @@ def get_thread(db: Session, thread_id: uuid.UUID) -> ThreadDetailResponse:
 
     return ThreadDetailResponse(
         id=thread.id,
-        author=CommentAuthor(id=thread.author.id, username=thread.author.username),
+        author=CommentAuthor(id=thread.author.id, username=thread.author.username, avatar_url=thread.author.avatar_url),
         trend=_trend_snippet(thread.trend),
         title=thread.title,
         body=thread.body,

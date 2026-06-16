@@ -84,6 +84,7 @@ class User(Base):
     target_geography: Mapped[list | None] = mapped_column(JSON, nullable=True)
     # ex: "homme", "femme", "tous", "autre"
     target_gender: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
