@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import func
 from sqlalchemy.orm import Session, selectinload
 
-from app.comments.service import _build_comment_responses, _enrich
+from app.comments.service import _enrich
 from app.community.service import _thread_response
 from app.dependencies import get_current_user, get_db
 from app.models import Comment, Like, Thread, User
