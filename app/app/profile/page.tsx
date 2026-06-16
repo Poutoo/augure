@@ -294,7 +294,7 @@ export default function ProfilePage() {
       {/* ── Informations ─────────────────────────────────────────────── */}
       <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
         <SectionTitle>Informations</SectionTitle>
-        <label className="block font-inter text-sm text-gray-500 mb-1">Nom d'utilisateur</label>
+        <label className="block font-inter text-sm text-gray-500 mb-1">Nom d&apos;utilisateur</label>
         <div className="flex gap-2">
           <input
             type="text"
@@ -338,7 +338,7 @@ export default function ProfilePage() {
 
       {/* ── Centres d'intérêt ─────────────────────────────────────────── */}
       <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-        <SectionTitle>Centres d'intérêt</SectionTitle>
+        <SectionTitle>Centres d&apos;intérêt</SectionTitle>
         <div className="flex flex-wrap gap-2">
           {INTERESTS.map(i => (
             <button

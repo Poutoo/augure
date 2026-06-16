@@ -428,7 +428,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
               currentUserId={currentUserId}
               activeReplyId={activeReplyId}
               postingReply={postingReply}
-              onReply={(id, username) => setActiveReplyId(id === activeReplyId ? null : id)}
+              onReply={(id) => setActiveReplyId(id === activeReplyId ? null : id)}
               onCancelReply={() => setActiveReplyId(null)}
               onPostReply={handlePostReply}
               onLikeUpdate={handleLikeUpdate}
