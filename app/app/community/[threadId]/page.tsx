@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
-import { STATUS_CONFIG, ApiThreadDetail, apiGetThread, apiToggleThreadLike, apiDeleteThread } from '@/lib/api';
+import { STATUS_CONFIG, ApiThreadDetail, apiGetThread, apiToggleThreadLike, apiDeleteThread, apiCheckCollections } from '@/lib/api';
 import TrendComments from '@/components/TrendComments';
+import CollectionPickerSheet from '@/components/CollectionPickerSheet';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -57,16 +58,23 @@ export default function ThreadDetailPage() {
   const [liked, setLiked] = useState(false);
   const [liking, setLiking] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [inAnyCollection, setInAnyCollection] = useState(false);
+  const [showBookmark, setShowBookmark] = useState(false);
 
   useEffect(() => { setToken(getToken()); }, []);
 
   useEffect(() => {
     if (!threadId) return;
     setLoading(true);
+    const token = localStorage.getItem('augure_token');
     apiGetThread(threadId)
-      .then(data => {
+      .then(async data => {
         setThread(data);
         setLikeCount(data.like_count);
+        if (token) {
+          const check = await apiCheckCollections(token, { thread_id: threadId });
+          setInAnyCollection(check.collection_ids.length > 0);
+        }
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -183,6 +191,14 @@ export default function ThreadDetailPage() {
                 <Icon icon={liked ? 'mdi:heart' : 'mdi:heart-outline'} className="text-white text-sm" />
                 <span className="font-inter text-xs text-white">{likeCount}</span>
               </button>
+              {token && (
+                <button
+                  onClick={() => setShowBookmark(true)}
+                  className="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
+                >
+                  <Icon icon={inAnyCollection ? 'mdi:bookmark' : 'mdi:bookmark-outline'} className="text-white text-sm" />
+                </button>
+              )}
               {isOwner && (
                 <button
                   onClick={handleDelete}
@@ -213,6 +229,18 @@ export default function ThreadDetailPage() {
         </div>
 
       </div>
+
+      {showBookmark && token && (
+        <CollectionPickerSheet
+          token={token}
+          threadId={threadId}
+          onClose={async () => {
+            setShowBookmark(false);
+            const check = await apiCheckCollections(token, { thread_id: threadId });
+            setInAnyCollection(check.collection_ids.length > 0);
+          }}
+        />
+      )}
     </main>
   );
 }

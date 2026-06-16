@@ -2,9 +2,10 @@
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { ApiTrend, STATUS_CONFIG, apiGetTrendById } from '@/lib/api';
+import { ApiTrend, STATUS_CONFIG, apiGetTrendById, apiCheckCollections } from '@/lib/api';
 import { useEffect, useState } from 'react';
 import TrendComments from '@/components/TrendComments';
+import CollectionPickerSheet from '@/components/CollectionPickerSheet';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -15,6 +16,8 @@ export default function TrendDetailModal() {
   const [trend, setTrend] = useState<ApiTrend | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showBookmark, setShowBookmark] = useState(false);
+  const [bookmarkToken, setBookmarkToken] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'detail' | 'comments'>('detail');
 
   const trendId = searchParams.get('trendId');
@@ -29,11 +32,16 @@ export default function TrendDetailModal() {
 
     setActiveTab('detail');
     const token = (typeof window !== 'undefined' ? localStorage.getItem('augure_token') : null) ?? '';
+    setBookmarkToken(token || null);
     apiGetTrendById(trendId, token)
-      .then(data => {
+      .then(async data => {
         setTrend(data);
         const t = setTimeout(() => setIsVisible(true), 30);
         document.body.style.overflow = 'hidden';
+        if (token) {
+          const check = await apiCheckCollections(token, { trend_id: trendId });
+          setIsBookmarked(check.collection_ids.length > 0);
+        }
         return () => clearTimeout(t);
       })
       .catch(() => setTrend(null));
@@ -58,6 +66,7 @@ export default function TrendDetailModal() {
   const panelClass = `relative bg-white w-full md:max-w-2xl h-[92vh] md:h-[85vh] rounded-t-[32px] md:rounded-[32px] shadow-2xl flex flex-col overflow-hidden z-10 transition-all duration-300 ease-out transform ${isVisible ? 'translate-y-0 opacity-100 md:scale-100' : 'translate-y-full opacity-0 md:translate-y-8 md:scale-95'}`;
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
       <div onClick={handleClose} className={overlayClass} />
 
@@ -98,7 +107,7 @@ export default function TrendDetailModal() {
             </div>
 
             <button
-              onClick={() => setIsBookmarked(!isBookmarked)}
+              onClick={() => bookmarkToken && setShowBookmark(true)}
               className="w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-100 rounded-full transition-colors shadow-md"
             >
               <Icon
@@ -238,5 +247,20 @@ export default function TrendDetailModal() {
         </div>
       </div>
     </div>
+
+    {showBookmark && bookmarkToken && trendId && (
+      <CollectionPickerSheet
+        token={bookmarkToken}
+        trendId={trendId ?? undefined}
+        onClose={async () => {
+          setShowBookmark(false);
+          if (bookmarkToken && trendId) {
+            const check = await apiCheckCollections(bookmarkToken, { trend_id: trendId });
+            setIsBookmarked(check.collection_ids.length > 0);
+          }
+        }}
+      />
+    )}
+    </>
   );
 }

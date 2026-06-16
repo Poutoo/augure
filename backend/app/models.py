@@ -270,6 +270,36 @@ class Comment(Base):
     )
 
 
+class FavoriteCollection(Base):
+    __tablename__ = "favorite_collections"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    emoji: Mapped[str] = mapped_column(String(10), nullable=False, default="🔖")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    items: Mapped[list["FavoriteItem"]] = relationship("FavoriteItem", back_populates="collection", cascade="all, delete-orphan")
+
+
+class FavoriteItem(Base):
+    __tablename__ = "favorite_items"
+    __table_args__ = (
+        UniqueConstraint("collection_id", "thread_id", name="uq_favitem_col_thread"),
+        UniqueConstraint("collection_id", "trend_id", name="uq_favitem_col_trend"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    collection_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("favorite_collections.id", ondelete="CASCADE"), nullable=False, index=True)
+    thread_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("threads.id", ondelete="CASCADE"), nullable=True)
+    trend_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("trends.id", ondelete="CASCADE"), nullable=True)
+    added_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    collection: Mapped["FavoriteCollection"] = relationship("FavoriteCollection", back_populates="items")
+    thread: Mapped["Thread | None"] = relationship("Thread")
+    trend: Mapped["Trend | None"] = relationship("Trend")
+
+
 class Like(Base):
     __tablename__ = "likes"
     __table_args__ = (

@@ -388,3 +388,145 @@ export async function apiDeleteThread(threadId: string, token: string): Promise<
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+// ── Favorites ─────────────────────────────────────────────────────────────────
+
+export interface ApiFavoriteCollection {
+  id: string;
+  name: string;
+  emoji: string;
+  item_count: number;
+  created_at: string;
+}
+
+export interface ApiFavThreadSnippet {
+  id: string;
+  title: string;
+  body: string;
+  author: ApiCommentAuthor;
+  trend: ApiThreadTrend | null;
+  created_at: string;
+}
+
+export interface ApiFavoriteItem {
+  id: string;
+  collection_id: string;
+  added_at: string;
+  thread: ApiFavThreadSnippet | null;
+  trend_id: string | null;
+  trend_title: string | null;
+  trend_image: string | null;
+  trend_status: string | null;
+}
+
+export interface ApiLikedThread {
+  thread: ApiThread;
+  liked_at: string;
+}
+
+export interface ApiLikedComment {
+  comment: ApiComment;
+  context_type: 'thread' | 'trend';
+  context_id: string;
+  context_title: string;
+  liked_at: string;
+}
+
+export async function apiGetMyLikedThreads(token: string): Promise<ApiLikedThread[]> {
+  const res = await fetch(`${API_BASE}/user/likes/threads`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiGetMyLikedComments(token: string): Promise<ApiLikedComment[]> {
+  const res = await fetch(`${API_BASE}/user/likes/comments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiGetMyCollections(token: string): Promise<ApiFavoriteCollection[]> {
+  const res = await fetch(`${API_BASE}/user/favorites`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiCreateCollection(token: string, body: { name: string; emoji: string }): Promise<ApiFavoriteCollection> {
+  const res = await fetch(`${API_BASE}/user/favorites`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur création collection');
+  }
+  return res.json();
+}
+
+export async function apiDeleteCollection(token: string, id: string): Promise<void> {
+  await fetch(`${API_BASE}/user/favorites/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function apiGetCollectionItems(token: string, id: string): Promise<ApiFavoriteItem[]> {
+  const res = await fetch(`${API_BASE}/user/favorites/${id}/items`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiAddToCollection(
+  token: string,
+  collectionId: string,
+  params: { thread_id?: string; trend_id?: string },
+): Promise<ApiFavoriteItem> {
+  const url = new URL(`${API_BASE}/user/favorites/${collectionId}/items`);
+  if (params.thread_id) url.searchParams.set('thread_id', params.thread_id);
+  if (params.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  const res = await fetch(url.toString(), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur ajout favori');
+  }
+  return res.json();
+}
+
+export async function apiRemoveFromCollection(
+  token: string,
+  collectionId: string,
+  params: { thread_id?: string; trend_id?: string },
+): Promise<void> {
+  const url = new URL(`${API_BASE}/user/favorites/${collectionId}/items`);
+  if (params.thread_id) url.searchParams.set('thread_id', params.thread_id);
+  if (params.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  await fetch(url.toString(), {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function apiCheckCollections(
+  token: string,
+  params: { thread_id?: string; trend_id?: string },
+): Promise<{ collection_ids: string[] }> {
+  const url = new URL(`${API_BASE}/user/favorites/check`);
+  if (params.thread_id) url.searchParams.set('thread_id', params.thread_id);
+  if (params.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return { collection_ids: [] };
+  return res.json();
+}

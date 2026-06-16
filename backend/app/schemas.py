@@ -248,3 +248,63 @@ class ThreadListResponse(BaseModel):
     items: list[ThreadResponse]
     skip: int
     limit: int
+
+
+# ── Favorites ─────────────────────────────────────────────────────────────────
+
+class FavoriteCollectionResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    emoji: str
+    item_count: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class FavoriteCollectionCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    emoji: str = Field(default="🔖", max_length=10)
+
+
+class FavThreadSnippet(BaseModel):
+    id: uuid.UUID
+    title: str
+    body: str
+    author: CommentAuthor
+    trend: ThreadTrendSnippet | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class FavoriteItemResponse(BaseModel):
+    id: uuid.UUID
+    collection_id: uuid.UUID
+    added_at: datetime
+    thread: FavThreadSnippet | None = None
+    trend_id: uuid.UUID | None = None
+    trend_title: str | None = None
+    trend_image: str | None = None
+    trend_status: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class CollectionCheckResponse(BaseModel):
+    collection_ids: list[uuid.UUID]
+
+
+# ── Likes ─────────────────────────────────────────────────────────────────────
+
+class LikedThreadResponse(BaseModel):
+    thread: ThreadResponse
+    liked_at: datetime
+
+
+class LikedCommentResponse(BaseModel):
+    comment: CommentResponse
+    context_type: str
+    context_id: uuid.UUID
+    context_title: str
+    liked_at: datetime
