@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
-import { STATUS_CONFIG, ApiThreadDetail, apiGetThread, apiToggleThreadLike, apiDeleteThread } from '@/lib/api';
+import { STATUS_CONFIG, ApiThreadDetail, apiGetThread, apiToggleThreadLike, apiDeleteThread, apiCheckCollections } from '@/lib/api';
 import TrendComments from '@/components/TrendComments';
+import CollectionPickerSheet from '@/components/CollectionPickerSheet';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -25,7 +26,16 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function Avatar({ username }: { username: string | null }) {
+function Avatar({ username, avatarUrl }: { username: string | null; avatarUrl?: string | null }) {
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={username ?? 'avatar'}
+        className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+      />
+    );
+  }
   return (
     <div className="w-9 h-9 rounded-full bg-[var(--color-text-dark)] flex items-center justify-center flex-shrink-0">
       <span className="font-syne font-bold text-sm text-white">
@@ -45,18 +55,26 @@ export default function ThreadDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState(false);
   const [liking, setLiking] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [inAnyCollection, setInAnyCollection] = useState(false);
+  const [showBookmark, setShowBookmark] = useState(false);
 
   useEffect(() => { setToken(getToken()); }, []);
 
   useEffect(() => {
     if (!threadId) return;
     setLoading(true);
+    const token = localStorage.getItem('augure_token');
     apiGetThread(threadId)
-      .then(data => {
+      .then(async data => {
         setThread(data);
         setLikeCount(data.like_count);
+        if (token) {
+          const check = await apiCheckCollections(token, { thread_id: threadId });
+          setInAnyCollection(check.collection_ids.length > 0);
+        }
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -72,6 +90,7 @@ export default function ThreadDetailPage() {
     try {
       const res = await apiToggleThreadLike(threadId, token);
       setLikeCount(res.like_count);
+      setLiked(res.liked);
     } finally {
       setLiking(false);
     }
@@ -154,7 +173,7 @@ export default function ThreadDetailPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Avatar username={thread.author.username} />
+              <Avatar username={thread.author.username} avatarUrl={thread.author.avatar_url} />
               <div>
                 <p className="font-syne font-bold text-sm text-white">
                   {thread.author.username ?? 'Utilisateur'}
@@ -169,9 +188,17 @@ export default function ThreadDetailPage() {
                 disabled={!token || liking}
                 className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors disabled:opacity-40"
               >
-                <Icon icon="mdi:heart-outline" className="text-white text-sm" />
+                <Icon icon={liked ? 'mdi:heart' : 'mdi:heart-outline'} className="text-white text-sm" />
                 <span className="font-inter text-xs text-white">{likeCount}</span>
               </button>
+              {token && (
+                <button
+                  onClick={() => setShowBookmark(true)}
+                  className="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
+                >
+                  <Icon icon={inAnyCollection ? 'mdi:bookmark' : 'mdi:bookmark-outline'} className="text-white text-sm" />
+                </button>
+              )}
               {isOwner && (
                 <button
                   onClick={handleDelete}
@@ -202,6 +229,18 @@ export default function ThreadDetailPage() {
         </div>
 
       </div>
+
+      {showBookmark && token && (
+        <CollectionPickerSheet
+          token={token}
+          threadId={threadId}
+          onClose={async () => {
+            setShowBookmark(false);
+            const check = await apiCheckCollections(token, { thread_id: threadId });
+            setInAnyCollection(check.collection_ids.length > 0);
+          }}
+        />
+      )}
     </main>
   );
 }

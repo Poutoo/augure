@@ -36,6 +36,81 @@ export const STATUS_CONFIG: Record<string, { label: string; icon: string; color:
   en_baisse: { label: 'En baisse', icon: 'mdi:arrow-down-bold',  color: 'text-white', badge: 'badge-status badge-status-en_baisse' },
 };
 
+// ── User profile ──────────────────────────────────────────────────────────────
+
+export interface ApiUser {
+  id: string;
+  email: string;
+  username: string | null;
+  avatar_url: string | null;
+  plan: string;
+  role: string | null;
+  target_ages: string[] | null;
+  target_networks: string[] | null;
+  target_geography: string[] | null;
+  target_gender: string | null;
+  interests: { id: number; name: string; slug: string }[];
+}
+
+export async function apiGetMe(token: string): Promise<ApiUser> {
+  const res = await fetch(`${API_BASE}/user/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Impossible de récupérer le profil');
+  return res.json();
+}
+
+export async function apiUpdateProfile(token: string, username: string): Promise<ApiUser> {
+  const res = await fetch(`${API_BASE}/user/profile`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ username }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur lors de la mise à jour');
+  }
+  return res.json();
+}
+
+export async function apiUpdatePreferences(
+  token: string,
+  payload: {
+    role: string;
+    target_ages: string[];
+    target_networks: string[];
+    target_geography: string[];
+    target_gender: string;
+    interest_slugs: string[];
+  },
+): Promise<ApiUser> {
+  const res = await fetch(`${API_BASE}/user/preferences`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur lors de la mise à jour');
+  }
+  return res.json();
+}
+
+export async function apiUploadAvatar(token: string, file: File): Promise<{ avatar_url: string }> {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${API_BASE}/user/avatar`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : "Erreur lors de l'upload");
+  }
+  return res.json();
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export async function apiRegister(email: string, password: string, username?: string) {
@@ -137,6 +212,7 @@ export async function apiGetTrendById(id: string, token: string): Promise<ApiTre
 export interface ApiCommentAuthor {
   id: string;
   username: string | null;
+  avatar_url: string | null;
 }
 
 export interface ApiComment {
@@ -312,4 +388,146 @@ export async function apiDeleteThread(threadId: string, token: string): Promise<
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
+}
+
+// ── Favorites ─────────────────────────────────────────────────────────────────
+
+export interface ApiFavoriteCollection {
+  id: string;
+  name: string;
+  emoji: string;
+  item_count: number;
+  created_at: string;
+}
+
+export interface ApiFavThreadSnippet {
+  id: string;
+  title: string;
+  body: string;
+  author: ApiCommentAuthor;
+  trend: ApiThreadTrend | null;
+  created_at: string;
+}
+
+export interface ApiFavoriteItem {
+  id: string;
+  collection_id: string;
+  added_at: string;
+  thread: ApiFavThreadSnippet | null;
+  trend_id: string | null;
+  trend_title: string | null;
+  trend_image: string | null;
+  trend_status: string | null;
+}
+
+export interface ApiLikedThread {
+  thread: ApiThread;
+  liked_at: string;
+}
+
+export interface ApiLikedComment {
+  comment: ApiComment;
+  context_type: 'thread' | 'trend';
+  context_id: string;
+  context_title: string;
+  liked_at: string;
+}
+
+export async function apiGetMyLikedThreads(token: string): Promise<ApiLikedThread[]> {
+  const res = await fetch(`${API_BASE}/user/likes/threads`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiGetMyLikedComments(token: string): Promise<ApiLikedComment[]> {
+  const res = await fetch(`${API_BASE}/user/likes/comments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiGetMyCollections(token: string): Promise<ApiFavoriteCollection[]> {
+  const res = await fetch(`${API_BASE}/user/favorites`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiCreateCollection(token: string, body: { name: string; emoji: string }): Promise<ApiFavoriteCollection> {
+  const res = await fetch(`${API_BASE}/user/favorites`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur création collection');
+  }
+  return res.json();
+}
+
+export async function apiDeleteCollection(token: string, id: string): Promise<void> {
+  await fetch(`${API_BASE}/user/favorites/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function apiGetCollectionItems(token: string, id: string): Promise<ApiFavoriteItem[]> {
+  const res = await fetch(`${API_BASE}/user/favorites/${id}/items`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function apiAddToCollection(
+  token: string,
+  collectionId: string,
+  params: { thread_id?: string; trend_id?: string },
+): Promise<ApiFavoriteItem> {
+  const url = new URL(`${API_BASE}/user/favorites/${collectionId}/items`);
+  if (params.thread_id) url.searchParams.set('thread_id', params.thread_id);
+  if (params.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  const res = await fetch(url.toString(), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(typeof data.detail === 'string' ? data.detail : 'Erreur ajout favori');
+  }
+  return res.json();
+}
+
+export async function apiRemoveFromCollection(
+  token: string,
+  collectionId: string,
+  params: { thread_id?: string; trend_id?: string },
+): Promise<void> {
+  const url = new URL(`${API_BASE}/user/favorites/${collectionId}/items`);
+  if (params.thread_id) url.searchParams.set('thread_id', params.thread_id);
+  if (params.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  await fetch(url.toString(), {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function apiCheckCollections(
+  token: string,
+  params: { thread_id?: string; trend_id?: string },
+): Promise<{ collection_ids: string[] }> {
+  const url = new URL(`${API_BASE}/user/favorites/check`);
+  if (params.thread_id) url.searchParams.set('thread_id', params.thread_id);
+  if (params.trend_id) url.searchParams.set('trend_id', params.trend_id);
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return { collection_ids: [] };
+  return res.json();
 }

@@ -8,9 +8,8 @@ import Image from 'next/image';
 const navItems = [
   { href: '/',           label: 'Accueil',     iconActive: 'mdi:home',          iconInactive: 'mdi:home-outline'          },
   { href: '/search',     label: 'Explorer',    iconActive: 'mdi:compass',       iconInactive: 'mdi:compass-outline'       },
-  { href: '/saved',      label: 'Enregistrés', iconActive: 'mdi:bookmark',      iconInactive: 'mdi:bookmark-outline'      },
-  { href: '/profile',    label: 'Profil',      iconActive: 'mdi:account',       iconInactive: 'mdi:account-outline'       },
   { href: '/community',  label: 'Communauté',  iconActive: 'mdi:account-group', iconInactive: 'mdi:account-group-outline' },
+  { href: '/profile',    label: 'Profil',      iconActive: 'mdi:account',       iconInactive: 'mdi:account-outline'       },
 ];
 
 const HIDDEN_PATHS = ['/welcome', '/login', '/onboarding'];

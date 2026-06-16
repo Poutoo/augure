@@ -23,7 +23,7 @@ def _build_comment_responses(
     return [
         CommentResponse(
             id=c.id,
-            author=CommentAuthor(id=c.author.id, username=c.author.username),
+            author=CommentAuthor(id=c.author.id, username=c.author.username, avatar_url=c.author.avatar_url),
             body="[Commentaire supprimé]" if c.is_deleted else c.body,
             like_count=like_count_map.get(c.id, 0),
             is_deleted=c.is_deleted,
