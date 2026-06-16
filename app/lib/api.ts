@@ -4,6 +4,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v
 
 export interface ApiTrend {
   id: string;
+  slug: string;
   title: string;
   description: string;
   context: string;

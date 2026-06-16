@@ -148,8 +148,12 @@ def seed_trends() -> None:
         for data in _TRENDS:
             if data["title"] in existing_titles:
                 continue
+            
+            slug = data["title"].lower().replace(" ", "-").replace("'", "")
+            
             trend = Trend(
                 title=data["title"],
+                slug=slug,
                 description=data["description"],
                 context=data["context"],
                 usage_example=data["usage_example"],
