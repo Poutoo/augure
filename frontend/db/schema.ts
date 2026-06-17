@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, jsonb, uuid, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, jsonb, uuid, integer, boolean } from 'drizzle-orm/pg-core';
 
 export const trends = pgTable('trends', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -9,7 +9,7 @@ export const trends = pgTable('trends', {
   usage_example: text('usage_example').notNull(),
   usage_keys: jsonb('usage_keys').$type<string[]>(),
   score_base: integer('score_base').default(0).notNull(),
-  status: text('status').notNull(), // Assuming text for simplicity, or we could use pgEnum
+  status: text('status').notNull(), 
   category: text('category'),
   region: text('region'),
   age_range: text('age_range'),
@@ -20,5 +20,8 @@ export const trends = pgTable('trends', {
   rank: integer('rank'),
   weakSignalsHashtags: jsonb('weak_signals_hashtags'),
   weakSignalsMusic: jsonb('weak_signals_music'),
+  ageDistribution: jsonb('age_distribution'),
+  originalPostAt: timestamp('original_post_at', { withTimezone: true }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  isMock: boolean('is_mock').default(false).notNull(),
 });
