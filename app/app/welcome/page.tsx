@@ -59,16 +59,12 @@ export default function WelcomePage() {
 
       {/* Boutons liquid glass */}
       <div className="w-full max-w-xs flex flex-col gap-4 relative z-10">
-        <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
-          <LiquidGlassButton href="/login" variant="primary">
-            Se connecter
-          </LiquidGlassButton>
-        </div>
-        <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
-          <LiquidGlassButton href="/onboarding" variant="secondary">
-            Créer un compte
-          </LiquidGlassButton>
-        </div>
+        <LiquidGlassButton href="/login" variant="primary" className="anim-fade-up" style={{ animationDelay: '80ms' }}>
+          Se connecter
+        </LiquidGlassButton>
+        <LiquidGlassButton href="/onboarding" variant="secondary" className="anim-fade-up" style={{ animationDelay: '160ms' }}>
+          Créer un compte
+        </LiquidGlassButton>
       </div>
 
     </div>

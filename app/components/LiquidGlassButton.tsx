@@ -9,6 +9,7 @@ interface LiquidGlassButtonProps {
   children: ReactNode;
   variant?: "primary" | "secondary";
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function LiquidGlassButton({
@@ -17,6 +18,7 @@ export default function LiquidGlassButton({
   children,
   variant = "primary",
   className = "",
+  style: styleProp,
 }: LiquidGlassButtonProps) {
   const isPrimary = variant === "primary";
 
@@ -24,7 +26,7 @@ export default function LiquidGlassButton({
     "group relative w-full py-4 px-8 rounded-full font-syne font-semibold text-base " +
     "text-center text-white transition-all duration-200 active:scale-[0.97] select-none overflow-hidden ";
 
-  const style: React.CSSProperties = isPrimary
+  const baseStyle: React.CSSProperties = isPrimary
     ? {
         background: "rgba(255,255,255,0.07)",
         boxShadow: [
@@ -98,14 +100,14 @@ export default function LiquidGlassButton({
 
   if (href) {
     return (
-      <Link href={href} className={base + className} style={style}>
+      <Link href={href} className={base + className} style={{ ...baseStyle, ...styleProp }}>
         {inner}
       </Link>
     );
   }
 
   return (
-    <button onClick={onClick} className={base + className} style={style}>
+    <button onClick={onClick} className={base + className} style={{ ...baseStyle, ...styleProp }}>
       {inner}
     </button>
   );
