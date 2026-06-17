@@ -40,7 +40,7 @@ def _thread_response(
 ) -> ThreadResponse:
     return ThreadResponse(
         id=thread.id,
-        author=CommentAuthor(id=thread.author.id, username=thread.author.username, avatar_url=thread.author.avatar_url),
+        author=CommentAuthor(id=thread.author.id, username=thread.author.username, avatar_url=thread.author.avatar_url, is_verified=thread.author.is_verified),
         trend=_trend_snippet(thread.trend),
         title=thread.title,
         body=thread.body,
@@ -159,7 +159,7 @@ def get_thread(
 
     return ThreadDetailResponse(
         id=thread.id,
-        author=CommentAuthor(id=thread.author.id, username=thread.author.username, avatar_url=thread.author.avatar_url),
+        author=CommentAuthor(id=thread.author.id, username=thread.author.username, avatar_url=thread.author.avatar_url, is_verified=thread.author.is_verified),
         trend=_trend_snippet(thread.trend),
         title=thread.title,
         body=thread.body,

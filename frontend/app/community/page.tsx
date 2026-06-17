@@ -76,8 +76,15 @@ function ThreadCard({ thread }: { thread: ApiThread }) {
           <div className="flex items-center gap-2">
             <Avatar username={thread.author.username} avatarUrl={thread.author.avatar_url} size={6} />
             <span className="font-inter text-xs text-gray-500">
-              {thread.author.username ?? 'Utilisateur'} · {formatRelativeTime(thread.created_at)}
+              {thread.author.username ?? 'Utilisateur'}
             </span>
+            {thread.author.is_verified && (
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black text-white text-[9px] font-syne font-bold tracking-wider uppercase">
+                <Icon icon="mdi:check-decagram" className="text-[9px]" />
+                Certifié
+              </span>
+            )}
+            <span className="font-inter text-xs text-gray-400">· {formatRelativeTime(thread.created_at)}</span>
           </div>
           <div className="flex items-center gap-3 text-gray-400">
             <span className="flex items-center gap-1 font-inter text-xs">

@@ -342,7 +342,15 @@ export default function ProfilePage() {
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
         {avatarError && <p className="text-sm text-red-500 font-inter flex items-center gap-1"><Icon icon="mdi:alert-circle-outline" /> {avatarError}</p>}
         <div className="text-center">
-          <p className="font-syne font-bold text-xl text-[var(--color-text-dark)]">{user.username ? `@${user.username}` : user.email}</p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="font-syne font-bold text-xl text-[var(--color-text-dark)]">{user.username ? `@${user.username}` : user.email}</p>
+            {user.is_verified && (
+              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-black text-white text-[10px] font-syne font-bold tracking-wider uppercase">
+                <Icon icon="mdi:check-decagram" className="text-[10px]" />
+                Certifié
+              </span>
+            )}
+          </div>
           <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-syne font-semibold ${planBadgeClass}`}>{planLabel}</span>
         </div>
       </div>

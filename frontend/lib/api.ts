@@ -51,6 +51,7 @@ export interface ApiUser {
   target_geography: string[] | null;
   target_gender: string | null;
   interests: { id: number; name: string; slug: string }[];
+  is_verified: boolean;
 }
 
 export async function apiGetMe(token: string): Promise<ApiUser> {
@@ -214,6 +215,7 @@ export interface ApiCommentAuthor {
   id: string;
   username: string | null;
   avatar_url: string | null;
+  is_verified: boolean;
 }
 
 export interface ApiComment {

@@ -102,6 +102,7 @@ class ProfileResponse(BaseModel):
     target_geography: list | None
     target_gender: str | None
     interests: list[InterestSchema]
+    is_verified: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -176,6 +177,7 @@ class CommentAuthor(BaseModel):
     id: uuid.UUID
     username: str | None
     avatar_url: str | None = None
+    is_verified: bool = False
 
     model_config = {"from_attributes": True}
 

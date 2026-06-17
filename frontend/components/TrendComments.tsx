@@ -155,10 +155,16 @@ function CommentItem({
     <div className={`flex gap-3 ${isReply ? 'ml-10' : ''}`}>
       <Avatar username={comment.author.username} avatarUrl={comment.author.avatar_url} />
       <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="font-syne font-bold text-sm text-[var(--color-text-dark)]">
             {comment.author.username ?? 'Utilisateur'}
           </span>
+          {comment.author.is_verified && (
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black text-white text-[9px] font-syne font-bold tracking-wider uppercase">
+              <Icon icon="mdi:check-decagram" className="text-[9px]" />
+              Certifié
+            </span>
+          )}
           <span className="font-inter text-xs text-gray-400">
             {formatRelativeTime(comment.created_at)}
           </span>
