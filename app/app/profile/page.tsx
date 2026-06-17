@@ -209,6 +209,13 @@ export default function ProfilePage() {
       const { avatar_url } = await apiUploadAvatar(token, file);
       setAvatarPreview(avatar_url);
       setUser(u => u ? { ...u, avatar_url } : u);
+      try {
+        const raw = localStorage.getItem('augure_profile_cache');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          localStorage.setItem('augure_profile_cache', JSON.stringify({ ...parsed, avatarUrl: avatar_url }));
+        }
+      } catch {}
     } catch (err) {
       setAvatarError(err instanceof Error ? err.message : "Erreur upload");
       setAvatarPreview(user?.avatar_url ?? null);
@@ -223,6 +230,14 @@ export default function ProfilePage() {
     try {
       const updated = await apiUpdateProfile(token, username.trim());
       setUser(u => u ? { ...u, username: updated.username } : u);
+      try {
+        const raw = localStorage.getItem('augure_profile_cache');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const newInitial = (updated.username ?? updated.email).charAt(0).toUpperCase();
+          localStorage.setItem('augure_profile_cache', JSON.stringify({ ...parsed, initial: newInitial }));
+        }
+      } catch {}
       setUsernameSuccess(true);
       setTimeout(() => setUsernameSuccess(false), 3000);
     } catch (err) {
