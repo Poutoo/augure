@@ -53,7 +53,7 @@ export default function Home() {
             {listLoading
               ? [1, 2, 3].map(i => <div key={i} className="flex-shrink-0 w-44 h-52 rounded-2xl bg-gray-200 animate-pulse" />)
               : topTrends.map((trend, i) => (
-                  <div key={trend.id} className="anim-scale-in" style={{ animationDelay: `${i * 80}ms` }}>
+                  <div key={trend.id} className="anim-scale-in flex-shrink-0" style={{ animationDelay: `${i * 80}ms` }}>
                     <TopTrendCard trend={trend} />
                   </div>
                 ))

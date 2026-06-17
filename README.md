@@ -122,7 +122,7 @@ Le scraper écrit **directement en base via SQL brut** (`INSERT ... ON CONFLICT`
 ### Justifications d'architecture
 
 **Next.js 16 (React / TypeScript)**
-Le rendu SSR (Server-Side Rendering) exécute la logique de récupération des données côté serveur, envoyant au client un HTML déjà hydraté. Sur les terminaux mobiles professionnels ou anciens de notre cible 45+, cela réduit significativement le temps d'affichage en limitant le JavaScript exécuté côté client. Le App Router de Next.js 16 permet en outre un découpage fin des composants serveur/client, optimisant la taille des bundles livrés.
+Le rendu SSR (Server-Side Rendering) exécute la logique de récupération des données côté serveur, envoyant au client un HTML pré-rendu qui sera ensuite hydraté. Sur les terminaux mobiles professionnels ou anciens de notre cible 45+, cela réduit significativement le temps d'affichage en limitant le JavaScript exécuté côté client. Le App Router de Next.js 16 permet en outre un découpage fin des composants serveur/client, optimisant la taille des bundles livrés.
 
 **FastAPI (Python 3.12)**
 FastAPI repose sur Starlette et est intégralement asynchrone. Ses performances brutes en I/O non-bloquant sont comparables à NodeJS pour les endpoints CRUD, tout en offrant une intégration native avec l'écosystème Python de traitement de données (PRAW pour Reddit, Pytrends, scripts d'enrichissement lexical). La validation automatique des schémas via Pydantic v2 et la génération OpenAPI embarquée éliminent une couche de boilerplate.
@@ -138,7 +138,7 @@ PostgreSQL est le choix de persistance relationnelle standard pour les profils u
 
 ```text
 augure/
-├── app/                            # Frontend — Next.js 16 (App Router)
+├── frontend/                       # Frontend — Next.js 16 (App Router)
 │   ├── app/                        # Routes applicatives
 │   │   ├── page.tsx                # Accueil — flux de tendances personnalisé
 │   │   ├── search/page.tsx         # Moteur de recherche & filtrage multicritères
