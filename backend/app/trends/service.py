@@ -91,7 +91,7 @@ def get_personalized_trends(
 
     items = [
         ScoredTrendResponse(
-            id=trend.id, title=trend.title, description=trend.description,
+            id=trend.id, slug=trend.slug, title=trend.title, description=trend.description,
             context=trend.context, usage_example=trend.usage_example, usage_keys=trend.usage_keys,
             score_base=trend.score_base, status=trend.status,
             category=trend.category, region=trend.region, age_range=trend.age_range,
@@ -135,7 +135,7 @@ def get_all_trends(
 
     items = [
         TrendResponse(
-            id=t.id, title=t.title, description=t.description,
+            id=t.id, slug=t.slug, title=t.title, description=t.description,
             context=t.context, usage_example=t.usage_example, usage_keys=t.usage_keys,
             score_base=t.score_base, status=t.status,
             category=t.category, region=t.region, age_range=t.age_range,
@@ -159,7 +159,7 @@ def get_trend_by_id(trend_id: uuid.UUID, db: Session) -> TrendResponse:
     if not trend:
         raise HTTPException(status_code=404, detail="Trend not found")
     return TrendResponse(
-        id=trend.id, title=trend.title, description=trend.description,
+        id=trend.id, slug=trend.slug, title=trend.title, description=trend.description,
         context=trend.context, usage_example=trend.usage_example, usage_keys=trend.usage_keys,
         score_base=trend.score_base, status=trend.status,
         category=trend.category, region=trend.region, age_range=trend.age_range,
