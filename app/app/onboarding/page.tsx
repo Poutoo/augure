@@ -45,19 +45,26 @@ const REVENUE_OPTS = ["-10K€", "+10K/20K€", "+20K/30K€", "+30K/40K€", "+
 const REV_SLUGS = ["-10k", "10-20k", "20-30k", "30-40k", "50-60k", "60-70k", "70-80k", "80-90k", "100k-plus"];
 
 const FEATURES = [
-  { label: "Recherches illimitées", star: false, standard: true },
-  { label: "Gérez votre audience", star: true, standard: false },
-  { label: "Pas de publicités", star: true, standard: false },
-  { label: "Accès aux statistiques", star: true, standard: false },
-  { label: "Exportation des données", star: true, standard: true },
-  { label: "Alertes personnalisées", star: false, standard: false },
-  { label: "Dashboard", star: true, standard: false },
-  { label: "Communauté", star: true, standard: false },
-  { label: "Graphiques", star: false, standard: false },
+  { label: "Recherches / jour",      freemium: "7",  premium: "∞",   business: "∞"   },
+  { label: "Fiches complètes",       freemium: false, premium: true,  business: true  },
+  { label: "Tous les filtres",       freemium: false, premium: true,  business: true  },
+  { label: "Alertes personnalisées", freemium: false, premium: true,  business: true  },
+  { label: "Sauvegarde favoris",     freemium: false, premium: true,  business: true  },
+  { label: "Export PDF / Excel",     freemium: false, premium: false, business: true  },
+  { label: "Dashboard équipe",       freemium: false, premium: false, business: true  },
+  { label: "Rapports personnalisés", freemium: false, premium: false, business: true  },
+  { label: "Accès API",              freemium: false, premium: false, business: true  },
+  { label: "Communauté",             freemium: true,  premium: true,  business: true  },
 ];
 
+const PLAN_META = {
+  freemium: { label: "Freemium", price: "Gratuit",    badge: "bg-gray-100 text-gray-700" },
+  premium:  { label: "Premium",  price: "14,99€/mois", badge: "bg-black text-white"       },
+  business: { label: "Business", price: "89,99€/mois", badge: "bg-gray-800 text-white"    },
+} as const;
+
 type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-type Plan = "standard" | "pro" | "";
+type Plan = "freemium" | "premium" | "business" | "";
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -89,6 +96,7 @@ export default function OnboardingPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [dir, setDir] = useState<'fwd' | 'bck'>('fwd');
 
   const toggleItem = (list: string[], setList: (v: string[]) => void, slug: string) => {
     setList(list.includes(slug) ? list.filter(s => s !== slug) : [...list, slug]);
@@ -119,7 +127,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const callSavePlan = async (chosen: 'standard' | 'pro') => {
+  const callSavePlan = async (chosen: 'freemium' | 'premium' | 'business') => {
     const token = localStorage.getItem('augure_token');
     if (token) await apiSavePlan(token, chosen).catch(() => { });
   };
@@ -127,7 +135,7 @@ export default function OnboardingPage() {
   const handlePay = async () => {
     setPayLoading(true);
     await new Promise(r => setTimeout(r, 1500));
-    await callSavePlan('pro');
+    await callSavePlan(plan as 'premium' | 'business');
     setPayLoading(false);
     setStep(7);
   };
@@ -152,7 +160,7 @@ export default function OnboardingPage() {
           <div className="flex items-center justify-between mt-3">
             {step > 1 ? (
               <button
-                onClick={() => { setError(null); setStep((s) => (s - 1) as Step); }}
+                onClick={() => { setError(null); setDir('bck'); setStep((s) => (s - 1) as Step); }}
                 className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-gray-50 transition-colors"
                 style={{ borderColor: "var(--color-text-dark)" }}
               >
@@ -170,7 +178,7 @@ export default function OnboardingPage() {
 
           {/* STEP 1 – Rôle */}
           {step === 1 && (
-            <>
+            <div key="step-1" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Quel est votre rôle ?
               </h1>
@@ -178,11 +186,12 @@ export default function OnboardingPage() {
                 Sélectionnez votre métier pour personnaliser votre expérience.
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {ROLES.map(r => (
+                {ROLES.map((r, i) => (
                   <button
                     key={r.value}
+                    style={{ animationDelay: `${i * 50}ms` }}
                     onClick={() => { setRole(r.value); setError(null); }}
-                    className={`relative flex flex-col gap-2 p-4 rounded-2xl border-2 text-left transition-all ${role === r.value
+                    className={`anim-scale-in relative flex flex-col gap-2 p-4 rounded-2xl border-2 text-left transition-all ${role === r.value
                       ? "bg-black border-black text-white"
                       : "bg-white border-gray-200 hover:border-gray-400 text-[var(--color-text-dark)]"
                       }`}
@@ -205,12 +214,12 @@ export default function OnboardingPage() {
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {/* STEP 2 – Centres d'intérêt */}
           {step === 2 && (
-            <>
+            <div key="step-2" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Vos centres d&apos;intérêt
               </h1>
@@ -218,41 +227,48 @@ export default function OnboardingPage() {
                 Sélectionnez au moins un domaine qui vous parle.
               </p>
               <div className="flex flex-wrap gap-2.5">
-                {INTERESTS.map(i => (
+                {INTERESTS.map((interest, idx) => (
                   <button
-                    key={i.slug}
-                    onClick={() => toggleItem(interests, setInterests, i.slug)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 font-syne font-semibold text-sm transition-all ${interests.includes(i.slug)
+                    key={interest.slug}
+                    style={{ animationDelay: `${idx * 35}ms` }}
+                    onClick={() => toggleItem(interests, setInterests, interest.slug)}
+                    className={`anim-fade-up flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 font-syne font-semibold text-sm transition-all ${interests.includes(interest.slug)
                       ? "bg-black border-black text-white"
                       : "bg-white border-gray-200 hover:border-gray-400 text-[var(--color-text-dark)]"
                       }`}
                   >
-                    <Icon icon={i.icon} className="text-lg" />
-                    {i.label}
+                    <Icon icon={interest.icon} className="text-lg" />
+                    {interest.label}
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {/* STEP 3 – Audience */}
           {step === 3 && (
-            <>
+            <div key="step-3" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Votre audience
               </h1>
               <p className="font-inter text-sm text-gray-400 mb-5">
                 Augure filtrera les tendances selon ces critères.
               </p>
-              <Section label="TRANCHE D'ÂGE">
-                <PillGroup items={AGE_RANGES} slugs={AGE_SLUGS} selected={ages} onToggle={s => toggleItem(ages, setAges, s)} />
-              </Section>
-              <Section label="RÉSEAUX">
-                <PillGroup items={NETWORKS} slugs={NET_SLUGS} selected={networks} onToggle={s => toggleItem(networks, setNetworks, s)} />
-              </Section>
-              <Section label="GÉOGRAPHIE">
-                <PillGroup items={GEOS} slugs={GEO_SLUGS} selected={geos} onToggle={s => toggleItem(geos, setGeos, s)} />
-              </Section>
+              <div className="anim-fade-up" style={{ animationDelay: '0ms' }}>
+                <Section label="TRANCHE D'ÂGE">
+                  <PillGroup items={AGE_RANGES} slugs={AGE_SLUGS} selected={ages} onToggle={s => toggleItem(ages, setAges, s)} />
+                </Section>
+              </div>
+              <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
+                <Section label="RÉSEAUX">
+                  <PillGroup items={NETWORKS} slugs={NET_SLUGS} selected={networks} onToggle={s => toggleItem(networks, setNetworks, s)} />
+                </Section>
+              </div>
+              <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
+                <Section label="GÉOGRAPHIE">
+                  <PillGroup items={GEOS} slugs={GEO_SLUGS} selected={geos} onToggle={s => toggleItem(geos, setGeos, s)} />
+                </Section>
+              </div>
               <Section label="GENRE">
                 <div className="flex flex-wrap gap-2">
                   {GENDERS.map(g => (
@@ -291,12 +307,12 @@ export default function OnboardingPage() {
                   </Section>
                 </>
               )}
-            </>
+            </div>
           )}
 
           {/* STEP 4 – Informations */}
           {step === 4 && (
-            <>
+            <div key="step-4" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Vos informations
               </h1>
@@ -352,12 +368,12 @@ export default function OnboardingPage() {
                   {error}
                 </div>
               )}
-            </>
+            </div>
           )}
 
-          {/* STEP 6 – Paiement simulé (Pro) */}
+          {/* STEP 6 – Paiement simulé (Premium / Business) */}
           {step === 6 && (
-            <>
+            <div key="step-6" className="anim-step-fwd">
               <button
                 onClick={() => setStep(5)}
                 className="w-9 h-9 mb-5 rounded-full border flex items-center justify-center hover:bg-gray-50 transition-colors self-start"
@@ -367,7 +383,9 @@ export default function OnboardingPage() {
               </button>
 
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">Paiement</h1>
-              <p className="font-inter text-sm text-gray-400 mb-6">Abonnement Pro · 24,99€/mois</p>
+              <p className="font-inter text-sm text-gray-400 mb-6">
+                Abonnement {plan === "premium" ? "Premium · 14,99€" : "Business · 89,99€"}/mois
+              </p>
 
               {/* Visual credit card */}
               <div
@@ -379,7 +397,9 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex items-center gap-2 mb-8">
                   <div className="w-8 h-5 rounded-sm bg-yellow-400 opacity-80" />
-                  <span className="font-syne font-bold text-white/60 text-xs tracking-widest uppercase">AUGURE PRO</span>
+                  <span className="font-syne font-bold text-white/60 text-xs tracking-widest uppercase">
+                    AUGURE {plan.toUpperCase()}
+                  </span>
                 </div>
                 <p className="font-mono text-white text-lg tracking-[0.18em] mb-4">4242 4242 4242 4242</p>
                 <div className="flex justify-between items-end">
@@ -429,15 +449,15 @@ export default function OnboardingPage() {
               >
                 {payLoading
                   ? <><Icon icon="mdi:loading" className="animate-spin text-xl" /> Traitement en cours…</>
-                  : "Payer 24,99€"
+                  : `Payer ${plan === "premium" ? "14,99€" : "89,99€"}`
                 }
               </button>
-            </>
+            </div>
           )}
 
           {/* STEP 7 – Succès */}
           {step === 7 && (
-            <div className="flex-1 flex flex-col">
+            <div key="step-7" className="anim-step-fwd flex-1 flex flex-col">
               <div className="flex justify-center mb-6">
                 <Image src="/logo-black.svg" alt="Augure" width={240} height={26} priority style={{ height: 'auto' }} />
               </div>
@@ -457,11 +477,13 @@ export default function OnboardingPage() {
                 <div className="px-5 py-4 border-b border-gray-100">
                   <div className="font-inter text-xs text-gray-400 mb-0.5">Plan</div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-0.5 rounded-full text-xs font-syne font-bold ${plan === "pro" ? "bg-black text-white" : "bg-gray-100 text-gray-700"}`}>
-                      {plan === "pro" ? "Pro" : "Standard"}
-                    </span>
+                    {plan && (
+                      <span className={`px-3 py-0.5 rounded-full text-xs font-syne font-bold ${PLAN_META[plan as keyof typeof PLAN_META]?.badge ?? "bg-gray-100 text-gray-700"}`}>
+                        {PLAN_META[plan as keyof typeof PLAN_META]?.label ?? plan}
+                      </span>
+                    )}
                     <span className="font-syne font-bold text-[var(--color-text-dark)]">
-                      {plan === "pro" ? "24,99€ / mois" : "Gratuit"}
+                      {plan ? PLAN_META[plan as keyof typeof PLAN_META]?.price : ""}
                     </span>
                   </div>
                 </div>
@@ -510,68 +532,85 @@ export default function OnboardingPage() {
           {/* Contenu scrollable */}
           <div className="flex-1 px-5 pt-8 pb-6 max-w-lg mx-auto w-full">
             <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] leading-tight mb-8">
-              Bienvenue.<br />Vous êtes ?
+              Bienvenue.<br />Choisissez votre plan.
             </h1>
 
-            {/* Plan cards */}
-            <div className="grid grid-cols-2 gap-3 mb-10">
-              {/* Standard */}
+            {/* Plan cards — stacked vertical */}
+            <div className="flex flex-col gap-3 mb-10">
+
+              {/* Freemium */}
               <button
-                onClick={() => setPlan("standard")}
-                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all min-h-[150px] ${plan === "standard" ? "border-black" : "border-gray-200 bg-gray-50"
-                  }`}
+                onClick={() => setPlan("freemium")}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "freemium" ? "border-black bg-white" : "border-gray-200 bg-gray-50"}`}
               >
                 <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-gray-200 text-gray-700">
-                  Standard
+                  FREEMIUM
                 </span>
-                <div className="mt-4 font-syne font-bold text-2xl text-[var(--color-text-dark)]">Gratuit</div>
+                <div className="mt-3 font-syne font-bold text-2xl text-[var(--color-text-dark)]">Gratuit</div>
+                <div className="font-inter text-xs text-gray-400 mt-0.5">7 recherches / jour · Fiches basiques</div>
               </button>
 
-              {/* Pro */}
+              {/* Premium — recommandé */}
               <button
-                onClick={() => setPlan("pro")}
-                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all min-h-[150px] ${plan === "pro" || plan === "" ? "border-black bg-white" : "border-gray-200"
-                  }`}
+                onClick={() => setPlan("premium")}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "premium" || plan === "" ? "border-zinc-600" : "border-zinc-700/50"}`}
+                style={{ background: "linear-gradient(145deg, #1c1c1e 0%, #2e2e30 55%, #1a1a1c 100%)" }}
               >
-                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-black text-white">
-                  Pro
+                {/* Shine overlay — clipé au contour de la carte, sans affecter le badge qui déborde */}
+                <span className="absolute inset-0 overflow-hidden rounded-[14px] pointer-events-none" aria-hidden>
+                  <span className="plan-shine" />
                 </span>
-                <div className="mt-4 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">24,99€</div>
-                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois</div>
+                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-white text-black flex items-center gap-1">
+                  <Icon icon="mdi:star-four-points" className="text-[10px]" /> PREMIUM · RECOMMANDÉ
+                </span>
+                <div className="mt-3 font-syne font-bold text-2xl italic text-white">14,99€</div>
+                <div className="font-inter text-xs text-white/50 mt-0.5">Par mois · Recherches illimitées</div>
+              </button>
+
+              {/* Business */}
+              <button
+                onClick={() => setPlan("business")}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "business" ? "border-black bg-white" : "border-gray-200"}`}
+              >
+                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-gray-800 text-white">
+                  BUSINESS
+                </span>
+                <div className="mt-3 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">89,99€</div>
+                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Équipes jusqu&apos;à 5 membres</div>
               </button>
             </div>
 
             {/* Tableau comparatif */}
             <div>
               {/* En-tête */}
-              <div className="grid text-right pb-2 border-b border-gray-100" style={{ gridTemplateColumns: "1fr 64px 48px" }}>
+              <div className="grid pb-2 border-b border-gray-100" style={{ gridTemplateColumns: "1fr 44px 44px 44px" }}>
                 <div />
-                <div className="font-inter text-xs text-gray-400 text-center">Standard</div>
-                <div className="font-syne text-xs font-semibold text-[var(--color-text-dark)] text-center">Pro</div>
+                <div className="font-inter text-[10px] text-gray-400 text-center">F</div>
+                <div className="font-syne text-[10px] font-semibold text-[var(--color-text-dark)] text-center">P</div>
+                <div className="font-syne text-[10px] font-semibold text-[var(--color-text-dark)] text-center">B</div>
               </div>
 
               {/* Lignes */}
               {FEATURES.map(f => (
                 <div
                   key={f.label}
-                  className="grid items-center py-3 border-b border-gray-50"
-                  style={{ gridTemplateColumns: "1fr 64px 48px" }}
+                  className="grid items-center py-2.5 border-b border-gray-50"
+                  style={{ gridTemplateColumns: "1fr 44px 44px 44px" }}
                 >
-                  <div className="flex items-center gap-1.5 font-inter text-sm text-gray-600 pr-2">
-                    {f.star && (
-                      <Icon icon="mdi:star-four-points" className="text-xs text-[var(--color-text-dark)] flex-shrink-0" />
-                    )}
-                    {f.label}
-                  </div>
-                  <div className="flex justify-center">
-                    {f.standard
-                      ? <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
-                      : <span className="text-gray-300 font-bold leading-none">—</span>
-                    }
-                  </div>
-                  <div className="flex justify-center">
-                    <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
-                  </div>
+                  <div className="font-inter text-sm text-gray-600 pr-2">{f.label}</div>
+                  {(["freemium", "premium", "business"] as const).map(col => {
+                    const val = f[col];
+                    return (
+                      <div key={col} className="flex justify-center">
+                        {typeof val === "string"
+                          ? <span className="font-inter text-xs font-semibold text-[var(--color-text-dark)]">{val}</span>
+                          : val
+                            ? <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
+                            : <span className="text-gray-300 font-bold leading-none text-sm">—</span>
+                        }
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
             </div>
@@ -580,34 +619,42 @@ export default function OnboardingPage() {
           {/* Footer CTA noir */}
           <div className="bg-black px-6 pt-7 pb-10 flex-shrink-0">
             <p className="font-syne font-bold text-white text-lg text-center mb-6 leading-snug">
-              Devenez{" "}
-              <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">Pro</span>
-              {" "}pour un accès illimité
+              {plan === "freemium"
+                ? <>Démarrez <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">gratuitement</span></>
+                : plan === "business"
+                  ? <>Passez à l&apos;échelle avec <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">Business</span></>
+                  : <>Devenez <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">Premium</span> pour un accès illimité</>
+              }
             </p>
             <button
               onClick={async () => {
-                const chosen = plan === "standard" ? "standard" : "pro";
-                if (chosen === "pro") {
-                  setPlan("pro");
-                  setStep(6);
-                } else {
-                  await callSavePlan("standard");
+                const chosen = plan || "premium";
+                if (chosen === "freemium") {
+                  await callSavePlan("freemium");
                   setStep(7);
+                } else {
+                  setPlan(chosen as "premium" | "business");
+                  setStep(6);
                 }
               }}
               className="w-full py-4 rounded-full bg-white text-black font-syne font-bold text-sm hover:opacity-90 transition-opacity mb-3"
             >
-              {plan === "standard" ? "Continuer gratuitement" : "Continuez avec Pro"}
+              {plan === "freemium"
+                ? "Continuer gratuitement"
+                : plan === "business"
+                  ? "Continuer avec Business"
+                  : "Continuer avec Premium"
+              }
             </button>
             <p className="font-inter text-xs text-white/40 text-center mb-5">
-              {plan === "standard" ? "Passez à Pro à tout moment" : "Changez ou annulez à tout moment"}
+              {plan === "freemium" ? "Passez à Premium à tout moment" : "Changez ou annulez à tout moment"}
             </p>
-            {plan !== "standard" && (
+            {plan !== "freemium" && (
               <button
-                onClick={async () => { setPlan("standard"); await callSavePlan("standard"); setStep(7); }}
+                onClick={async () => { setPlan("freemium"); await callSavePlan("freemium"); setStep(7); }}
                 className="w-full font-inter text-xs text-white/40 hover:text-white/70 transition-colors text-center mb-6"
               >
-                Continuer avec Standard (gratuit)
+                Continuer avec Freemium (gratuit)
               </button>
             )}
             <div className="flex justify-center gap-6">
@@ -631,6 +678,7 @@ export default function OnboardingPage() {
             disabled={loading}
             onClick={() => {
               setError(null);
+              setDir('fwd');
               if (step === 1) {
                 if (!role) { setError("Sélectionnez votre profil."); return; }
                 setStep(2);

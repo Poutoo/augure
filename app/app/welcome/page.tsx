@@ -43,7 +43,7 @@ export default function WelcomePage() {
       <div className="flex-1" />
 
       {/* Logo SVG centré */}
-      <div className="flex items-center justify-center px-10 relative z-10">
+      <div className="anim-fade-in flex items-center justify-center px-10 relative z-10">
         <Image
           src="/logo.svg"
           alt="AUGURE."
@@ -59,12 +59,16 @@ export default function WelcomePage() {
 
       {/* Boutons liquid glass */}
       <div className="w-full max-w-xs flex flex-col gap-4 relative z-10">
-        <LiquidGlassButton href="/login" variant="primary">
-          Se connecter
-        </LiquidGlassButton>
-        <LiquidGlassButton href="/onboarding" variant="secondary">
-          Créer un compte
-        </LiquidGlassButton>
+        <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
+          <LiquidGlassButton href="/login" variant="primary">
+            Se connecter
+          </LiquidGlassButton>
+        </div>
+        <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
+          <LiquidGlassButton href="/onboarding" variant="secondary">
+            Créer un compte
+          </LiquidGlassButton>
+        </div>
       </div>
 
     </div>

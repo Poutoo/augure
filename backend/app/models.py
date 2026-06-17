@@ -69,7 +69,7 @@ class User(Base):
     )
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     username: Mapped[str | None] = mapped_column(String(100), nullable=True, unique=True)
-    plan: Mapped[str] = mapped_column(String(20), nullable=False, server_default="standard")
+    plan: Mapped[str] = mapped_column(String(20), nullable=False, server_default="freemium")
 
     role: Mapped[UserRole | None] = mapped_column(
         Enum(UserRole, name="user_role"), nullable=True

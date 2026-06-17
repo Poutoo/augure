@@ -52,7 +52,11 @@ export default function Home() {
           <div className="flex gap-3 overflow-x-auto scrollbar-hide px-4 md:px-8 pb-3">
             {listLoading
               ? [1, 2, 3].map(i => <div key={i} className="flex-shrink-0 w-44 h-52 rounded-2xl bg-gray-200 animate-pulse" />)
-              : topTrends.map(trend => <TopTrendCard key={trend.id} trend={trend} />)
+              : topTrends.map((trend, i) => (
+                  <div key={trend.id} className="anim-scale-in" style={{ animationDelay: `${i * 80}ms` }}>
+                    <TopTrendCard trend={trend} />
+                  </div>
+                ))
             }
             <div className="flex-shrink-0 w-8 flex items-center justify-center opacity-30">
               <Icon icon="mdi:chevron-right" className="text-3xl text-gray-500" />
@@ -66,15 +70,17 @@ export default function Home() {
           <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 md:px-8 pb-2">
             <button
               onClick={() => setActiveCategory('Tous')}
-              className={`flex-shrink-0 px-5 py-2 rounded-full font-syne font-semibold text-sm transition-all ${activeCategory === 'Tous' ? 'bg-[var(--color-text-dark)] text-white' : 'bg-white text-[var(--color-text-dark)] border border-gray-200 hover:border-gray-400'}`}
+              style={{ animationDelay: '0ms' }}
+              className={`anim-fade-up flex-shrink-0 px-5 py-2 rounded-full font-syne font-semibold text-sm transition-all ${activeCategory === 'Tous' ? 'bg-[var(--color-text-dark)] text-white' : 'bg-white text-[var(--color-text-dark)] border border-gray-200 hover:border-gray-400'}`}
             >
               Tous
             </button>
-            {CATEGORIES.map(cat => (
+            {CATEGORIES.map((cat, i) => (
               <button
                 key={cat}
+                style={{ animationDelay: `${(i + 1) * 40}ms` }}
                 onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-5 py-2 rounded-full font-syne font-semibold text-sm transition-all ${activeCategory === cat ? 'bg-[var(--color-text-dark)] text-white' : 'bg-white text-[var(--color-text-dark)] border border-gray-200 hover:border-gray-400'}`}
+                className={`anim-fade-up flex-shrink-0 px-5 py-2 rounded-full font-syne font-semibold text-sm transition-all ${activeCategory === cat ? 'bg-[var(--color-text-dark)] text-white' : 'bg-white text-[var(--color-text-dark)] border border-gray-200 hover:border-gray-400'}`}
               >
                 {cat}
               </button>
@@ -103,7 +109,11 @@ export default function Home() {
             </div>
           ) : filteredTrends.length > 0 ? (
             <div className="flex flex-col gap-3">
-              {filteredTrends.map(trend => <TrendListItem key={trend.id} trend={trend} />)}
+              {filteredTrends.map((trend, i) => (
+                <div key={trend.id} className="anim-fade-up" style={{ animationDelay: `${Math.min(i * 50, 300)}ms` }}>
+                  <TrendListItem trend={trend} />
+                </div>
+              ))}
             </div>
           ) : (
             <p className="font-inter text-gray-400 text-center py-8">Aucune tendance pour cette catégorie.</p>

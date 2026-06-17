@@ -57,12 +57,13 @@ export default function LoginPage() {
       <div className="relative z-10 flex flex-col flex-1 items-center justify-center px-6 gap-10">
 
         {/* Logo */}
-        <Image src="/logo.svg" alt="Augure" width={240} height={14} priority className="opacity-95" />
+        <Image src="/logo.svg" alt="Augure" width={240} height={14} priority className="opacity-95 anim-fade-in" />
 
         {/* Liquid Glass Card */}
         <div
-          className="w-full max-w-xs rounded-3xl p-7 flex flex-col gap-5 relative overflow-hidden"
+          className="w-full max-w-xs rounded-3xl p-7 flex flex-col gap-5 relative overflow-hidden anim-fade-up"
           style={{
+            animationDelay: '80ms',
             background: "rgba(255,255,255,0.055)",
             backdropFilter: "blur(28px)",
             WebkitBackdropFilter: "blur(28px)",
@@ -128,7 +129,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="font-inter text-xs text-white/50 rounded-lg px-3 py-2 text-center" style={{ background: "rgba(255,255,255,0.06)" }}>
+            <p key={error} className="anim-shake font-inter text-xs text-white/50 rounded-lg px-3 py-2 text-center" style={{ background: "rgba(255,255,255,0.06)" }}>
               {error}
             </p>
           )}
@@ -136,7 +137,7 @@ export default function LoginPage() {
           <button
             onClick={handleSubmit}
             disabled={loading || !email || !password}
-            className="w-full py-3.5 rounded-xl font-syne font-bold text-sm text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-30"
+            className="w-full py-3.5 rounded-xl font-syne font-bold text-sm text-white flex items-center justify-center gap-2 transition-opacity active:scale-95 transition-transform disabled:opacity-30"
             style={{
               background: "rgba(255,255,255,0.13)",
               border: "1px solid rgba(255,255,255,0.18)",

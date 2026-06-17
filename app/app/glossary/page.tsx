@@ -28,15 +28,21 @@ export default function GlossaryPage() {
           Retour
         </Link>
 
-        <h1 className="font-syne font-bold text-4xl text-[var(--color-text-dark)] mb-4">Glossaire</h1>
-        <p className="font-inter text-gray-600 text-lg mb-8">Toutes les tendances décryptées par Augure.</p>
+        <h1 className="anim-fade-up font-syne font-bold text-4xl text-[var(--color-text-dark)] mb-4">Glossaire</h1>
+        <p className="anim-fade-up font-inter text-gray-600 text-lg mb-8" style={{ animationDelay: '40ms' }}>Toutes les tendances décryptées par Augure.</p>
 
-        <SearchBar />
+        <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
+          <SearchBar />
+        </div>
 
         <div className="flex flex-col gap-4 mt-8">
           {loading
             ? [1, 2, 3].map(i => <div key={i} className="h-32 rounded-2xl bg-gray-100 animate-pulse" />)
-            : trends.map(trend => <TrendCard key={trend.id} trend={trend} />)
+            : trends.map((trend, i) => (
+                <div key={trend.id} className="anim-fade-up" style={{ animationDelay: `${Math.min(i * 50, 300)}ms` }}>
+                  <TrendCard trend={trend} />
+                </div>
+              ))
           }
         </div>
       </div>

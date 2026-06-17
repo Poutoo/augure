@@ -141,13 +141,13 @@ export default function TrendDetailModal() {
           </div>
 
           {/* Contenu scrollable */}
-          <div className="flex-1 px-6 py-6 overflow-y-auto pb-12 flex flex-col gap-6">
+          <div key={activeTab} className="anim-fade-in flex-1 px-6 py-6 overflow-y-auto pb-24 md:pb-12 flex flex-col gap-6">
             {activeTab === 'comments' ? (
               <TrendComments trendId={trend.id} />
             ) : (
               <>
                 {/* Titre + meta */}
-                <div>
+                <div className="anim-fade-up">
                   {(trend.region || trend.created_at) && (
                     <p className="font-inter text-xs font-medium text-gray-400 uppercase tracking-widest mb-1.5">
                       {trend.created_at ? `Depuis ${new Date(trend.created_at).getFullYear()}` : ''}
@@ -176,7 +176,7 @@ export default function TrendDetailModal() {
                 {/* Plateformes */}
                 {trend.platforms && trend.platforms.length > 0 && (
                   <>
-                    <div>
+                    <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
                       <h3 className="font-syne font-bold text-xs text-gray-400 tracking-wider uppercase mb-3">
                         PLATEFORMES
                       </h3>
@@ -193,7 +193,7 @@ export default function TrendDetailModal() {
                 )}
 
                 {/* Définition */}
-                <div>
+                <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
                   <h3 className="font-syne font-bold text-xl text-gray-900 mb-2.5">Définition</h3>
                   <p className="font-inter text-gray-600 text-base leading-relaxed">{trend.description}</p>
                 </div>
@@ -201,7 +201,7 @@ export default function TrendDetailModal() {
                 <hr className="border-gray-100" />
 
                 {/* Contexte */}
-                <div>
+                <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
                   <h3 className="font-syne font-bold text-xl text-gray-900 mb-2.5">Contexte & Origine</h3>
                   <p className="font-inter text-gray-600 text-base leading-relaxed">{trend.context}</p>
                 </div>
@@ -209,7 +209,7 @@ export default function TrendDetailModal() {
                 <hr className="border-gray-100" />
 
                 {/* Comment l'utiliser */}
-                <div>
+                <div className="anim-fade-up" style={{ animationDelay: '240ms' }}>
                   <h3 className="font-syne font-bold text-xl text-gray-900 mb-3 flex items-center gap-2">
                     <Icon icon="mdi:lightbulb-on" className="text-[var(--color-text-dark)]" /> Comment l&apos;utiliser
                   </h3>
@@ -226,7 +226,7 @@ export default function TrendDetailModal() {
                 {trend.extra_stats && trend.extra_stats.length > 0 && (
                   <>
                     <hr className="border-gray-100" />
-                    <div>
+                    <div className="anim-fade-up" style={{ animationDelay: '320ms' }}>
                       <h3 className="font-syne font-bold text-xl text-gray-900 mb-4">Chiffres clés</h3>
                       <div className="grid grid-cols-2 gap-4">
                         {trend.extra_stats.map((stat, i) => (

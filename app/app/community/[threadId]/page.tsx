@@ -144,7 +144,7 @@ export default function ThreadDetailPage() {
 
         {/* Header dark */}
         <div
-          className="bg-[var(--color-text-dark)] relative overflow-hidden px-4 md:px-8 pt-10 pb-8"
+          className="anim-fade-in bg-[var(--color-text-dark)] relative overflow-hidden px-4 md:px-8 pt-10 pb-8"
           style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.025) 1px, rgba(255,255,255,0.025) 2px)' }}
         >
           <Link
@@ -217,7 +217,7 @@ export default function ThreadDetailPage() {
         <div className="px-4 md:px-8 py-6 flex flex-col gap-6 pb-10">
 
           {/* Corps du forum */}
-          <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+          <div className="anim-fade-up bg-white rounded-2xl px-5 py-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)]" style={{ animationDelay: '80ms' }}>
             <p className="font-inter text-gray-700 text-base leading-relaxed whitespace-pre-wrap">
               {thread.body}
             </p>
@@ -226,7 +226,9 @@ export default function ThreadDetailPage() {
           <hr className="border-gray-100" />
 
           {/* Commentaires */}
-          <TrendComments threadId={thread.id} isLocked={thread.is_locked} />
+          <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
+            <TrendComments threadId={thread.id} isLocked={thread.is_locked} />
+          </div>
         </div>
 
       </div>
