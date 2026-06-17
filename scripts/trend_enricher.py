@@ -29,9 +29,11 @@ def get_ai_description(title):
         print(f"   ⚠️  Aucun contexte web trouvé pour '{title}'. On conserve la valeur par défaut.")
         return None
 
-    url = "http://localhost:11434/api/generate"
+    url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
+    model = os.getenv("AI_MODEL", "llama3")
+
     payload = {
-        "model": "llama3",
+        "model": model,
         "system": "Tu es un expert en culture web, réseaux sociaux (TikTok, YouTube) et divertissement. Ta mission est d'expliquer l'origine ou le concept d'une tendance en te basant STRICTEMENT sur les informations web fournies.\n\nRÈGLES ABSOLUES :\n1. Rédige EXCLUSIVEMENT en français.\n2. Sois factuel en utilisant le contexte fourni.\n3. Ne renvoie QUE la définition brute.\n4. INTERDICTION d'utiliser des formules d'introduction ou de politesse.\n5. Longueur maximale : 20 mots.\n6. SI LE CONTEXTE NE CONTIENT PAS D'INFORMATION PERTINENTE POUR DÉFINIR CETTE TENDANCE, RÉPONDS UNIQUEMENT PAR LE MOT 'INCONNU'.",
         "prompt": f"Analyse et définis brièvement la tendance '{title}' à l'aide de ces informations web : '{web_context}'\nDéfinition brute (en français) :",
         "stream": False
@@ -48,7 +50,7 @@ def get_ai_description(title):
         return res_text
     except Exception as e:
         print(f"❌ Erreur de connexion à Ollama : {e}")
-        print("💡 As-tu bien lancé 'ollama run llama3' dans un autre terminal ?")
+        print(f"💡 As-tu bien lancé 'ollama run {model}' dans un autre terminal ?")
         return None
 
 def enrich_trends():
@@ -56,7 +58,7 @@ def enrich_trends():
     db_url = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
     engine = create_engine(db_url)
 
-    default_text = "La description de cette tendance n'est pas encore disponible. Nous vous prions de nous excuser pour ce désagrément et vous invitons à réessayer ultérieurement."
+    default_text = os.getenv("DEFAULT_DESCRIPTION", "La description de cette tendance n'est pas encore disponible. Nous vous prions de nous excuser pour ce désagrément et vous invitons à réessayer ultérieurement.")
 
     with engine.connect() as connection:
         trends_to_update = connection.execute(
