@@ -73,6 +73,7 @@ def get_personalized_trends(
             (Trend.score_base + func.coalesce(func.sum(tag_score), 0)).label("affinity_score"),
         )
         .outerjoin(TrendTag, TrendTag.trend_id == Trend.id)
+        .filter(Trend.is_mock == True)
         .group_by(Trend.id)
         .subquery()
     )
@@ -115,7 +116,7 @@ def get_all_trends(
 ):
     from app.schemas import TrendListResponse
 
-    query = db.query(Trend).options(selectinload(Trend.tags))
+    query = db.query(Trend).options(selectinload(Trend.tags)).filter(Trend.is_mock == True)
 
     if category:
         query = query.filter(Trend.category.ilike(category))
