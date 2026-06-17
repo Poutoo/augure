@@ -245,6 +245,14 @@ Trend ─── TrendTag (INTEREST | GENERATION | ROLE)
 | `TrendStatus` | `viral`, `emergent`, `en_hausse`, `stable`, `en_baisse` |
 | `TagType` | `interest`, `generation`, `role` |
 
+### Architecture de Données Hybride (Live / Démo)
+
+La table `Trend` intègre une colonne `is_mock` (booléenne). Cette conception permet d'isoler hermétiquement deux cycles de vie au sein de la même base de données :
+- **Les données réelles (`is_mock=false`)** : Insérées en continu par le scraper en arrière-plan avec des slugs techniques (ex: `fashion`).
+- **Les données de démonstration (`is_mock=true`)** : Insérées via des scripts de seeding spécifiques (ex: `backend/seed_demo.py`) avec des slugs narratifs et un rendu visuel contrôlé (ex: `matcha-coded`).
+
+L'API backend filtre nativement par ce flag (via le paramètre `only_mock=True` par défaut) pour garantir une interface publique toujours stable et riche.
+
 ---
 
 ## 5. API Reference
@@ -518,8 +526,29 @@ Ce script enrichit les tendances existantes en base avec des données structuré
 
 ---
 
-## 10. Retour d'expérience (REX)
+## 10. Retour d'expérience (REX) : Les défis de l'ingestion de données
 
+La construction du moteur d'Augure s'est heurtée à la réalité de l'extraction de données à grande échelle. Guidés par une approche **Lean Startup**, nous avons dû adapter nos ambitions techniques pour livrer un MVP fonctionnel. Voici les principaux défis rencontrés et nos stratégies de pivot.
+
+### Le mur du scraping gratuit et légal
+Notre ambition initiale était de scraper plusieurs réseaux (TikTok, Instagram, Reddit) de manière autonome. Nous nous sommes rapidement heurtés aux protections anti-scraping massives (blocages d'IP, shadowbans) et aux restrictions légales, rendant l'écosystème Instagram quasi-impénétrable gratuitement.
+**Le Pivot Lean** : Face à l'impossibilité de maintenir un scraper stable gratuitement sans épuiser notre temps de développement, nous avons abandonné la collecte multi-plateformes pour nous concentrer **exclusivement sur TikTok**, véritable vivier des signaux faibles. Pour la collecte, nous nous sommes tournés vers **Ensemble Data** (https://ensembledata.com/), dont l'essai de 7 jours (50 crédits/jour) offrait le meilleur compromis gratuit sur le marché pour valider notre preuve de concept (POC).
+
+### Algorithme de détection des signaux faibles
+Disposer de l'API d'Ensemble Data ne suffisait pas : une vidéo virale n'est pas forcément une tendance culturelle. Nous avons dû concevoir notre propre algorithme de qualification (`scraper/main.py`). 
+Notre stratégie repose sur :
+- **L'analyse de co-occurrences** : Regroupement de hashtags de niche et détection de modèles redondants (clusters) sur des échantillons de vidéos.
+- **La matrice de Momentum** : Un calcul de vélocité qui croise le volume de vues avec le taux de croissance (Delta) par rapport à un snapshot historique, distinguant les buzz éphémères des vraies tendances en accélération (`Émergent`, `En hausse`, `Viral`).
+
+### L'IA générative en local pour l'enrichissement éditorial
+Les données brutes retournées par TikTok (descriptions chaotiques, pluie de hashtags) n'étaient pas présentables pour notre cible audience.
+**La Solution** : Nous avons développé un script local exploitant **Ollama** (modèles LLM open-source exécutés sur nos machines). Le script ingère les métadonnées brutes, les nettoie, et génère les champs qualitatifs d'Augure (`description`, `context`, `usage_example`). Cette approche garantit une interface claire.
+
+### Bilan et Évolutions futures
+Cette expérience a été extrêmement formatrice sur la réalité de la Data Engineering. Elle nous a appris qu'un algorithme de prédiction n'est rien sans un accès permanent et qualitatif à la donnée. 
+**Vision V2** : Avec un budget dédié, la prochaine évolution logique consistera à souscrire à des accès API officiels multi-plateformes. Cela permettrait d'alimenter une base de données suffisante pour entraîner un algorithme capable d'anticiper la trajectoire d'une tendance pour se rapprocher au plus près de la réalité du marché.
+
+---
 
 ## 11. Équipe
 
