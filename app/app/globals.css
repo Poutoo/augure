@@ -52,6 +52,69 @@ body {
 .badge-status-stable    { background-color: var(--color-status-stable); }
 .badge-status-en_baisse { background-color: var(--color-status-en-baisse); }
 
+/* ── Animations globales ─────────────────────────────────────────────────── */
+
+@keyframes anim-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes anim-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes anim-scale-in {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes anim-shake {
+  0%, 100% { transform: translateX(0); }
+  18%      { transform: translateX(-6px); }
+  36%      { transform: translateX(6px); }
+  54%      { transform: translateX(-4px); }
+  72%      { transform: translateX(4px); }
+  88%      { transform: translateX(-2px); }
+}
+@keyframes anim-step-fwd {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes anim-step-bck {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.anim-fade-up  { animation: anim-fade-up  0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-fade-in  { animation: anim-fade-in  0.3s  ease-out both; }
+.anim-scale-in { animation: anim-scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-shake    { animation: anim-shake    0.4s  ease-in-out; }
+.anim-step-fwd { animation: anim-step-fwd 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-step-bck { animation: anim-step-bck 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ── Plan Premium — shine effect ─────────────────────────────────────────── */
+@keyframes shine-sweep {
+  0%   { transform: translateX(-150%) skewX(-18deg); opacity: 0; }
+  6%   { opacity: 1; }
+  28%  { transform: translateX(380%) skewX(-18deg); opacity: 0; }
+  100% { transform: translateX(380%) skewX(-18deg); opacity: 0; }
+}
+
+.plan-shine {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 38%;
+  height: 120%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.52) 45%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 100%
+  );
+  animation: shine-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
 /* Scrollbar horizontal masquée mais fonctionnelle */
 .scrollbar-hide {
   -ms-overflow-style: none;

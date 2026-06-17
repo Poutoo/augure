@@ -25,13 +25,14 @@ export default function BottomNav() {
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-2px_16px_rgba(0,0,0,0.06)] z-50">
         <div className="flex justify-around items-center h-16">
-          {navItems.map((item) => {
+          {navItems.map((item, i) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors relative ${active ? 'text-[var(--color-primary)]' : 'text-gray-400 hover:text-gray-600'}`}
+                style={{ animationDelay: `${i * 60}ms` }}
+                className={`anim-fade-up flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors relative ${active ? 'text-[var(--color-primary)]' : 'text-gray-400 hover:text-gray-600'}`}
               >
                 <Icon icon={active ? item.iconActive : item.iconInactive} className="text-[22px]" />
                 <span className="text-[10px] font-syne font-medium">{item.label}</span>
@@ -56,13 +57,14 @@ export default function BottomNav() {
             />
           </Link>
         </div>
-        {navItems.map((item) => {
+        {navItems.map((item, i) => {
           const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all mx-2 xl:mx-0 ${active ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}`}
+              style={{ animationDelay: `${i * 60}ms` }}
+              className={`anim-fade-up flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all mx-2 xl:mx-0 ${active ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}`}
             >
               <Icon icon={active ? item.iconActive : item.iconInactive} className="text-[22px] flex-shrink-0" />
               <span className="font-syne font-semibold text-sm hidden xl:block">{item.label}</span>

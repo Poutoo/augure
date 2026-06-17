@@ -359,9 +359,9 @@ export default function ProfilePage() {
 
       {/* ── Tab: Préférences ────────────────────────────────────────── */}
       {activeTab === 'preferences' && (
-        <div className="px-4 md:px-8 pt-6 pb-24 md:pb-6 flex flex-col gap-6">
+        <div className="anim-fade-in px-4 md:px-8 pt-6 pb-24 md:pb-6 flex flex-col gap-6">
 
-          <section className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
+          <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '0ms' }}>
             <SectionTitle>Informations</SectionTitle>
             <label className="block font-inter text-sm text-gray-500 mb-1">Nom d&apos;utilisateur</label>
             <div className="flex gap-2">
@@ -380,7 +380,7 @@ export default function ProfilePage() {
             <SaveFeedback error={usernameError} success={usernameSuccess} />
           </section>
 
-          <section className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
+          <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '80ms' }}>
             <SectionTitle>Rôle</SectionTitle>
             <div className="flex flex-wrap gap-2">
               {ROLES.map(r => (
@@ -391,7 +391,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
+          <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '160ms' }}>
             <SectionTitle>Centres d&apos;intérêt</SectionTitle>
             <div className="flex flex-wrap gap-2">
               {INTERESTS.map(i => (
@@ -402,7 +402,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
+          <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '240ms' }}>
             <SectionTitle>Audience cible</SectionTitle>
             <p className="font-inter text-xs text-gray-500 uppercase tracking-wide mb-2">Âge</p>
             <div className="flex flex-wrap gap-2 mb-4">
@@ -434,7 +434,7 @@ export default function ProfilePage() {
             <SaveFeedback error={prefError} success={prefSuccess} />
           </section>
 
-          <section className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
+          <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '320ms' }}>
             <SectionTitle>Compte</SectionTitle>
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="font-inter text-sm text-gray-500">Email</span>
@@ -453,7 +453,7 @@ export default function ProfilePage() {
 
       {/* ── Tab: Likes ───────────────────────────────────────────────── */}
       {activeTab === 'likes' && (
-        <div className="px-4 md:px-8 pt-5 pb-24 md:pb-6">
+        <div className="anim-fade-in px-4 md:px-8 pt-5 pb-24 md:pb-6">
           {/* Sub-tabs */}
           <div className="flex gap-2 mb-4">
             {(['threads', 'comments'] as const).map(sub => (
@@ -531,7 +531,7 @@ export default function ProfilePage() {
 
       {/* ── Tab: Collections ─────────────────────────────────────────── */}
       {activeTab === 'collections' && (
-        <div className="px-4 md:px-8 pt-5 pb-24 md:pb-6">
+        <div className="anim-fade-in px-4 md:px-8 pt-5 pb-24 md:pb-6">
 
           {/* Collection detail drill-in */}
           {collectionDetail ? (

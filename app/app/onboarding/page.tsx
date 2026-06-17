@@ -96,6 +96,7 @@ export default function OnboardingPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [dir, setDir] = useState<'fwd' | 'bck'>('fwd');
 
   const toggleItem = (list: string[], setList: (v: string[]) => void, slug: string) => {
     setList(list.includes(slug) ? list.filter(s => s !== slug) : [...list, slug]);
@@ -159,7 +160,7 @@ export default function OnboardingPage() {
           <div className="flex items-center justify-between mt-3">
             {step > 1 ? (
               <button
-                onClick={() => { setError(null); setStep((s) => (s - 1) as Step); }}
+                onClick={() => { setError(null); setDir('bck'); setStep((s) => (s - 1) as Step); }}
                 className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-gray-50 transition-colors"
                 style={{ borderColor: "var(--color-text-dark)" }}
               >
@@ -177,7 +178,7 @@ export default function OnboardingPage() {
 
           {/* STEP 1 – Rôle */}
           {step === 1 && (
-            <>
+            <div key="step-1" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Quel est votre rôle ?
               </h1>
@@ -185,11 +186,12 @@ export default function OnboardingPage() {
                 Sélectionnez votre métier pour personnaliser votre expérience.
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {ROLES.map(r => (
+                {ROLES.map((r, i) => (
                   <button
                     key={r.value}
+                    style={{ animationDelay: `${i * 50}ms` }}
                     onClick={() => { setRole(r.value); setError(null); }}
-                    className={`relative flex flex-col gap-2 p-4 rounded-2xl border-2 text-left transition-all ${role === r.value
+                    className={`anim-scale-in relative flex flex-col gap-2 p-4 rounded-2xl border-2 text-left transition-all ${role === r.value
                       ? "bg-black border-black text-white"
                       : "bg-white border-gray-200 hover:border-gray-400 text-[var(--color-text-dark)]"
                       }`}
@@ -212,12 +214,12 @@ export default function OnboardingPage() {
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {/* STEP 2 – Centres d'intérêt */}
           {step === 2 && (
-            <>
+            <div key="step-2" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Vos centres d&apos;intérêt
               </h1>
@@ -225,41 +227,48 @@ export default function OnboardingPage() {
                 Sélectionnez au moins un domaine qui vous parle.
               </p>
               <div className="flex flex-wrap gap-2.5">
-                {INTERESTS.map(i => (
+                {INTERESTS.map((interest, idx) => (
                   <button
-                    key={i.slug}
-                    onClick={() => toggleItem(interests, setInterests, i.slug)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 font-syne font-semibold text-sm transition-all ${interests.includes(i.slug)
+                    key={interest.slug}
+                    style={{ animationDelay: `${idx * 35}ms` }}
+                    onClick={() => toggleItem(interests, setInterests, interest.slug)}
+                    className={`anim-fade-up flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 font-syne font-semibold text-sm transition-all ${interests.includes(interest.slug)
                       ? "bg-black border-black text-white"
                       : "bg-white border-gray-200 hover:border-gray-400 text-[var(--color-text-dark)]"
                       }`}
                   >
-                    <Icon icon={i.icon} className="text-lg" />
-                    {i.label}
+                    <Icon icon={interest.icon} className="text-lg" />
+                    {interest.label}
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {/* STEP 3 – Audience */}
           {step === 3 && (
-            <>
+            <div key="step-3" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Votre audience
               </h1>
               <p className="font-inter text-sm text-gray-400 mb-5">
                 Augure filtrera les tendances selon ces critères.
               </p>
-              <Section label="TRANCHE D'ÂGE">
-                <PillGroup items={AGE_RANGES} slugs={AGE_SLUGS} selected={ages} onToggle={s => toggleItem(ages, setAges, s)} />
-              </Section>
-              <Section label="RÉSEAUX">
-                <PillGroup items={NETWORKS} slugs={NET_SLUGS} selected={networks} onToggle={s => toggleItem(networks, setNetworks, s)} />
-              </Section>
-              <Section label="GÉOGRAPHIE">
-                <PillGroup items={GEOS} slugs={GEO_SLUGS} selected={geos} onToggle={s => toggleItem(geos, setGeos, s)} />
-              </Section>
+              <div className="anim-fade-up" style={{ animationDelay: '0ms' }}>
+                <Section label="TRANCHE D'ÂGE">
+                  <PillGroup items={AGE_RANGES} slugs={AGE_SLUGS} selected={ages} onToggle={s => toggleItem(ages, setAges, s)} />
+                </Section>
+              </div>
+              <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
+                <Section label="RÉSEAUX">
+                  <PillGroup items={NETWORKS} slugs={NET_SLUGS} selected={networks} onToggle={s => toggleItem(networks, setNetworks, s)} />
+                </Section>
+              </div>
+              <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
+                <Section label="GÉOGRAPHIE">
+                  <PillGroup items={GEOS} slugs={GEO_SLUGS} selected={geos} onToggle={s => toggleItem(geos, setGeos, s)} />
+                </Section>
+              </div>
               <Section label="GENRE">
                 <div className="flex flex-wrap gap-2">
                   {GENDERS.map(g => (
@@ -298,12 +307,12 @@ export default function OnboardingPage() {
                   </Section>
                 </>
               )}
-            </>
+            </div>
           )}
 
           {/* STEP 4 – Informations */}
           {step === 4 && (
-            <>
+            <div key="step-4" className={dir === 'fwd' ? 'anim-step-fwd' : 'anim-step-bck'}>
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Vos informations
               </h1>
@@ -359,12 +368,12 @@ export default function OnboardingPage() {
                   {error}
                 </div>
               )}
-            </>
+            </div>
           )}
 
           {/* STEP 6 – Paiement simulé (Premium / Business) */}
           {step === 6 && (
-            <>
+            <div key="step-6" className="anim-step-fwd">
               <button
                 onClick={() => setStep(5)}
                 className="w-9 h-9 mb-5 rounded-full border flex items-center justify-center hover:bg-gray-50 transition-colors self-start"
@@ -443,12 +452,12 @@ export default function OnboardingPage() {
                   : `Payer ${plan === "premium" ? "14,99€" : "89,99€"}`
                 }
               </button>
-            </>
+            </div>
           )}
 
           {/* STEP 7 – Succès */}
           {step === 7 && (
-            <div className="flex-1 flex flex-col">
+            <div key="step-7" className="anim-step-fwd flex-1 flex flex-col">
               <div className="flex justify-center mb-6">
                 <Image src="/logo-black.svg" alt="Augure" width={240} height={26} priority style={{ height: 'auto' }} />
               </div>
@@ -544,13 +553,18 @@ export default function OnboardingPage() {
               {/* Premium — recommandé */}
               <button
                 onClick={() => setPlan("premium")}
-                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "premium" || plan === "" ? "border-black bg-white" : "border-gray-200"}`}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "premium" || plan === "" ? "border-zinc-600" : "border-zinc-700/50"}`}
+                style={{ background: "linear-gradient(145deg, #1c1c1e 0%, #2e2e30 55%, #1a1a1c 100%)" }}
               >
-                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-black text-white flex items-center gap-1">
+                {/* Shine overlay — clipé au contour de la carte, sans affecter le badge qui déborde */}
+                <span className="absolute inset-0 overflow-hidden rounded-[14px] pointer-events-none" aria-hidden>
+                  <span className="plan-shine" />
+                </span>
+                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-white text-black flex items-center gap-1">
                   <Icon icon="mdi:star-four-points" className="text-[10px]" /> PREMIUM · RECOMMANDÉ
                 </span>
-                <div className="mt-3 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">14,99€</div>
-                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Recherches illimitées</div>
+                <div className="mt-3 font-syne font-bold text-2xl italic text-white">14,99€</div>
+                <div className="font-inter text-xs text-white/50 mt-0.5">Par mois · Recherches illimitées</div>
               </button>
 
               {/* Business */}
@@ -664,6 +678,7 @@ export default function OnboardingPage() {
             disabled={loading}
             onClick={() => {
               setError(null);
+              setDir('fwd');
               if (step === 1) {
                 if (!role) { setError("Sélectionnez votre profil."); return; }
                 setStep(2);

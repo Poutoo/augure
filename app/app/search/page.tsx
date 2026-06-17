@@ -81,13 +81,14 @@ function SearchPageInner() {
         </div>
 
         <div className="flex gap-0 overflow-x-auto scrollbar-hide px-4 md:px-8 border-b border-gray-100">
-          {CATEGORIES.map(cat => {
+          {CATEGORIES.map((cat, i) => {
             const active = activeCategory === cat;
             return (
               <button
                 key={cat}
+                style={{ animationDelay: `${i * 40}ms` }}
                 onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-4 py-3 font-syne font-semibold text-sm border-b-2 transition-all whitespace-nowrap ${active ? 'border-[var(--color-primary)] text-[var(--color-primary)]' : 'border-transparent text-gray-400 hover:text-gray-700'}`}
+                className={`anim-fade-up flex-shrink-0 px-4 py-3 font-syne font-semibold text-sm border-b-2 transition-all whitespace-nowrap ${active ? 'border-[var(--color-primary)] text-[var(--color-primary)]' : 'border-transparent text-gray-400 hover:text-gray-700'}`}
               >
                 {cat}
               </button>
@@ -114,7 +115,13 @@ function SearchPageInner() {
               {[1, 2, 3, 4].map(i => <div key={i} className="h-24 rounded-2xl bg-gray-100 animate-pulse" />)}
             </div>
           ) : filteredTrends.length > 0 ? (
-            filteredTrends.map(trend => <ExplorerTrendCard key={trend.id} trend={trend} />)
+            <div key={activeCategory + query} className="flex flex-col">
+              {filteredTrends.map((trend, i) => (
+                <div key={trend.id} className="anim-fade-up" style={{ animationDelay: `${Math.min(i * 50, 300)}ms` }}>
+                  <ExplorerTrendCard trend={trend} />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Icon icon="mdi:magnify-close" className="text-5xl text-gray-200 mb-4" />

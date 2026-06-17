@@ -289,7 +289,7 @@ export default function CommunityPage() {
 
         {/* Header */}
         <div
-          className="bg-[var(--color-text-dark)] relative overflow-hidden px-4 md:px-8 pt-12 pb-8"
+          className="anim-fade-in bg-[var(--color-text-dark)] relative overflow-hidden px-4 md:px-8 pt-12 pb-8"
           style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.025) 1px, rgba(255,255,255,0.025) 2px)' }}
         >
           <div className="flex items-center justify-between">
@@ -311,11 +311,12 @@ export default function CommunityPage() {
 
         {/* Filtres */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 md:px-8 py-4">
-          {filters.map(f => (
+          {filters.map((f, i) => (
             <button
               key={f.key}
+              style={{ animationDelay: `${i * 80}ms` }}
               onClick={() => setFilter(f.key)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full font-syne font-semibold text-sm transition-all ${
+              className={`anim-fade-up flex-shrink-0 px-4 py-2 rounded-full font-syne font-semibold text-sm transition-all ${
                 filter === f.key
                   ? 'bg-[var(--color-text-dark)] text-white'
                   : 'bg-white text-[var(--color-text-dark)] border border-gray-200 hover:border-gray-400'
@@ -351,8 +352,12 @@ export default function CommunityPage() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              {filtered.map(t => <ThreadCard key={t.id} thread={t} />)}
+            <div key={filter} className="flex flex-col gap-3">
+              {filtered.map((t, i) => (
+                <div key={t.id} className="anim-fade-up" style={{ animationDelay: `${Math.min(i * 50, 300)}ms` }}>
+                  <ThreadCard thread={t} />
+                </div>
+              ))}
             </div>
           )}
         </section>
