@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 
 const navItems = [
-  { href: '/',           label: 'Accueil',     iconActive: 'mdi:home',          iconInactive: 'mdi:home-outline'          },
-  { href: '/search',     label: 'Explorer',    iconActive: 'mdi:compass',       iconInactive: 'mdi:compass-outline'       },
-  { href: '/community',  label: 'Communauté',  iconActive: 'mdi:account-group', iconInactive: 'mdi:account-group-outline' },
-  { href: '/profile',    label: 'Profil',      iconActive: 'mdi:account',       iconInactive: 'mdi:account-outline'       },
+  { href: '/', label: 'Accueil', iconActive: 'mdi:home', iconInactive: 'mdi:home-outline' },
+  { href: '/search', label: 'Explorer', iconActive: 'mdi:search', iconInactive: 'mdi:search' },
+  { href: '/community', label: 'Communauté', iconActive: 'mdi:account-group', iconInactive: 'mdi:account-group-outline' },
+  { href: '/profile', label: 'Profil', iconActive: 'mdi:account', iconInactive: 'mdi:account-outline' },
 ];
 
 const HIDDEN_PATHS = ['/welcome', '/login', '/onboarding'];
