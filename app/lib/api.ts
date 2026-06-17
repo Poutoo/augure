@@ -221,6 +221,7 @@ export interface ApiComment {
   author: ApiCommentAuthor;
   body: string;
   like_count: number;
+  is_liked: boolean;
   is_deleted: boolean;
   parent_comment_id: string | null;
   created_at: string;
@@ -252,6 +253,7 @@ export interface ApiThread {
   is_locked: boolean;
   comment_count: number;
   like_count: number;
+  is_liked: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -349,8 +351,9 @@ export async function apiCreateThread(
   return res.json();
 }
 
-export async function apiGetThread(threadId: string): Promise<ApiThreadDetail> {
-  const res = await fetch(`${API_BASE}/community/threads/${threadId}`);
+export async function apiGetThread(threadId: string, token?: string | null): Promise<ApiThreadDetail> {
+  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(`${API_BASE}/community/threads/${threadId}`, { headers });
   if (!res.ok) throw new Error('Thread introuvable');
   return res.json();
 }

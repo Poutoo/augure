@@ -190,6 +190,7 @@ class CommentResponse(BaseModel):
     author: CommentAuthor
     body: str
     like_count: int
+    is_liked: bool = False
     is_deleted: bool
     parent_comment_id: uuid.UUID | None
     created_at: datetime
@@ -234,6 +235,7 @@ class ThreadResponse(BaseModel):
     is_locked: bool
     comment_count: int
     like_count: int
+    is_liked: bool = False
     created_at: datetime
     updated_at: datetime
 
