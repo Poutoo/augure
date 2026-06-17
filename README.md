@@ -130,7 +130,7 @@ FastAPI repose sur Starlette et est intégralement asynchrone. Ses performances 
 **PostgreSQL + SQLAlchemy 2 / Alembic**
 PostgreSQL est le choix de persistance relationnelle standard pour les profils utilisateurs complexes, les jointures many-to-many (tags × tendances × intérêts) et les contraintes d'unicité transactionnelles (likes, favoris). SQLAlchemy 2 avec le style `Mapped[T]` apporte un typage statique complet sur les modèles ORM. Alembic assure le versioning incrémental du schéma en production — chaque évolution structurelle est tracée, réversible et déployable sans downtime si les migrations sont rédigées correctement.
 
-> **Note d'architecture** : Le backend FastAPI et le frontend Next.js sont des services strictement séparés. Le frontend consomme le backend exclusivement via l'API REST `/api/v1`. Drizzle ORM sur le frontend est limité à la lecture directe de la base Supabase pour les cas où la latence d'un aller-retour backend est inacceptable (ex: chargement initial du flux de tendances).
+> **Note d'architecture (Arbitrage MVP)** : Le backend FastAPI et le frontend Next.js sont des services séparés. Pour des raisons de performance sur les pages statiques non personnalisées (ex : Glossaire), Next.js utilise Drizzle ORM en lecture directe sur Supabase. En revanche, tout le flux personnalisé et scoré passe obligatoirement par l'API REST FastAPI (`/api/v1/trends`) afin de centraliser la logique métier de calcul d'affinité et garantir l'étanchéité du pattern 3-Tiers.
 
 ---
 
@@ -411,9 +411,9 @@ docker compose up --build
 | Service | URL locale |
 | :--- | :--- |
 | Frontend Next.js | http://localhost:3000 |
+| Backend FastAPI | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/api/docs |
 | PostgreSQL | localhost:5432 |
-
-> **Note** : Le service backend FastAPI n'est pas inclus dans le `docker-compose.yml` actuel — le lancer séparément avec la méthode B si nécessaire.
 
 ---
 
