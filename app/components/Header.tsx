@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { apiGetMe } from '@/lib/api';
 
+const PROFILE_CACHE_KEY = 'augure_profile_cache';
+
 export default function Header({ dark = false }: { dark?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -18,18 +20,34 @@ export default function Header({ dark = false }: { dark?: boolean }) {
     const token = localStorage.getItem('augure_token');
     if (!token) return;
 
+    // Affichage immédiat depuis le cache — évite le rechargement à chaque navigation
+    try {
+      const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+      if (raw) {
+        const { initial: ci, avatarUrl: ca } = JSON.parse(raw);
+        setInitial(ci);
+        setAvatarUrl(ca);
+      }
+    } catch {}
+
+    // Re-validation silencieuse en arrière-plan
     apiGetMe(token)
       .then(user => {
-        setInitial((user.username ?? user.email).charAt(0).toUpperCase());
-        setAvatarUrl(user.avatar_url);
+        const i = (user.username ?? user.email).charAt(0).toUpperCase();
+        const a = user.avatar_url;
+        setInitial(i);
+        setAvatarUrl(a);
+        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({ initial: i, avatarUrl: a }));
       })
       .catch(() => {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          const email: string = payload.sub ?? payload.email ?? '';
-          setInitial(email.charAt(0).toUpperCase());
-        } catch {
-          setInitial('');
+        if (!localStorage.getItem(PROFILE_CACHE_KEY)) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const email: string = payload.sub ?? payload.email ?? '';
+            setInitial(email.charAt(0).toUpperCase());
+          } catch {
+            setInitial('');
+          }
         }
       });
   }, []);
@@ -47,6 +65,7 @@ export default function Header({ dark = false }: { dark?: boolean }) {
 
   const handleLogout = () => {
     localStorage.removeItem('augure_token');
+    localStorage.removeItem(PROFILE_CACHE_KEY);
     document.cookie = 'augure_session=; path=/; max-age=0; SameSite=Lax';
     router.push('/welcome');
   };
