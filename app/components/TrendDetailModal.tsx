@@ -141,7 +141,7 @@ export default function TrendDetailModal() {
           </div>
 
           {/* Contenu scrollable */}
-          <div className="flex-1 px-6 py-6 overflow-y-auto pb-12 flex flex-col gap-6">
+          <div className="flex-1 px-6 py-6 overflow-y-auto pb-24 md:pb-12 flex flex-col gap-6">
             {activeTab === 'comments' ? (
               <TrendComments trendId={trend.id} />
             ) : (
