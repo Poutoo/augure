@@ -12,7 +12,7 @@
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -34,13 +34,13 @@
 
   frontend:
     build:
-      context: ./app
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: augure_frontend
     ports:
       - "3000:3000"
     volumes:
-      - ./app:/app
+      - ./frontend:/app
       - /app/node_modules
     environment:
       - WATCHPACK_POLLING=true
