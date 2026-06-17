@@ -375,7 +375,7 @@ SUPABASE_SERVICE_KEY="<service_role_key>"
 
 ### 7.3 Variables d'environnement — Frontend
 
-Créer `app/.env.local` (le `.env.example` fourni sert de base) :
+Créer `frontend/.env.local` (le `.env.example` fourni sert de base) :
 
 ```env
 # Connexion directe Supabase pour Drizzle ORM
@@ -458,7 +458,7 @@ L'API est accessible sur `http://localhost:8000` — Swagger UI sur `http://loca
 #### Frontend Next.js
 
 ```bash
-cd app
+cd frontend
 
 # Installer les dépendances
 npm install
@@ -471,7 +471,7 @@ L'application est accessible sur `http://localhost:3000`.
 
 #### Commandes Drizzle ORM (gestion du schéma Supabase)
 
-Ces commandes s'exécutent depuis le dossier `app/` et ciblent la base Supabase configurée dans `.env.local` :
+Ces commandes s'exécutent depuis le dossier `frontend/` et ciblent la base Supabase configurée dans `.env.local` :
 
 ```bash
 # Générer les fichiers de migration Drizzle à partir du schéma TypeScript
@@ -501,9 +501,11 @@ alembic history --verbose
 
 ## 9. Ingestion de données
 
-### Scraper Python (Reddit / Pytrends)
+### Scraper Python (TikTok via Ensemble Data)
 
-Le scraper tourne en service Docker indépendant. Il collecte les signaux faibles depuis Reddit via PRAW et les tendances Google via Pytrends, puis insère les données normalisées en base.
+> **Note historique** : L'ambition initiale du scraper était de collecter des signaux depuis Reddit (via PRAW) et Instagram. Face aux blocages massifs anti-scraping et aux restrictions légales de ces plateformes, nous avons pivoté vers une source unique et qualitative — TikTok via l'API **Ensemble Data**.
+
+Le scraper tourne en service Docker indépendant. Il collecte les signaux faibles depuis TikTok via l'API Ensemble Data, applique un algorithme de qualification (co-occurrences de hashtags, matrice de momentum), puis insère les données normalisées en base.
 
 ```bash
 # Lancer le scraper en autonome
@@ -522,7 +524,7 @@ cd scripts
 python trend_enricher.py
 ```
 
-Ce script enrichit les tendances existantes en base avec des données structurées issues de sources externes (JSON TikTok / Instagram exportés manuellement), contournant les restrictions d'API des plateformes.
+Ce script enrichit les tendances existantes en base avec des données structurées issues de TikTok (métadonnées exportées via Ensemble Data), nettoyées et enrichies localement via Ollama pour générer les champs qualitatifs (`description`, `context`, `usage_example`).
 
 ---
 
@@ -543,6 +545,21 @@ Notre stratégie repose sur :
 ### L'IA générative en local pour l'enrichissement éditorial
 Les données brutes retournées par TikTok (descriptions chaotiques, pluie de hashtags) n'étaient pas présentables pour notre cible audience.
 **La Solution** : Nous avons développé un script local exploitant **Ollama** (modèles LLM open-source exécutés sur nos machines). Le script ingère les métadonnées brutes, les nettoie, et génère les champs qualitatifs d'Augure (`description`, `context`, `usage_example`). Cette approche garantit une interface claire.
+
+### Le défi du Cold Start : Moteur de recommandation et scoring dynamique
+
+Proposer un catalogue brut de tendances à une cible de plus de 45 ans aurait créé une surcharge cognitive, allant à l'encontre de notre promesse d'accessibilité. Le défi était de personnaliser le flux dès la création du compte sans pour autant déployer des modèles de Machine Learning complexes, totalement surdimensionnés pour ce contexte.
+
+**La Solution Technique** : Nous avons développé un moteur de scoring dynamique au cœur de notre backend FastAPI (`backend/app/trends/service.py`). Dès l'onboarding, le profil utilisateur est segmenté (Rôle, Intérêts, Génération cible). 
+
+Plutôt que de stocker un historique de recommandations figé en base de données, l'algorithme calcule l'affinité en temps réel à chaque appel d'API via une sous-requête SQL optimisée utilisant SQLAlchemy :
+- Un tag d'intérêt correspondant aux choix de l'utilisateur ajoute **+3 points** au score de la tendance.
+- Une correspondance de génération cible ajoute **+2 points**.
+- Une adéquation avec le rôle utilisateur ajoute **+1 point**.
+
+Le score final est la somme du `score_base` éditorial (attribué lors de l'ingestion) et du total des points d'affinité calculés dynamiquement.
+
+Cette approche garantit une synchronisation immédiate : si l'utilisateur modifie ses centres d'intérêt dans son profil, son flux de tendances est recalculé instantanément à la milliseconde près, sans aucune latence réseau ni dette de stockage.
 
 ### Bilan et Évolutions futures
 Cette expérience a été extrêmement formatrice sur la réalité de la Data Engineering. Elle nous a appris qu'un algorithme de prédiction n'est rien sans un accès permanent et qualitatif à la donnée. 
