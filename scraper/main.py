@@ -7,6 +7,7 @@ import time
 import re
 import argparse
 from datetime import datetime
+from rapidfuzz import fuzz, process
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
@@ -25,6 +26,46 @@ CATEGORY_MAPPING = {
     "Beauté": "beauty",
     "Tech": "tech"
 }
+
+# Liste de secours si la DB est inaccessible
+FALLBACK_BAN = {
+    "fyp", "foryou", "foryoupage", "viral", "trending",
+    "xyzbca", "xyz", "pourtoi", "pov", "grwm", "ootd",
+    "foryourpage", "blowthisup", "makeitgofyp", "trend", "explore", "video"
+}
+
+def get_banned_hashtags(connection):
+    """Charge la liste des hashtags bannis depuis la base de données."""
+    try:
+        query = text("SELECT tag FROM banned_hashtags")
+        result = connection.execute(query).fetchall()
+        if not result:
+            return FALLBACK_BAN
+        return {row[0].lower() for row in result}
+    except Exception as e:
+        print(f"⚠️ Impossible de charger les hashtags bannis : {e}")
+        return FALLBACK_BAN
+
+def is_valid_trend_hashtag(tag, view_count, banned_list):
+    """
+    Vérifie si un hashtag est pertinent pour une tendance émergente.
+    Traitement : Amélioration B (Filtrage dynamique par volume).
+    """
+    tag = tag.lower().strip().replace("#", "")
+    
+    # 1. Vérification liste noire
+    if tag in banned_list:
+        return False
+    
+    # 2. Filtrage par volume : > 500M = macro-tendance (trop mainstream)
+    if view_count > 500000000:
+        return False
+        
+    # 3. Filtrage par longueur
+    if len(tag) < 3:
+        return False
+        
+    return True
 
 def get_api_stats():
     """Affiche les crédits utilisés et totaux au démarrage."""
@@ -48,30 +89,68 @@ def get_api_usage():
     except Exception:
         return 0
 
-def extract_signals(posts, keyword):
-    """Extrait les hashtags et musiques les plus fréquents parmi les posts."""
+def clean_trend_title(raw_title, search_keyword, banned_list):
+    """Nettoie le titre en supprimant les hashtags parasites et le bruit."""
+    if not raw_title:
+        return search_keyword.title()
+    
+    # Remplacement des underscores/tirets par des espaces
+    raw_title = raw_title.replace('_', ' ').replace('-', ' ')
+    # Suppression des hashtags (#tag) et conversion en mots
+    words = re.sub(r'#\w+', '', raw_title).lower().split()
+    # Filtrage via la liste dynamique
+    filtered = [w for w in words if w not in banned_list and len(w) > 1]
+    cleaned = " ".join(filtered).strip()
+    
+    # Si le résultat est trop court ou vide, on fallback sur le mot-clé
+    if len(cleaned) < 5:
+        return search_keyword.title()
+    
+    return cleaned.title()
+
+def extract_signals(posts, keyword, banned_list):
+    """
+    Extrait les hashtags, musiques et détecte les co-occurrences.
+    Amélioration C : Co-occurrence de hashtags de niche.
+    """
     hashtags_freq = {}
     music_freq = {}
+    co_occurrences = {}
+    unique_authors = set()
 
     for post in posts:
         aweme_info = post.get('aweme_info', {})
-        
-        # 1. Extraction Hashtags
+        author_id = aweme_info.get('author', {}).get('unique_id')
+        if author_id:
+            unique_authors.add(author_id)
+            
+        # 1. Extraction et filtrage des hashtags de la vidéo
         cha_list = aweme_info.get('cha_list', []) or []
-        for cha in cha_list:
-            name = cha.get('hashtag_name')
-            if name and name.lower() != keyword.lower():
-                hashtags_freq[name] = hashtags_freq.get(name, 0) + 1
+        current_video_tags = set()
         
-        # Si cha_list est vide, tenter de parser le desc
+        for cha in cha_list:
+            name = cha.get('hashtag_name', '').lower()
+            if name and name != keyword.lower() and is_valid_trend_hashtag(name, 0, banned_list):
+                hashtags_freq[name] = hashtags_freq.get(name, 0) + 1
+                current_video_tags.add(name)
+        
         if not cha_list:
             desc = aweme_info.get('desc', '')
             found_hashtags = re.findall(r'#(\w+)', desc)
             for h in found_hashtags:
-                if h.lower() != keyword.lower():
-                    hashtags_freq[h] = hashtags_freq.get(h, 0) + 1
+                h_low = h.lower()
+                if h_low != keyword.lower() and is_valid_trend_hashtag(h_low, 0, banned_list):
+                    hashtags_freq[h_low] = hashtags_freq.get(h_low, 0) + 1
+                    current_video_tags.add(h_low)
 
-        # 2. Extraction Musique
+        # 2. Détection de co-occurrence (paires de hashtags)
+        tags_list = sorted(list(current_video_tags))
+        for i in range(len(tags_list)):
+            for j in range(i + 1, len(tags_list)):
+                pair = tuple(sorted([tags_list[i], tags_list[j]]))
+                co_occurrences[pair] = co_occurrences.get(pair, 0) + 1
+
+        # 3. Musique
         music = aweme_info.get('music', {})
         if music:
             music_id = music.get('id_str') or str(music.get('id', ''))
@@ -85,56 +164,77 @@ def extract_signals(posts, keyword):
                     }
                 music_freq[music_id]["count"] += 1
 
-    # Tri et sélection du Top 3
-    top_hashtags = sorted(hashtags_freq.items(), key=lambda x: x[1], reverse=True)[:3]
-    weak_signals_hashtags = [{"name": name, "count": count} for name, count in top_hashtags]
+    # Tri et sélection
+    top_hashtags = sorted(hashtags_freq.items(), key=lambda x: x[1], reverse=True)[:5]
+    
+    # Identification des clusters (paires apparaissant sur > 1 vidéo)
+    clusters = [
+        {"tags": list(pair), "count": count} 
+        for pair, count in co_occurrences.items() if count > 1
+    ]
+    
+    weak_signals_hashtags = {
+        "top_tags": [{"name": name, "count": count} for name, count in top_hashtags],
+        "clusters": sorted(clusters, key=lambda x: x["count"], reverse=True)[:3],
+        "unique_creators_count": len(unique_authors)
+    }
 
     top_music = sorted(music_freq.values(), key=lambda x: x["count"], reverse=True)[:3]
-    weak_signals_music = top_music
-
-    return weak_signals_hashtags, weak_signals_music
+    
+    return weak_signals_hashtags, top_music, len(unique_authors)
 
 def calculate_trend_status(current_views, previous_views, original_post_at=None):
-    """Calcule le statut du cycle de vie basé sur la vélocité (vues/jour) et le momentum."""
+    """
+    Calcule le statut basé sur les seuils d'audit (Volume + Momentum).
+    Intègre la normalisation temporelle (Pics de week-end et posts Flash).
+    """
     now = datetime.now()
     
-    # 1. Calcul de l'âge et de la vélocité
-    if original_post_at:
-        # Assurer que original_post_at est un datetime
-        if isinstance(original_post_at, (int, float)):
-            original_post_at = datetime.fromtimestamp(original_post_at)
-        
-        delta = now - original_post_at.replace(tzinfo=None) # Simplification pour comparaison
-        days = max(1, delta.days) # Plancher de 1 jour
-    else:
-        days = 1
-    
-    velocity = current_views / days # Vues par jour (Vq)
-
-    # 2. Logique de décision (Matrice de Vélocité)
-    
-    # Cas de croissance forte détectée via Snapshot (J-1)
+    # 1. Calcul du momentum (J-1) avec lissage week-end
+    growth = 0
     if previous_views > 0:
         growth = (current_views - previous_views) / previous_views
-        if growth > 0.3:
-            return "EN_HAUSSE"
+        
+        # Normalisation Week-end : Le trafic est souvent +30% supérieur le samedi/dimanche
+        # On réduit légèrement le momentum calculé ces jours-là pour éviter les faux VIRAL
+        if now.weekday() in [5, 6]: # Samedi ou Dimanche
+            growth = growth * 0.8
+            
+    # 2. Calcul de la vélocité quotidienne (Vq) pour les contenus récents
+    velocity = 0
+    if original_post_at:
+        # Assurer la cohérence des fuseaux horaires (simplifié)
+        delta = now - original_post_at.replace(tzinfo=None)
+        
+        # Cas Post Flash (<2h) : On impose un plancher de 1 jour pour ne pas diviser par zéro
+        # et pour exiger une preuve d'endurance du contenu.
+        days = max(1, delta.days) 
+        velocity = current_views / days
 
-    # Cas VIRAL : Explosion immédiate (< 3 jours) et forte vélocité
-    if original_post_at and days <= 3 and velocity > 100000:
+    # 3. Matrice de Décision
+    
+    # Cas EN_BAISSE (Momentum négatif ou quasi-nul sur vieux contenu)
+    if growth < -0.05 and previous_views > 0:
+        return "EN_BAISSE"
+
+    # Cas VIRAL : > 5M vues ET (croissance explosive > 50% OU vélocité > 500k/j)
+    if current_views > 5000000 and (growth > 0.5 or velocity > 500000):
         return "VIRAL"
     
-    # Cas EMERGENT : Niche récente (< 5 jours)
-    if original_post_at and days <= 5 and velocity > 10000:
-        return "EMERGENT"
-    
-    # Cas STABLE : Post établi ou vélocité modérée
-    if days > 10 or velocity > 5000:
+    # Cas STABLE : > 5M vues mais croissance stabilisée
+    if current_views > 5000000:
         return "STABLE"
+
+    # Cas EN_HAUSSE : 1M-5M vues ET croissance positive notable (> 20%)
+    if 1000000 <= current_views <= 5000000 and growth > 0.2:
+        return "EN_HAUSSE"
     
-    # Cas EN_BAISSE : Vieux post avec faible vélocité
-    if days > 15 and velocity < 2000:
-        return "EN_BAISSE"
-    
+    # Cas EMERGENT : < 1M vues ET croissance positive
+    if current_views < 1000000:
+        # Si c'est un contenu de niche qui commence à peine
+        if growth > 0.1 or velocity > 10000:
+            return "EMERGENT"
+
     return "STABLE"
 
 def fetch_audience_demographics(username, dry_run=False):
@@ -162,12 +262,63 @@ def fetch_audience_demographics(username, dry_run=False):
         print(f"⚠️ Échec de la récupération d'audience : {e}")
         return None
 
-def insert_to_db(connection, title, total_views, platform_name, category, hashtags, music, description=None, context=None, age_dist=None, original_post_at=None, dry_run=False):
-    """Insère ou met à jour la tendance, gère les snapshots et calcule le statut."""
-    clean_title = re.sub(r'[^a-zA-Z0-9 ]', '', title)[:100] or f"Trend {category}"
-    slug = re.sub(r'[^a-z0-9]+', '-', clean_title.lower()).strip('-')
-    if not slug: slug = f"trend-{uuid.uuid4().hex[:8]}"
+def identify_trend_name(posts, category_keyword, banned_list, connection=None):
+    """
+    Identifie le nom de la tendance et fournit un slug stable via dédoublonnage fuzzy.
+    Traitement : Amélioration A (Dédoublonnage fuzzy ratio > 85).
+    """
+    # 1. Extraction du hashtag dominant
+    hashtag_counts = {}
+    for post in posts:
+        cha_list = post.get('aweme_info', {}).get('cha_list', []) or []
+        for cha in cha_list:
+            name = cha.get('hashtag_name', '').lower()
+            if name and name not in banned_list:
+                hashtag_counts[name] = hashtag_counts.get(name, 0) + 1
+    
+    top_tag = None
+    if hashtag_counts:
+        top_tag = sorted(hashtag_counts.items(), key=lambda x: x[1], reverse=True)[0][0]
 
+    # 2. Détermination du Titre (Pipeline Cascade)
+    raw_name = ""
+    top_post = posts[0].get('aweme_info', {})
+    search_desc = top_post.get('search_desc')
+    
+    if search_desc and len(search_desc) > 3:
+        raw_name = search_desc
+    elif top_tag:
+        raw_name = top_tag
+    else:
+        raw_name = category_keyword
+
+    clean_name = clean_trend_title(raw_name, category_keyword, banned_list)
+
+    # 3. Dédoublonnage Fuzzy (Amélioration A)
+    stable_slug = f"{category_keyword.lower()}-{ (top_tag if top_tag else category_keyword.lower()).replace('_', '-') }"
+    
+    if connection:
+        try:
+            query = text("SELECT title, slug FROM trends WHERE category = :cat")
+            existing_trends = connection.execute(query, {"cat": category_keyword}).fetchall()
+            
+            if existing_trends:
+                titles = [row[0] for row in existing_trends]
+                match = process.extractOne(clean_name, titles, scorer=fuzz.WRatio)
+                
+                if match and match[1] > 85:
+                    matched_title = match[0]
+                    for row in existing_trends:
+                        if row[0] == matched_title:
+                            print(f"🔄 [FUZZY] Fusion de '{clean_name}' avec '{matched_title}' (Score: {match[1]})")
+                            return matched_title, row[1]
+        except Exception as e:
+            print(f"⚠️ Erreur lors du dédoublonnage fuzzy : {e}")
+
+    return clean_name, stable_slug
+
+def insert_to_db(connection, title, slug, total_views, platform_name, category, hashtags, music, description=None, context=None, age_dist=None, original_post_at=None, dry_run=False):
+    """Insère ou met à jour la tendance avec un slug persistant."""
     previous_views = 0
     existing = None
 
@@ -177,22 +328,21 @@ def insert_to_db(connection, title, total_views, platform_name, category, hashta
         
         if existing:
             previous_views = existing.score_base
-            snapshot_query = text("""
-                INSERT INTO trends_snapshots (id, trend_slug, views_count, recorded_at)
-                VALUES (:id, :slug, :views, NOW())
-            """)
-            connection.execute(snapshot_query, {"id": str(uuid.uuid4()), "slug": slug, "views": previous_views})
+            if total_views != previous_views:
+                snapshot_query = text("""
+                    INSERT INTO trends_snapshots (id, trend_slug, views_count, recorded_at)
+                    VALUES (:id, :slug, :views, NOW())
+                """)
+                connection.execute(snapshot_query, {"id": str(uuid.uuid4()), "slug": slug, "views": previous_views})
     else:
         previous_views = 500000 
 
-    # Normalisation forcée en majuscules pour l'Enum DB
     new_status = calculate_trend_status(total_views, previous_views, original_post_at=original_post_at).upper()
 
     if dry_run:
-        print(f"🧪 [DRY-RUN] Serait inséré : {clean_title} | Status: {new_status} | Vues: {total_views} | Age: {age_dist is not None} | Date Post: {original_post_at}")
+        print(f"🧪 [DRY-RUN] Serait inséré : {title} | Slug: {slug} | Status: {new_status} | Vues: {total_views}")
         return
 
-    # Utilisation d'un SQL robuste avec casting JSONB manuel là où c'est nécessaire pour l'agrégation
     query = text("""
         INSERT INTO trends (
             id, title, slug, description, context, usage_example, 
@@ -207,12 +357,10 @@ def insert_to_db(connection, title, total_views, platform_name, category, hashta
             :original_post_at, NOW()
         )
         ON CONFLICT (slug) DO UPDATE 
-        SET score_base = EXCLUDED.score_base,
+        SET title = EXCLUDED.title,
+            score_base = EXCLUDED.score_base,
             status = EXCLUDED.status,
-            platforms = (
-                SELECT jsonb_agg(DISTINCT x) 
-                FROM jsonb_array_elements(COALESCE(trends.platforms::jsonb, '[]'::jsonb) || EXCLUDED.platforms::jsonb) t(x)
-            ),
+            description = EXCLUDED.description,
             weak_signals_hashtags = EXCLUDED.weak_signals_hashtags,
             weak_signals_music = EXCLUDED.weak_signals_music,
             age_distribution = COALESCE(EXCLUDED.age_distribution, trends.age_distribution),
@@ -221,11 +369,11 @@ def insert_to_db(connection, title, total_views, platform_name, category, hashta
     
     connection.execute(query, {
         "id": str(uuid.uuid4()), 
-        "title": clean_title, 
+        "title": title, 
         "slug": slug,
-        "description": description or f"Analyse de la tendance émergente {clean_title}.",
+        "description": description or f"Analyse de la tendance {title}.",
         "context": context or "Détecté via l'analyse des signaux faibles TikTok.",
-        "usage_example": f"Utilisez #{hashtags[0]['name']} si applicable." if hashtags else "Intégrez cette tendance dans votre prochain contenu.",
+        "usage_example": f"Utilisez les codes de {title} dans votre prochain contenu.",
         "score": total_views, 
         "platforms": json.dumps([platform_name]),
         "status": new_status,
@@ -236,34 +384,7 @@ def insert_to_db(connection, title, total_views, platform_name, category, hashta
         "original_post_at": original_post_at
     })
     connection.commit()
-    print(f"✅ [{platform_name.upper()}] '{clean_title}' ({new_status}) synchronisé. Vues: {total_views} (+{total_views-previous_views if existing else 0})")
-
-GENERIC_HASHTAGS = {"fyp", "viral", "foryou", "trending", "tiktok", "pourtoi", "trend", "explore", "video"}
-
-def identify_trend_name(posts, category_keyword):
-    """Identifie le nom le plus représentatif pour la tendance."""
-    # 1. Tenter de récupérer le search_desc du premier post (très qualitatif sur TikTok)
-    top_post = posts[0].get('aweme_info', {})
-    search_desc = top_post.get('search_desc')
-    if search_desc and len(search_desc) > 3:
-        return search_desc.strip().title()
-
-    # 2. Analyser les hashtags des 20 vidéos pour trouver le leader
-    hashtag_counts = {}
-    for post in posts:
-        cha_list = post.get('aweme_info', {}).get('cha_list', []) or []
-        for cha in cha_list:
-            name = cha.get('hashtag_name', '').lower()
-            if name and name not in GENERIC_HASHTAGS:
-                hashtag_counts[name] = hashtag_counts.get(name, 0) + 1
-    
-    if hashtag_counts:
-        top_tag = sorted(hashtag_counts.items(), key=lambda x: x[1], reverse=True)[0][0]
-        # Nettoyage : cottage_core -> Cottage Core
-        return top_tag.replace('_', ' ').replace('-', ' ').title()
-
-    # 3. Fallback sur le mot-clé de la catégorie
-    return category_keyword.title()
+    print(f"✅ [{platform_name.upper()}] '{title}' ({new_status}) synchronisé. Vues: {total_views} (+{total_views-previous_views if existing else 0})")
 
 def scrape_tiktok(category, dry_run=False):
     """Récupère et analyse les signaux faibles TikTok pour une catégorie donnée."""
@@ -275,69 +396,74 @@ def scrape_tiktok(category, dry_run=False):
     print(f"📱 [{datetime.now().strftime('%H:%M:%S')}] {'[DRY-RUN] ' if dry_run else ''}Analyse TikTok pour '{category}' (Mot-clé: {keyword})...", flush=True)
     
     try:
-        if dry_run:
-            raw_json = {
-                "data": [
-                    {
-                        "aweme_info": {
-                            "desc": f"Ceci est une simulation de tendance pour {category} #test",
-                            "statistics": {"play_count": 1250000},
-                            "author": {"unique_id": "user_test"},
-                            "music": {"id_str": "123", "title": "Mock Music", "author": "Mock Artist"},
-                            "cha_list": [{"hashtag_name": "test"}]
-                        }
-                    }
-                ]
-            }
-        else:
-            url = "https://ensembledata.com/apis/tt/keyword/search"
-            params = {"name": keyword, "period": "7", "sorting": "1", "token": API_KEY}
-            response = requests.get(url, params=params, timeout=20)
-            response.raise_for_status()
-            raw_json = response.json()
+        engine = create_engine(DB_URL)
+        banned_list = FALLBACK_BAN
+        
+        with engine.connect() as conn:
+            if not dry_run:
+                banned_list = get_banned_hashtags(conn)
 
-        posts = raw_json.get("data", [])
-        if isinstance(posts, dict): posts = posts.get("data", [])
-            
-        if posts:
-            sample_posts = posts[:20]
-            hashtags, music = extract_signals(sample_posts, keyword)
-            
-            top_post = sample_posts[0]
-            aweme_info = top_post.get('aweme_info', {})
-            author = aweme_info.get('author', {})
-            username = author.get('unique_id')
-            
-            statistics = aweme_info.get('statistics', {})
-            raw_views = statistics.get('play_count', 0)
-            
-            # Application du Naming Pipeline (Claude's Strategy)
-            title = identify_trend_name(sample_posts, keyword)
-            
-            description = aweme_info.get('desc')
-            
-            # Extraction de la date de publication originale
-            create_time = aweme_info.get('create_time')
-            original_post_at = datetime.fromtimestamp(create_time) if create_time else None
-            
-            # --- STRATÉGIE BUDGET SAFE RESTAURÉE ---
-            age_dist = None
             if dry_run:
-                age_dist = fetch_audience_demographics(username, dry_run=True)
+                raw_json = {
+                    "data": [
+                        {
+                            "aweme_info": {
+                                "desc": f"Ceci est une simulation de tendance pour {category} #test #viral",
+                                "statistics": {"play_count": 1250000},
+                                "author": {"unique_id": "user_test"},
+                                "music": {"id_str": "123", "title": "Mock Music", "author": "Mock Artist"},
+                                "cha_list": [{"hashtag_name": "test"}, {"hashtag_name": "viral"}]
+                            }
+                        }
+                    ]
+                }
             else:
-                remaining_credits = get_api_usage()
-                # On n'enrichit l'audience (26 crédits) que si le budget est confortable (> 30)
-                if remaining_credits > 30 and username:
-                    age_dist = fetch_audience_demographics(username)
-            
-            if dry_run:
-                insert_to_db(None, title, int(raw_views), "tiktok", category, hashtags, music, description=description, age_dist=age_dist, original_post_at=original_post_at, dry_run=True)
+                url = "https://ensembledata.com/apis/tt/keyword/search"
+                params = {"name": keyword, "period": "7", "sorting": "1", "token": API_KEY}
+                response = requests.get(url, params=params, timeout=20)
+                response.raise_for_status()
+                raw_json = response.json()
+
+            posts = raw_json.get("data", [])
+            if isinstance(posts, dict): posts = posts.get("data", [])
+                
+            if posts:
+                sample_posts = posts[:20]
+                weak_signals_hashtags, music, unique_creators_count = extract_signals(sample_posts, keyword, banned_list)
+                
+                if unique_creators_count < 5 and not dry_run:
+                    print(f"⚠️ Tendance '{keyword}' ignorée : seulement {unique_creators_count} créateurs uniques (seuil: 5).")
+                    return
+
+                top_post = sample_posts[0]
+                aweme_info = top_post.get('aweme_info', {})
+                author = aweme_info.get('author', {})
+                username = author.get('unique_id')
+                
+                statistics = aweme_info.get('statistics', {})
+                raw_views = statistics.get('play_count', 0)
+                
+                # Passer la connexion pour le dédoublonnage fuzzy
+                title, slug = identify_trend_name(sample_posts, keyword, banned_list, connection=conn if not dry_run else None)
+                
+                description = aweme_info.get('desc')
+                create_time = aweme_info.get('create_time')
+                original_post_at = datetime.fromtimestamp(create_time) if create_time else None
+                
+                age_dist = None
+                if dry_run:
+                    age_dist = fetch_audience_demographics(username, dry_run=True)
+                else:
+                    remaining_credits = get_api_usage()
+                    if remaining_credits > 30 and username:
+                        age_dist = fetch_audience_demographics(username)
+                
+                if dry_run:
+                    insert_to_db(None, title, slug, int(raw_views), "tiktok", category, weak_signals_hashtags, music, description=description, age_dist=age_dist, original_post_at=original_post_at, dry_run=True)
+                else:
+                    insert_to_db(conn, title, slug, int(raw_views), "tiktok", category, weak_signals_hashtags, music, description=description, age_dist=age_dist, original_post_at=original_post_at)
             else:
-                engine = create_engine(DB_URL)
-                with engine.connect() as conn:
-                    insert_to_db(conn, title, int(raw_views), "tiktok", category, hashtags, music, description=description, age_dist=age_dist, original_post_at=original_post_at)
-        else:
-            print(f"⚠️ Aucune donnée pour '{category}'.")
+                print(f"⚠️ Aucune donnée pour '{category}'.")
     except Exception as e:
         print(f"❌ Erreur sur '{category}' : {e}")
 
@@ -355,10 +481,7 @@ def main():
     print(f"🚀 Orchestrateur Augure prêt. {'[MODE DRY-RUN]' if args.dry_run else ''}")
     if not args.dry_run:
         get_api_stats()
-        # Lancement immédiat en PROD
         run_all_categories()
-        
-        # Planification pour le futur
         schedule.every().day.at("04:00").do(run_all_categories)
         while True:
             schedule.run_pending()

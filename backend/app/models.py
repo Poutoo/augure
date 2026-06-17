@@ -171,6 +171,16 @@ class TrendSnapshot(Base):
     )
 
 
+class BannedHashtag(Base):
+    __tablename__ = "banned_hashtags"
+
+    tag: Mapped[str] = mapped_column(String(100), primary_key=True)
+    reason: Mapped[str | None] = mapped_column(String(50), nullable=True) # 'algorithme', 'temporel', 'macro', 'format'
+    added_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
 class TrendTag(Base):
     """
     Relie une tendance à un critère de matching.
