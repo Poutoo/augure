@@ -146,6 +146,7 @@ class Trend(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+    is_mock: Mapped[bool] = mapped_column(Boolean, server_default='false', nullable=False)
 
     tags: Mapped[list["TrendTag"]] = relationship(
         "TrendTag",
