@@ -61,8 +61,6 @@ const GENDERS    = [
   { label: "Autre",  slug: "autre"  },
 ];
 
-const EMOJI_OPTIONS = ['🔖', '📌', '⭐', '🎯', '🔥', '💡', '🎬', '📸', '🎵', '💎'];
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function toggle(list: string[], slug: string): string[] {
@@ -139,7 +137,6 @@ export default function ProfilePage() {
   const [colItemsLoading, setColItemsLoading] = useState(false);
   const [showCreateCol, setShowCreateCol] = useState(false);
   const [newColName, setNewColName] = useState('');
-  const [newColEmoji, setNewColEmoji] = useState('🔖');
   const [creatingCol, setCreatingCol] = useState(false);
   const [colToDelete, setColToDelete] = useState<ApiFavoriteCollection | null>(null);
   const [deletingCol, setDeletingCol] = useState(false);
@@ -271,9 +268,9 @@ export default function ProfilePage() {
     if (!token || !newColName.trim()) return;
     setCreatingCol(true);
     try {
-      const col = await apiCreateCollection(token, { name: newColName.trim(), emoji: newColEmoji });
+      const col = await apiCreateCollection(token, { name: newColName.trim(), emoji: '🔖' });
       setCollections(prev => [col, ...prev]);
-      setNewColName(''); setNewColEmoji('🔖'); setShowCreateCol(false);
+      setNewColName(''); setShowCreateCol(false);
     } finally { setCreatingCol(false); }
   };
 
@@ -555,7 +552,6 @@ export default function ProfilePage() {
                 <button onClick={() => { setCollectionDetail(null); setCollectionItems([]); }} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
                   <Icon icon="mdi:arrow-left" className="text-[var(--color-text-dark)]" />
                 </button>
-                <span className="text-xl">{collectionDetail.emoji}</span>
                 <h2 className="font-syne font-bold text-[var(--color-text-dark)]">{collectionDetail.name}</h2>
               </div>
 
@@ -586,19 +582,21 @@ export default function ProfilePage() {
                     if (item.trend_id) {
                       const trendStatus = item.trend_status ? STATUS_CONFIG[item.trend_status] : null;
                       return (
-                        <div key={item.id} className="bg-white rounded-2xl px-4 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
-                          <div className="flex items-center gap-2">
-                            {item.trend_image && <img src={item.trend_image} alt={item.trend_title ?? ''} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-1.5 mb-0.5">
-                                <Icon icon="mdi:trending-up" className="text-xs text-gray-400" />
-                                <span className="font-inter text-xs text-gray-400">Trend</span>
-                                {trendStatus && <span className={`text-xs font-inter font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>{trendStatus.label}</span>}
+                        <Link key={item.id} href={`?trendId=${item.trend_id}`} scroll={false} className="block group">
+                          <div className="bg-white rounded-2xl px-4 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-2">
+                              {item.trend_image && <img src={item.trend_image} alt={item.trend_title ?? ''} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <Icon icon="mdi:trending-up" className="text-xs text-gray-400" />
+                                  <span className="font-inter text-xs text-gray-400">Trend</span>
+                                  {trendStatus && <span className={`text-xs font-inter font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>{trendStatus.label}</span>}
+                                </div>
+                                <h3 className="font-syne font-bold text-sm text-[var(--color-text-dark)] truncate">{item.trend_title}</h3>
                               </div>
-                              <h3 className="font-syne font-bold text-sm text-[var(--color-text-dark)] truncate">{item.trend_title}</h3>
                             </div>
                           </div>
-                        </div>
+                        </Link>
                       );
                     }
                     return null;
@@ -612,11 +610,6 @@ export default function ProfilePage() {
               {showCreateCol ? (
                 <div className="mb-4 bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                   <p className="font-syne font-bold text-xs text-gray-400 uppercase tracking-wider mb-3">Nouvelle collection</p>
-                  <div className="flex gap-2 flex-wrap mb-3">
-                    {EMOJI_OPTIONS.map(e => (
-                      <button key={e} onClick={() => setNewColEmoji(e)} className={`w-10 h-10 text-xl rounded-xl transition-all ${newColEmoji === e ? 'bg-[var(--color-text-dark)] ring-2 ring-[var(--color-text-dark)]' : 'bg-gray-100 hover:bg-gray-200'}`}>{e}</button>
-                    ))}
-                  </div>
                   <input
                     type="text"
                     value={newColName}
@@ -628,7 +621,7 @@ export default function ProfilePage() {
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 font-inter text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors mb-3"
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => { setShowCreateCol(false); setNewColName(''); setNewColEmoji('🔖'); }} className="flex-1 py-2.5 rounded-xl border border-gray-200 font-syne font-semibold text-sm text-gray-600">Annuler</button>
+                    <button onClick={() => { setShowCreateCol(false); setNewColName(''); }} className="flex-1 py-2.5 rounded-xl border border-gray-200 font-syne font-semibold text-sm text-gray-600">Annuler</button>
                     <button onClick={handleCreateCollection} disabled={!newColName.trim() || creatingCol} className="flex-1 py-2.5 rounded-xl bg-[var(--color-text-dark)] text-white font-syne font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-1.5">
                       {creatingCol && <Icon icon="mdi:loading" className="animate-spin text-sm" />} Créer
                     </button>
@@ -642,24 +635,41 @@ export default function ProfilePage() {
 
               {/* Collections grid */}
               {collectionsLoading ? (
-                <div className="grid grid-cols-2 gap-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />)}</div>
+                <div className="grid grid-cols-2 gap-2">{[1, 2, 3, 4].map(i => <div key={i} className="aspect-square rounded-2xl bg-gray-100 animate-pulse" />)}</div>
               ) : collections.length === 0 ? (
                 <div className="text-center py-12">
                   <Icon icon="mdi:bookmark-outline" className="text-5xl text-gray-200 mx-auto mb-3" />
                   <p className="font-syne font-bold text-gray-400">Aucune collection</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {collections.map(col => (
-                    <div key={col.id} className="relative group">
-                      <button onClick={() => setCollectionDetail(col)} className="w-full bg-white rounded-2xl p-4 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow text-left">
-                        <span className="text-3xl block mb-2">{col.emoji}</span>
-                        <p className="font-syne font-bold text-sm text-[var(--color-text-dark)] truncate">{col.name}</p>
-                        <p className="font-inter text-xs text-gray-400 mt-0.5">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
-                      </button>
+                    <div
+                      key={col.id}
+                      className="relative group aspect-square rounded-2xl overflow-hidden cursor-pointer"
+                      onClick={() => setCollectionDetail(col)}
+                    >
+                      {/* Background */}
+                      {col.cover_image_url ? (
+                        <img
+                          src={col.cover_image_url}
+                          alt={col.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-b from-white to-gray-300" />
+                      )}
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                      {/* Info */}
+                      <div className="absolute bottom-0 left-0 right-0 px-3 py-2.5">
+                        <p className="font-syne font-bold text-white text-sm leading-tight truncate drop-shadow">{col.name}</p>
+                        <p className="font-inter text-xs text-white/60 mt-0.5">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
+                      </div>
+                      {/* Delete button — z-10 pour passer au-dessus */}
                       <button
                         onClick={e => { e.stopPropagation(); setColToDelete(col); }}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-50 text-red-400 flex items-center justify-center transition-opacity hover:bg-red-100 md:opacity-0 md:group-hover:opacity-100"
+                        className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/30 text-white flex items-center justify-center transition-opacity hover:bg-black/50 md:opacity-0 md:group-hover:opacity-100 backdrop-blur-sm"
                         aria-label="Supprimer la collection"
                       >
                         <Icon icon="mdi:delete-outline" className="text-sm" />
@@ -699,7 +709,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleDeleteCollection}
                 disabled={deletingCol}
-                className="flex-1 py-3 rounded-2xl bg-red-500 text-white font-syne font-semibold text-sm hover:bg-red-600 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-2xl bg-[var(--color-text-dark)] text-white font-syne font-semibold text-sm hover:opacity-80 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
               >
                 {deletingCol
                   ? <><Icon icon="mdi:loading" className="animate-spin" /> Suppression…</>

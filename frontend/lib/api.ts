@@ -401,6 +401,7 @@ export interface ApiFavoriteCollection {
   name: string;
   emoji: string;
   item_count: number;
+  cover_image_url: string | null;
   created_at: string;
 }
 

@@ -11,8 +11,6 @@ import {
   apiCreateCollection,
 } from '@/lib/api';
 
-const EMOJI_OPTIONS = ['🔖', '📌', '⭐', '🎯', '🔥', '💡', '🎬', '📸', '🎵', '💎'];
-
 interface Props {
   token: string;
   threadId?: string;
@@ -28,7 +26,6 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
 
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newEmoji, setNewEmoji] = useState('🔖');
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -61,10 +58,9 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
     if (!newName.trim()) return;
     setCreating(true);
     try {
-      const col = await apiCreateCollection(token, { name: newName.trim(), emoji: newEmoji });
+      const col = await apiCreateCollection(token, { name: newName.trim(), emoji: '🔖' });
       setCollections(prev => [col, ...prev]);
       setNewName('');
-      setNewEmoji('🔖');
       setShowCreate(false);
       await apiAddToCollection(token, col.id, { thread_id: threadId, trend_id: trendId });
       setCheckedIds(prev => new Set([...prev, col.id]));
@@ -101,7 +97,11 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
                   disabled={toggling === col.id}
                   className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-left"
                 >
-                  <span className="text-2xl flex-shrink-0">{col.emoji}</span>
+                  <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-b from-gray-200 to-gray-300">
+                    {col.cover_image_url && (
+                      <img src={col.cover_image_url} alt={col.name} className="w-full h-full object-cover" />
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-syne font-semibold text-sm text-[var(--color-text-dark)] truncate">{col.name}</p>
                     <p className="font-inter text-xs text-gray-400">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
@@ -127,19 +127,6 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
             <div className="px-4 pb-4 flex flex-col gap-3">
               <p className="font-syne font-bold text-xs text-gray-400 uppercase tracking-wider">Nouvelle collection</p>
 
-              {/* Emoji picker */}
-              <div className="flex gap-2 flex-wrap">
-                {EMOJI_OPTIONS.map(e => (
-                  <button
-                    key={e}
-                    onClick={() => setNewEmoji(e)}
-                    className={`w-10 h-10 text-xl rounded-xl transition-all ${newEmoji === e ? 'bg-[var(--color-text-dark)] ring-2 ring-[var(--color-text-dark)]' : 'bg-gray-100 hover:bg-gray-200'}`}
-                  >
-                    {e}
-                  </button>
-                ))}
-              </div>
-
               <input
                 type="text"
                 value={newName}
@@ -153,7 +140,7 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => { setShowCreate(false); setNewName(''); setNewEmoji('🔖'); }}
+                  onClick={() => { setShowCreate(false); setNewName(''); }}
                   className="flex-1 py-2.5 rounded-xl border border-gray-200 font-syne font-semibold text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   Annuler
