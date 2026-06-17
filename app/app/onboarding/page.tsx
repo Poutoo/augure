@@ -576,7 +576,7 @@ export default function OnboardingPage() {
                   BUSINESS
                 </span>
                 <div className="mt-3 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">89,99€</div>
-                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Équipes jusqu'à 5 membres</div>
+                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Équipes jusqu&apos;à 5 membres</div>
               </button>
             </div>
 
