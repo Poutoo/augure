@@ -71,7 +71,7 @@ class InterestSchema(BaseModel):
 
 
 class PlanRequest(BaseModel):
-    plan: Literal["standard", "pro"]
+    plan: Literal["freemium", "premium", "business"]
 
 
 class OnboardingResponse(BaseModel):

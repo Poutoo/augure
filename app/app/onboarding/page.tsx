@@ -45,19 +45,26 @@ const REVENUE_OPTS = ["-10K€", "+10K/20K€", "+20K/30K€", "+30K/40K€", "+
 const REV_SLUGS = ["-10k", "10-20k", "20-30k", "30-40k", "50-60k", "60-70k", "70-80k", "80-90k", "100k-plus"];
 
 const FEATURES = [
-  { label: "Recherches illimitées", star: false, standard: true },
-  { label: "Gérez votre audience", star: true, standard: false },
-  { label: "Pas de publicités", star: true, standard: false },
-  { label: "Accès aux statistiques", star: true, standard: false },
-  { label: "Exportation des données", star: true, standard: true },
-  { label: "Alertes personnalisées", star: false, standard: false },
-  { label: "Dashboard", star: true, standard: false },
-  { label: "Communauté", star: true, standard: false },
-  { label: "Graphiques", star: false, standard: false },
+  { label: "Recherches / jour",      freemium: "7",  premium: "∞",   business: "∞"   },
+  { label: "Fiches complètes",       freemium: false, premium: true,  business: true  },
+  { label: "Tous les filtres",       freemium: false, premium: true,  business: true  },
+  { label: "Alertes personnalisées", freemium: false, premium: true,  business: true  },
+  { label: "Sauvegarde favoris",     freemium: false, premium: true,  business: true  },
+  { label: "Export PDF / Excel",     freemium: false, premium: false, business: true  },
+  { label: "Dashboard équipe",       freemium: false, premium: false, business: true  },
+  { label: "Rapports personnalisés", freemium: false, premium: false, business: true  },
+  { label: "Accès API",              freemium: false, premium: false, business: true  },
+  { label: "Communauté",             freemium: true,  premium: true,  business: true  },
 ];
 
+const PLAN_META = {
+  freemium: { label: "Freemium", price: "Gratuit",    badge: "bg-gray-100 text-gray-700" },
+  premium:  { label: "Premium",  price: "14,99€/mois", badge: "bg-black text-white"       },
+  business: { label: "Business", price: "89,99€/mois", badge: "bg-gray-800 text-white"    },
+} as const;
+
 type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-type Plan = "standard" | "pro" | "";
+type Plan = "freemium" | "premium" | "business" | "";
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -119,7 +126,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const callSavePlan = async (chosen: 'standard' | 'pro') => {
+  const callSavePlan = async (chosen: 'freemium' | 'premium' | 'business') => {
     const token = localStorage.getItem('augure_token');
     if (token) await apiSavePlan(token, chosen).catch(() => { });
   };
@@ -127,7 +134,7 @@ export default function OnboardingPage() {
   const handlePay = async () => {
     setPayLoading(true);
     await new Promise(r => setTimeout(r, 1500));
-    await callSavePlan('pro');
+    await callSavePlan(plan as 'premium' | 'business');
     setPayLoading(false);
     setStep(7);
   };
@@ -355,7 +362,7 @@ export default function OnboardingPage() {
             </>
           )}
 
-          {/* STEP 6 – Paiement simulé (Pro) */}
+          {/* STEP 6 – Paiement simulé (Premium / Business) */}
           {step === 6 && (
             <>
               <button
@@ -367,7 +374,9 @@ export default function OnboardingPage() {
               </button>
 
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">Paiement</h1>
-              <p className="font-inter text-sm text-gray-400 mb-6">Abonnement Pro · 24,99€/mois</p>
+              <p className="font-inter text-sm text-gray-400 mb-6">
+                Abonnement {plan === "premium" ? "Premium · 14,99€" : "Business · 89,99€"}/mois
+              </p>
 
               {/* Visual credit card */}
               <div
@@ -379,7 +388,9 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex items-center gap-2 mb-8">
                   <div className="w-8 h-5 rounded-sm bg-yellow-400 opacity-80" />
-                  <span className="font-syne font-bold text-white/60 text-xs tracking-widest uppercase">AUGURE PRO</span>
+                  <span className="font-syne font-bold text-white/60 text-xs tracking-widest uppercase">
+                    AUGURE {plan.toUpperCase()}
+                  </span>
                 </div>
                 <p className="font-mono text-white text-lg tracking-[0.18em] mb-4">4242 4242 4242 4242</p>
                 <div className="flex justify-between items-end">
@@ -429,7 +440,7 @@ export default function OnboardingPage() {
               >
                 {payLoading
                   ? <><Icon icon="mdi:loading" className="animate-spin text-xl" /> Traitement en cours…</>
-                  : "Payer 24,99€"
+                  : `Payer ${plan === "premium" ? "14,99€" : "89,99€"}`
                 }
               </button>
             </>
@@ -457,11 +468,13 @@ export default function OnboardingPage() {
                 <div className="px-5 py-4 border-b border-gray-100">
                   <div className="font-inter text-xs text-gray-400 mb-0.5">Plan</div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-0.5 rounded-full text-xs font-syne font-bold ${plan === "pro" ? "bg-black text-white" : "bg-gray-100 text-gray-700"}`}>
-                      {plan === "pro" ? "Pro" : "Standard"}
-                    </span>
+                    {plan && (
+                      <span className={`px-3 py-0.5 rounded-full text-xs font-syne font-bold ${PLAN_META[plan as keyof typeof PLAN_META]?.badge ?? "bg-gray-100 text-gray-700"}`}>
+                        {PLAN_META[plan as keyof typeof PLAN_META]?.label ?? plan}
+                      </span>
+                    )}
                     <span className="font-syne font-bold text-[var(--color-text-dark)]">
-                      {plan === "pro" ? "24,99€ / mois" : "Gratuit"}
+                      {plan ? PLAN_META[plan as keyof typeof PLAN_META]?.price : ""}
                     </span>
                   </div>
                 </div>
@@ -510,68 +523,80 @@ export default function OnboardingPage() {
           {/* Contenu scrollable */}
           <div className="flex-1 px-5 pt-8 pb-6 max-w-lg mx-auto w-full">
             <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] leading-tight mb-8">
-              Bienvenue.<br />Vous êtes ?
+              Bienvenue.<br />Choisissez votre plan.
             </h1>
 
-            {/* Plan cards */}
-            <div className="grid grid-cols-2 gap-3 mb-10">
-              {/* Standard */}
+            {/* Plan cards — stacked vertical */}
+            <div className="flex flex-col gap-3 mb-10">
+
+              {/* Freemium */}
               <button
-                onClick={() => setPlan("standard")}
-                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all min-h-[150px] ${plan === "standard" ? "border-black" : "border-gray-200 bg-gray-50"
-                  }`}
+                onClick={() => setPlan("freemium")}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "freemium" ? "border-black bg-white" : "border-gray-200 bg-gray-50"}`}
               >
                 <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-gray-200 text-gray-700">
-                  Standard
+                  FREEMIUM
                 </span>
-                <div className="mt-4 font-syne font-bold text-2xl text-[var(--color-text-dark)]">Gratuit</div>
+                <div className="mt-3 font-syne font-bold text-2xl text-[var(--color-text-dark)]">Gratuit</div>
+                <div className="font-inter text-xs text-gray-400 mt-0.5">7 recherches / jour · Fiches basiques</div>
               </button>
 
-              {/* Pro */}
+              {/* Premium — recommandé */}
               <button
-                onClick={() => setPlan("pro")}
-                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all min-h-[150px] ${plan === "pro" || plan === "" ? "border-black bg-white" : "border-gray-200"
-                  }`}
+                onClick={() => setPlan("premium")}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "premium" || plan === "" ? "border-black bg-white" : "border-gray-200"}`}
               >
-                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-black text-white">
-                  Pro
+                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-black text-white flex items-center gap-1">
+                  <Icon icon="mdi:star-four-points" className="text-[10px]" /> PREMIUM · RECOMMANDÉ
                 </span>
-                <div className="mt-4 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">24,99€</div>
-                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois</div>
+                <div className="mt-3 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">14,99€</div>
+                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Recherches illimitées</div>
+              </button>
+
+              {/* Business */}
+              <button
+                onClick={() => setPlan("business")}
+                className={`relative flex flex-col p-5 rounded-2xl border-2 text-left transition-all ${plan === "business" ? "border-black bg-white" : "border-gray-200"}`}
+              >
+                <span className="absolute -top-2.5 left-3 px-3 py-0.5 rounded-full text-xs font-syne font-bold bg-gray-800 text-white">
+                  BUSINESS
+                </span>
+                <div className="mt-3 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">89,99€</div>
+                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Équipes jusqu'à 5 membres</div>
               </button>
             </div>
 
             {/* Tableau comparatif */}
             <div>
               {/* En-tête */}
-              <div className="grid text-right pb-2 border-b border-gray-100" style={{ gridTemplateColumns: "1fr 64px 48px" }}>
+              <div className="grid pb-2 border-b border-gray-100" style={{ gridTemplateColumns: "1fr 44px 44px 44px" }}>
                 <div />
-                <div className="font-inter text-xs text-gray-400 text-center">Standard</div>
-                <div className="font-syne text-xs font-semibold text-[var(--color-text-dark)] text-center">Pro</div>
+                <div className="font-inter text-[10px] text-gray-400 text-center">F</div>
+                <div className="font-syne text-[10px] font-semibold text-[var(--color-text-dark)] text-center">P</div>
+                <div className="font-syne text-[10px] font-semibold text-[var(--color-text-dark)] text-center">B</div>
               </div>
 
               {/* Lignes */}
               {FEATURES.map(f => (
                 <div
                   key={f.label}
-                  className="grid items-center py-3 border-b border-gray-50"
-                  style={{ gridTemplateColumns: "1fr 64px 48px" }}
+                  className="grid items-center py-2.5 border-b border-gray-50"
+                  style={{ gridTemplateColumns: "1fr 44px 44px 44px" }}
                 >
-                  <div className="flex items-center gap-1.5 font-inter text-sm text-gray-600 pr-2">
-                    {f.star && (
-                      <Icon icon="mdi:star-four-points" className="text-xs text-[var(--color-text-dark)] flex-shrink-0" />
-                    )}
-                    {f.label}
-                  </div>
-                  <div className="flex justify-center">
-                    {f.standard
-                      ? <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
-                      : <span className="text-gray-300 font-bold leading-none">—</span>
-                    }
-                  </div>
-                  <div className="flex justify-center">
-                    <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
-                  </div>
+                  <div className="font-inter text-sm text-gray-600 pr-2">{f.label}</div>
+                  {(["freemium", "premium", "business"] as const).map(col => {
+                    const val = f[col];
+                    return (
+                      <div key={col} className="flex justify-center">
+                        {typeof val === "string"
+                          ? <span className="font-inter text-xs font-semibold text-[var(--color-text-dark)]">{val}</span>
+                          : val
+                            ? <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
+                            : <span className="text-gray-300 font-bold leading-none text-sm">—</span>
+                        }
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
             </div>
@@ -580,34 +605,42 @@ export default function OnboardingPage() {
           {/* Footer CTA noir */}
           <div className="bg-black px-6 pt-7 pb-10 flex-shrink-0">
             <p className="font-syne font-bold text-white text-lg text-center mb-6 leading-snug">
-              Devenez{" "}
-              <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">Pro</span>
-              {" "}pour un accès illimité
+              {plan === "freemium"
+                ? <>Démarrez <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">gratuitement</span></>
+                : plan === "business"
+                  ? <>Passez à l&apos;échelle avec <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">Business</span></>
+                  : <>Devenez <span className="bg-white text-black px-2.5 py-0.5 rounded-lg font-black">Premium</span> pour un accès illimité</>
+              }
             </p>
             <button
               onClick={async () => {
-                const chosen = plan === "standard" ? "standard" : "pro";
-                if (chosen === "pro") {
-                  setPlan("pro");
-                  setStep(6);
-                } else {
-                  await callSavePlan("standard");
+                const chosen = plan || "premium";
+                if (chosen === "freemium") {
+                  await callSavePlan("freemium");
                   setStep(7);
+                } else {
+                  setPlan(chosen as "premium" | "business");
+                  setStep(6);
                 }
               }}
               className="w-full py-4 rounded-full bg-white text-black font-syne font-bold text-sm hover:opacity-90 transition-opacity mb-3"
             >
-              {plan === "standard" ? "Continuer gratuitement" : "Continuez avec Pro"}
+              {plan === "freemium"
+                ? "Continuer gratuitement"
+                : plan === "business"
+                  ? "Continuer avec Business"
+                  : "Continuer avec Premium"
+              }
             </button>
             <p className="font-inter text-xs text-white/40 text-center mb-5">
-              {plan === "standard" ? "Passez à Pro à tout moment" : "Changez ou annulez à tout moment"}
+              {plan === "freemium" ? "Passez à Premium à tout moment" : "Changez ou annulez à tout moment"}
             </p>
-            {plan !== "standard" && (
+            {plan !== "freemium" && (
               <button
-                onClick={async () => { setPlan("standard"); await callSavePlan("standard"); setStep(7); }}
+                onClick={async () => { setPlan("freemium"); await callSavePlan("freemium"); setStep(7); }}
                 className="w-full font-inter text-xs text-white/40 hover:text-white/70 transition-colors text-center mb-6"
               >
-                Continuer avec Standard (gratuit)
+                Continuer avec Freemium (gratuit)
               </button>
             )}
             <div className="flex justify-center gap-6">

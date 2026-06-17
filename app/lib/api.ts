@@ -164,7 +164,7 @@ export async function apiSaveOnboarding(
   return res.json();
 }
 
-export async function apiSavePlan(token: string, plan: 'standard' | 'pro'): Promise<void> {
+export async function apiSavePlan(token: string, plan: 'freemium' | 'premium' | 'business'): Promise<void> {
   await fetch(`${API_BASE}/user/plan`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

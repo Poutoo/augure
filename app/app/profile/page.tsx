@@ -290,7 +290,12 @@ export default function ProfilePage() {
   if (!user) return null;
 
   const initial = (user.username ?? user.email).charAt(0).toUpperCase();
-  const planLabel = user.plan === 'pro' ? 'Pro' : 'Standard';
+  const PLAN_LABELS: Record<string, string> = { freemium: 'Freemium', premium: 'Premium', business: 'Business' };
+  const planLabel = PLAN_LABELS[user.plan] ?? user.plan;
+  const planBadgeClass =
+    user.plan === 'business' ? 'bg-gray-800 text-white' :
+    user.plan === 'premium'  ? 'bg-[var(--color-text-dark)] text-white' :
+                               'bg-gray-100 text-gray-600';
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -326,7 +331,7 @@ export default function ProfilePage() {
         {avatarError && <p className="text-sm text-red-500 font-inter flex items-center gap-1"><Icon icon="mdi:alert-circle-outline" /> {avatarError}</p>}
         <div className="text-center">
           <p className="font-syne font-bold text-xl text-[var(--color-text-dark)]">{user.username ? `@${user.username}` : user.email}</p>
-          <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-syne font-semibold ${user.plan === 'pro' ? 'bg-[var(--color-text-dark)] text-white' : 'bg-gray-100 text-gray-600'}`}>{planLabel}</span>
+          <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-syne font-semibold ${planBadgeClass}`}>{planLabel}</span>
         </div>
       </div>
 
@@ -437,7 +442,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center justify-between py-2">
               <span className="font-inter text-sm text-gray-500">Abonnement</span>
-              <span className={`font-syne font-semibold text-sm ${user.plan === 'pro' ? 'text-[var(--color-text-dark)]' : 'text-gray-600'}`}>{planLabel}</span>
+              <span className={`font-syne font-semibold text-sm ${user.plan !== 'freemium' ? 'text-[var(--color-text-dark)]' : 'text-gray-600'}`}>{planLabel}</span>
             </div>
             <button onClick={handleLogout} className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-red-100 text-red-500 font-syne font-semibold text-sm hover:bg-red-50 transition-colors">
               <Icon icon="mdi:logout" className="text-base" /> Se déconnecter
