@@ -457,8 +457,11 @@ def scrape_tiktok(category, dry_run=False):
                     age_dist = fetch_audience_demographics(username, dry_run=True)
                 else:
                     remaining_credits = get_api_usage()
-                    if remaining_credits > 30 and username:
+                    # RÈGLE 1 : Ne pas appeler l'audience (26 crédits) si budget < 30
+                    if remaining_credits >= 30 and username:
                         age_dist = fetch_audience_demographics(username)
+                    elif username:
+                        print(f"📉 [QUOTA] Audience ignorée pour @{username} (Crédits restants : {remaining_credits})")
                 
                 if dry_run:
                     insert_to_db(None, title, slug, int(raw_views), "tiktok", category, weak_signals_hashtags, music, description=description, age_dist=age_dist, original_post_at=original_post_at, dry_run=True)
@@ -483,7 +486,15 @@ def main():
     print(f"🚀 Orchestrateur Augure prêt. {'[MODE DRY-RUN]' if args.dry_run else ''}")
     if not args.dry_run:
         get_api_stats()
-        run_all_categories()
+        
+        # PROTECTION : On ne lance le run immédiat que s'il reste assez de crédits (>35)
+        # pour ne pas bloquer le run programmé de 04:00 en cas de redémarrage container.
+        credits = get_api_usage()
+        if credits >= 35:
+            run_all_categories()
+        else:
+            print(f"⏳ [QUOTA] Run de démarrage sauté (Budget : {credits}/50). Attente du prochain créneau (04:00).")
+            
         schedule.every().day.at("04:00").do(run_all_categories)
         while True:
             schedule.run_pending()
