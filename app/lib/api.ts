@@ -18,6 +18,7 @@ export interface ApiTrend {
   platforms: string[] | null;
   badges: string[] | null;
   extra_stats: { label: string; value: string }[] | null;
+  age_distribution: Record<string, number> | null;
   rank: number | null;
   score_base: number;
   tags: { tag_type: string; value: string }[];

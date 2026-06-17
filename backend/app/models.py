@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import Enum as PyEnum
 
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, JSON, String, Table, Text, UniqueConstraint
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, Enum, ForeignKey, Integer, JSON, String, Table, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -138,6 +138,10 @@ class Trend(Base):
     slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     weak_signals_hashtags: Mapped[list | None] = mapped_column(JSON, nullable=True)
     weak_signals_music: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    age_distribution: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    original_post_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -150,6 +154,21 @@ class Trend(Base):
     )
     threads: Mapped[list["Thread"]] = relationship("Thread", back_populates="trend")
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="trend")
+
+
+class TrendSnapshot(Base):
+    __tablename__ = "trends_snapshots"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    trend_slug: Mapped[str] = mapped_column(
+        String(255), ForeignKey("trends.slug", ondelete="CASCADE"), nullable=False, index=True
+    )
+    views_count: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    recorded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
 
 
 class TrendTag(Base):
