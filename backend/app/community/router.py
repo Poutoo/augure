@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.community import service as community_service
-from app.dependencies import get_current_user, get_db
+from app.dependencies import get_current_user, get_db, get_optional_current_user
 from app.models import User
 from app.schemas import (
     CommentCreate,
@@ -55,8 +55,10 @@ def create_thread(
 def get_thread(
     thread_id: UUID,
     db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User | None, Depends(get_optional_current_user)] = None,
 ) -> ThreadDetailResponse:
-    return community_service.get_thread(db, thread_id)
+    user_id = current_user.id if current_user else None
+    return community_service.get_thread(db, thread_id, user_id=user_id)
 
 
 @router.post(

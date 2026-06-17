@@ -23,7 +23,8 @@ Projet développé dans le cadre de la Compétition B3 2026 — Digital Campus P
 7. [Installation et configuration](#7-installation-et-configuration)
 8. [Lancement en local](#8-lancement-en-local)
 9. [Ingestion de données](#9-ingestion-de-données)
-10. [Équipe](#10-équipe)
+10. [Retour d'expérience (REX)](#10-retour-dexperience)
+11. [Équipe](#11-equipe)
 
 ---
 
@@ -38,6 +39,70 @@ Projet développé dans le cadre de la Compétition B3 2026 — Digital Campus P
 ---
 
 ## 2. Architecture technique
+
+### Classification architecturale
+
+| Dimension | Pattern retenu | Ce que ce n'est PAS |
+| :--- | :--- | :--- |
+| Style global | **Architecture 3-Tiers** | ~~Monolithe fullstack~~ |
+| Pattern backend | **Monolithe modulaire** | ~~Microservices~~ |
+| Topologie de déploiement | **Multi-conteneurs Docker Compose** | ~~Orchestration Kubernetes~~ |
+| Gestion des données | **Base de données partagée (single DB)** | ~~Database-per-service~~ |
+| Communication inter-services | **REST synchrone (HTTP/JSON)** | ~~Event bus / message broker~~ |
+
+#### Architecture 3-Tiers
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Tier 1 — Présentation                                  │
+│  Next.js 16  ·  SSR  ·  App Router  ·  Tailwind CSS    │
+│  Déployé sur Vercel (Edge Network)                      │
+└────────────────────────┬────────────────────────────────┘
+                         │ REST HTTP/JSON  /api/v1
+┌────────────────────────▼────────────────────────────────┐
+│  Tier 2 — Application                                   │
+│  FastAPI  ·  Uvicorn ASGI  ·  JWT Auth                  │
+│  Monolithe modulaire (7 domaines métier)                │
+└────────────────────────┬────────────────────────────────┘
+                         │ SQLAlchemy (pool TCP)
+┌────────────────────────▼────────────────────────────────┐
+│  Tier 3 — Données                                       │
+│  PostgreSQL 15  ·  Supabase (prod) / Docker (local)     │
+│  Schéma versionné via Alembic                           │
+└─────────────────────────────────────────────────────────┘
+         ▲
+         │ SQL direct (INSERT / ON CONFLICT) — bypass API
+┌────────┴───────────────────────────────────────────────┐
+│  Service d'ingestion indépendant                       │
+│  Scraper Python  ·  EnsembleData API  ·  planifié 04h  │
+└────────────────────────────────────────────────────────┘
+```
+
+#### Monolithe modulaire (backend)
+
+Le backend FastAPI est un **monolithe modulaire** : un seul processus ASGI Uvicorn, organisé en modules verticaux par domaine métier. Chaque domaine encapsule son propre `router.py` (endpoints HTTP) et `service.py` (logique métier), sans dépendances croisées entre modules. Le `models.py` et le `database.py` sont les seuls artefacts partagés.
+
+```
+app/
+├── main.py          ← point d'entrée unique, montage des 7 routeurs
+├── database.py      ← session factory partagée (1 pool de connexions)
+├── models.py        ← tous les modèles ORM dans un module centralisé
+├── auth/            ← domaine Auth   (router + service)
+├── users/           ← domaine Users  (router + service)
+├── trends/          ← domaine Trends (router + service + scoring engine)
+├── comments/        ← domaine Comments
+├── community/       ← domaine Community (threads)
+├── favorites/       ← domaine Favorites
+└── likes/           ← domaine Likes
+```
+
+> **Pourquoi pas des microservices ?** Les contraintes d'un projet de compétition (délai, équipe de 2 devs, base de données unique Supabase) rendent les microservices contre-productifs : ils ajoutent un overhead de communication réseau, de déploiement et d'observabilité sans bénéfice à cette échelle. Le monolithe modulaire permet une séparation propre des responsabilités tout en restant simple à déployer et à déboguer.
+
+#### Point d'attention : couplage scraper → base de données
+
+Le scraper écrit **directement en base via SQL brut** (`INSERT ... ON CONFLICT`) sans passer par l'API FastAPI. Ce choix est délibéré — il contourne les restrictions d'API des plateformes et évite un aller-retour HTTP — mais introduit un **couplage structurel fort** : toute évolution du schéma `trends` doit être coordonnée entre la migration Alembic et le scraper. Cette dette est acceptable en contexte MVP.
+
+---
 
 ### Stack de production
 
@@ -453,7 +518,10 @@ Ce script enrichit les tendances existantes en base avec des données structuré
 
 ---
 
-## 10. Équipe
+## 10. Retour d'expérience (REX)
+
+
+## 11. Équipe
 
 | Pôle | Membres |
 | :--- | :--- |

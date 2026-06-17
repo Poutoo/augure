@@ -67,10 +67,11 @@ export default function ThreadDetailPage() {
     if (!threadId) return;
     setLoading(true);
     const token = localStorage.getItem('augure_token');
-    apiGetThread(threadId)
+    apiGetThread(threadId, token)
       .then(async data => {
         setThread(data);
         setLikeCount(data.like_count);
+        setLiked(data.is_liked);
         if (token) {
           const check = await apiCheckCollections(token, { thread_id: threadId });
           setInAnyCollection(check.collection_ids.length > 0);

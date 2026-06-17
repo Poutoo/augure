@@ -19,6 +19,7 @@ def _build_comment_responses(
     comments: list[Comment],
     replies_map: dict[uuid.UUID, list[Comment]],
     like_count_map: dict[uuid.UUID, int],
+    liked_ids: set[uuid.UUID] | None = None,
 ) -> list[CommentResponse]:
     return [
         CommentResponse(
@@ -26,12 +27,13 @@ def _build_comment_responses(
             author=CommentAuthor(id=c.author.id, username=c.author.username, avatar_url=c.author.avatar_url),
             body="[Commentaire supprimé]" if c.is_deleted else c.body,
             like_count=like_count_map.get(c.id, 0),
+            is_liked=c.id in liked_ids if liked_ids is not None else False,
             is_deleted=c.is_deleted,
             parent_comment_id=c.parent_comment_id,
             created_at=c.created_at,
             updated_at=c.updated_at,
             replies=_build_comment_responses(
-                replies_map.get(c.id, []), {}, like_count_map
+                replies_map.get(c.id, []), {}, like_count_map, liked_ids
             ),
         )
         for c in comments
@@ -61,13 +63,16 @@ def _load_top_level(
     return total, rows
 
 
-def _enrich(top_level: list[Comment], db: Session) -> list[CommentResponse]:
+def _enrich(
+    top_level: list[Comment],
+    db: Session,
+    user_id: uuid.UUID | None = None,
+) -> list[CommentResponse]:
     if not top_level:
         return []
 
     top_ids = [c.id for c in top_level]
 
-    # Toutes les réponses directes en un seul appel
     all_replies: list[Comment] = (
         db.query(Comment)
         .options(selectinload(Comment.author))
@@ -79,7 +84,6 @@ def _enrich(top_level: list[Comment], db: Session) -> list[CommentResponse]:
     for r in all_replies:
         replies_map.setdefault(r.parent_comment_id, []).append(r)
 
-    # Comptage des likes en un seul appel
     all_ids = top_ids + [r.id for r in all_replies]
     like_count_map: dict[uuid.UUID, int] = dict(
         db.query(Like.comment_id, func.count(Like.id))
@@ -88,7 +92,16 @@ def _enrich(top_level: list[Comment], db: Session) -> list[CommentResponse]:
         .all()
     )
 
-    return _build_comment_responses(top_level, replies_map, like_count_map)
+    liked_ids: set[uuid.UUID] | None = None
+    if user_id is not None:
+        liked_ids = {
+            row[0]
+            for row in db.query(Like.comment_id)
+            .filter(Like.user_id == user_id, Like.comment_id.in_(all_ids))
+            .all()
+        }
+
+    return _build_comment_responses(top_level, replies_map, like_count_map, liked_ids)
 
 
 # ── CRUD ──────────────────────────────────────────────────────────────────────
@@ -100,11 +113,12 @@ def get_comments(
     thread_id: uuid.UUID | None = None,
     skip: int = 0,
     limit: int = 20,
+    user_id: uuid.UUID | None = None,
 ) -> CommentListResponse:
     total, top_level = _load_top_level(
         db, trend_id=trend_id, thread_id=thread_id, skip=skip, limit=limit
     )
-    items = _enrich(top_level, db)
+    items = _enrich(top_level, db, user_id=user_id)
     return CommentListResponse(total=total, items=items, skip=skip, limit=limit)
 
 

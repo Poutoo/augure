@@ -133,7 +133,7 @@ function CommentItem({
   isReply = false,
 }: CommentItemProps) {
   const [likeCount, setLikeCount] = useState(comment.like_count);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(comment.is_liked);
   const [liking, setLiking] = useState(false);
 
   const isReplyTarget = activeReplyId === comment.id;
@@ -268,7 +268,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
             setSkip(data.items.length);
           }
         } else if (threadId) {
-          const thread = await apiGetThread(threadId);
+          const thread = await apiGetThread(threadId, getToken());
           if (!cancelled) {
             setComments(thread.comments);
             setTotal(thread.comment_count);

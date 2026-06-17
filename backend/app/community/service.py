@@ -36,6 +36,7 @@ def _thread_response(
     thread: Thread,
     like_count: int,
     comment_count: int,
+    is_liked: bool = False,
 ) -> ThreadResponse:
     return ThreadResponse(
         id=thread.id,
@@ -47,6 +48,7 @@ def _thread_response(
         is_locked=thread.is_locked,
         comment_count=comment_count,
         like_count=like_count,
+        is_liked=is_liked,
         created_at=thread.created_at,
         updated_at=thread.updated_at,
     )
@@ -128,7 +130,11 @@ def create_thread(
     return _thread_response(thread, like_count=0, comment_count=0)
 
 
-def get_thread(db: Session, thread_id: uuid.UUID) -> ThreadDetailResponse:
+def get_thread(
+    db: Session,
+    thread_id: uuid.UUID,
+    user_id: uuid.UUID | None = None,
+) -> ThreadDetailResponse:
     thread = (
         db.query(Thread)
         .options(selectinload(Thread.author), selectinload(Thread.trend))
@@ -141,7 +147,15 @@ def get_thread(db: Session, thread_id: uuid.UUID) -> ThreadDetailResponse:
     like_count: int = (
         db.query(func.count(Like.id)).filter(Like.thread_id == thread_id).scalar() or 0
     )
-    comment_list: CommentListResponse = get_comments(db, thread_id=thread_id, limit=100)
+    is_liked = False
+    if user_id is not None:
+        is_liked = (
+            db.query(Like)
+            .filter(Like.user_id == user_id, Like.thread_id == thread_id)
+            .first()
+        ) is not None
+
+    comment_list: CommentListResponse = get_comments(db, thread_id=thread_id, limit=100, user_id=user_id)
 
     return ThreadDetailResponse(
         id=thread.id,
@@ -153,6 +167,7 @@ def get_thread(db: Session, thread_id: uuid.UUID) -> ThreadDetailResponse:
         is_locked=thread.is_locked,
         comment_count=comment_list.total,
         like_count=like_count,
+        is_liked=is_liked,
         created_at=thread.created_at,
         updated_at=thread.updated_at,
         comments=comment_list.items,
