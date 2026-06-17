@@ -17,12 +17,17 @@ from app.schemas import (
 )
 
 
-def _collection_response(col: FavoriteCollection, item_count: int) -> FavoriteCollectionResponse:
+def _collection_response(
+    col: FavoriteCollection,
+    item_count: int,
+    cover_image_url: str | None = None,
+) -> FavoriteCollectionResponse:
     return FavoriteCollectionResponse(
         id=col.id,
         name=col.name,
         emoji=col.emoji,
         item_count=item_count,
+        cover_image_url=cover_image_url,
         created_at=col.created_at,
     )
 
@@ -57,14 +62,34 @@ def get_collections(user_id: uuid.UUID, db: Session) -> list[FavoriteCollectionR
         .group_by(FavoriteItem.collection_id)
         .subquery()
     )
+    # First trend-with-image per collection (earliest item that has an image)
+    earliest_subq = (
+        select(FavoriteItem.collection_id, func.min(FavoriteItem.added_at).label("earliest_at"))
+        .join(Trend, FavoriteItem.trend_id == Trend.id)
+        .where(FavoriteItem.trend_id.isnot(None))
+        .where(Trend.image_url.isnot(None))
+        .group_by(FavoriteItem.collection_id)
+        .subquery()
+    )
+    cover_subq = (
+        select(FavoriteItem.collection_id, Trend.image_url.label("cover_url"))
+        .join(Trend, FavoriteItem.trend_id == Trend.id)
+        .join(
+            earliest_subq,
+            (FavoriteItem.collection_id == earliest_subq.c.collection_id)
+            & (FavoriteItem.added_at == earliest_subq.c.earliest_at),
+        )
+        .subquery()
+    )
     rows = (
-        db.query(FavoriteCollection, cnt_subq.c.cnt)
+        db.query(FavoriteCollection, cnt_subq.c.cnt, cover_subq.c.cover_url)
         .outerjoin(cnt_subq, FavoriteCollection.id == cnt_subq.c.collection_id)
+        .outerjoin(cover_subq, FavoriteCollection.id == cover_subq.c.collection_id)
         .filter(FavoriteCollection.user_id == user_id)
         .order_by(FavoriteCollection.created_at.desc())
         .all()
     )
-    return [_collection_response(col, cnt or 0) for col, cnt in rows]
+    return [_collection_response(col, cnt or 0, cover_url) for col, cnt, cover_url in rows]
 
 
 def create_collection(user_id: uuid.UUID, payload: FavoriteCollectionCreate, db: Session) -> FavoriteCollectionResponse:

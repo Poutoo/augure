@@ -13,6 +13,10 @@
   min-width: 0; /* Permet aux éléments flex de rétrécir en dessous de leur contenu */
 }
 
+img {
+  filter: grayscale(1);
+}
+
 html, body {
   overflow-x: hidden;
   width: 100%;

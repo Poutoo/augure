@@ -260,6 +260,7 @@ class FavoriteCollectionResponse(BaseModel):
     name: str
     emoji: str
     item_count: int
+    cover_image_url: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
