@@ -46,10 +46,13 @@ def enrich_trends():
     db_url = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
     engine = create_engine(db_url)
 
-    default_text = "La description de cette tendance n'est pas encore disponible. Notre équipe vous prie de l'en excuser et vous invite à revenir prochainement."
+    default_text = "La description de cette tendance n'est pas encore disponible. Nous vous prions de nous excuser pour ce désagrément et vous invitons à réessayer ultérieurement."
 
     with engine.connect() as connection:
-        trends_to_update = connection.execute(text("SELECT id, title FROM trends WHERE description = :d"), {"d": default_text}).fetchall()
+        trends_to_update = connection.execute(
+            text("SELECT id, title FROM trends WHERE description = :d AND is_mock = FALSE"), 
+            {"d": default_text}
+        ).fetchall()
         
         if not trends_to_update:
             print("✨ Aucune tendance en attente d'enrichissement. Tout est à jour !")
