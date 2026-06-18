@@ -26,7 +26,7 @@ export default function SearchBar({ dark = false }: { dark?: boolean }) {
         <Icon icon="mdi:magnify" className={`text-xl flex-shrink-0 ${dark ? 'text-white/40' : 'text-gray-400'}`} />
         <input
           type="text"
-          className={`min-w-0 flex-1 bg-transparent outline-none px-2 font-inter text-[15px] ${dark ? 'text-white placeholder:text-white/40' : 'text-[var(--color-text-dark)] placeholder:text-gray-400'}`}
+          className={`min-w-0 flex-1 bg-transparent outline-none px-2 font-syne text-[15px] ${dark ? 'text-white placeholder:text-white/40' : 'text-[var(--color-text-dark)] placeholder:text-gray-400'}`}
           placeholder="Rechercher une tendance..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}

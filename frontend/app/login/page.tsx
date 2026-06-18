@@ -98,7 +98,7 @@ export default function LoginPage() {
               onChange={e => setEmail(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleSubmit()}
               placeholder="Email"
-              className="w-full px-4 py-3.5 rounded-xl text-white font-inter text-sm placeholder-white/30 focus:outline-none transition-colors"
+              className="w-full px-4 py-3.5 rounded-xl text-white font-syne text-sm placeholder-white/30 focus:outline-none transition-colors"
               style={{
                 background: "rgba(255,255,255,0.07)",
                 border: "1px solid rgba(255,255,255,0.11)",
@@ -111,7 +111,7 @@ export default function LoginPage() {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSubmit()}
                 placeholder="Mot de passe"
-                className="w-full px-4 py-3.5 rounded-xl text-white font-inter text-sm placeholder-white/30 focus:outline-none transition-colors pr-12"
+                className="w-full px-4 py-3.5 rounded-xl text-white font-syne text-sm placeholder-white/30 focus:outline-none transition-colors pr-12"
                 style={{
                   background: "rgba(255,255,255,0.07)",
                   border: "1px solid rgba(255,255,255,0.11)",
@@ -129,7 +129,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p key={error} className="anim-shake font-inter text-xs text-white/50 rounded-lg px-3 py-2 text-center" style={{ background: "rgba(255,255,255,0.06)" }}>
+            <p key={error} className="anim-shake font-syne text-xs text-white/50 rounded-lg px-3 py-2 text-center" style={{ background: "rgba(255,255,255,0.06)" }}>
               {error}
             </p>
           )}
@@ -153,7 +153,7 @@ export default function LoginPage() {
         </div>
 
         {/* Sign-up link */}
-        <Link href="/onboarding" className="font-inter text-sm text-white/30 hover:text-white/60 transition-colors text-center">
+        <Link href="/onboarding" className="font-syne text-sm text-white/30 hover:text-white/60 transition-colors text-center">
           Pas encore de compte ?{" "}<span className="underline">Créer un compte</span>
         </Link>
       </div>

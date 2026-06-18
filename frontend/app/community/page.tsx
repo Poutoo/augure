@@ -59,9 +59,9 @@ function ThreadCard({ thread }: { thread: ApiThread }) {
         {thread.trend && (
           <div className="flex items-center gap-1.5 mb-2">
             <Icon icon="mdi:link-variant" className="text-xs text-gray-400" />
-            <span className="font-inter text-xs text-gray-400 truncate">{thread.trend.title}</span>
+            <span className="font-syne text-xs text-gray-400 truncate">{thread.trend.title}</span>
             {trendStatus && (
-              <span className={`flex-shrink-0 text-xs font-inter font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>
+              <span className={`flex-shrink-0 text-xs font-syne font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>
                 {trendStatus.label}
               </span>
             )}
@@ -75,7 +75,7 @@ function ThreadCard({ thread }: { thread: ApiThread }) {
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
             <Avatar username={thread.author.username} avatarUrl={thread.author.avatar_url} size={6} />
-            <span className="font-inter text-xs text-gray-500">
+            <span className="font-syne text-xs text-gray-500">
               {thread.author.username ?? 'Utilisateur'}
             </span>
             {thread.author.is_verified && (
@@ -84,14 +84,14 @@ function ThreadCard({ thread }: { thread: ApiThread }) {
                 Certifié
               </span>
             )}
-            <span className="font-inter text-xs text-gray-400">· {formatRelativeTime(thread.created_at)}</span>
+            <span className="font-syne text-xs text-gray-400">· {formatRelativeTime(thread.created_at)}</span>
           </div>
           <div className="flex items-center gap-3 text-gray-400">
-            <span className="flex items-center gap-1 font-inter text-xs">
+            <span className="flex items-center gap-1 font-syne text-xs">
               <Icon icon="mdi:comment-outline" className="text-sm" />
               {thread.comment_count}
             </span>
-            <span className="flex items-center gap-1 font-inter text-xs">
+            <span className="flex items-center gap-1 font-syne text-xs">
               <Icon icon="mdi:heart-outline" className="text-sm" />
               {thread.like_count}
             </span>
@@ -177,7 +177,7 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
               onChange={e => setTitle(e.target.value)}
               placeholder="De quoi voulez-vous parler ?"
               maxLength={300}
-              className="w-full font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
+              className="w-full font-syne text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
             />
           </div>
 
@@ -190,7 +190,7 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
               placeholder="Développez votre sujet…"
               rows={4}
               maxLength={5000}
-              className="w-full resize-none font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
+              className="w-full resize-none font-syne text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
             />
           </div>
 
@@ -199,7 +199,7 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
             <label className="font-syne font-bold text-xs text-gray-400 uppercase tracking-wider block mb-2">Trend liée (optionnel)</label>
             {selectedTrend ? (
               <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-200">
-                <span className="font-inter text-sm text-[var(--color-text-dark)] flex-1 truncate">{selectedTrend.title}</span>
+                <span className="font-syne text-sm text-[var(--color-text-dark)] flex-1 truncate">{selectedTrend.title}</span>
                 <button onClick={() => { setSelectedTrend(null); setTrendQuery(''); }}>
                   <Icon icon="mdi:close" className="text-gray-400 text-sm" />
                 </button>
@@ -211,17 +211,17 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
                   value={trendQuery}
                   onChange={e => setTrendQuery(e.target.value)}
                   placeholder="Rechercher une trend…"
-                  className="w-full font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
+                  className="w-full font-syne text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
                 />
                 {(trendResults.length > 0 || searching) && (
                   <div className="mt-1 bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
                     {searching ? (
-                      <div className="px-4 py-3 font-inter text-sm text-gray-400">Recherche…</div>
+                      <div className="px-4 py-3 font-syne text-sm text-gray-400">Recherche…</div>
                     ) : trendResults.map(t => (
                       <button
                         key={t.id}
                         onClick={() => { setSelectedTrend(t); setTrendQuery(''); setTrendResults([]); }}
-                        className="w-full text-left px-4 py-3 font-inter text-sm text-[var(--color-text-dark)] hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+                        className="w-full text-left px-4 py-3 font-syne text-sm text-[var(--color-text-dark)] hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                       >
                         {t.title}
                       </button>
@@ -232,7 +232,7 @@ function CreateThreadModal({ onClose, onCreated, token }: CreateThreadModalProps
             )}
           </div>
 
-          {error && <p className="font-inter text-sm text-red-500">{error}</p>}
+          {error && <p className="font-syne text-sm text-red-500">{error}</p>}
         </div>
 
         {/* Footer */}
@@ -302,7 +302,7 @@ export default function CommunityPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="font-syne font-extrabold text-2xl text-white">Communauté</h1>
-              <p className="font-inter text-sm text-white/50 mt-1">{total} forum{total !== 1 ? 's' : ''}</p>
+              <p className="font-syne text-sm text-white/50 mt-1">{total} forum{total !== 1 ? 's' : ''}</p>
             </div>
             {token && (
               <button
@@ -352,7 +352,7 @@ export default function CommunityPage() {
               {token && (
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="mt-4 font-inter text-sm text-[var(--color-text-dark)] font-semibold hover:underline"
+                  className="mt-4 font-syne text-sm text-[var(--color-text-dark)] font-semibold hover:underline"
                 >
                   Créer le premier →
                 </button>
@@ -372,7 +372,7 @@ export default function CommunityPage() {
         {/* CTA connexion */}
         {!token && !loading && (
           <div className="mx-4 md:mx-8 mb-8 bg-white rounded-2xl px-5 py-5 text-center shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
-            <p className="font-inter text-sm text-gray-500">
+            <p className="font-syne text-sm text-gray-500">
               <Link href="/login" className="text-[var(--color-text-dark)] font-semibold hover:underline">
                 Connectez-vous
               </Link>{' '}

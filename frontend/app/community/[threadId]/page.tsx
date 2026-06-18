@@ -130,7 +130,7 @@ export default function ThreadDetailPage() {
         <div className="text-center px-4">
           <Icon icon="mdi:alert-circle-outline" className="text-5xl text-gray-200 mx-auto mb-3" />
           <p className="font-syne font-bold text-gray-500 mb-4">Forum introuvable</p>
-          <Link href="/community" className="font-inter text-sm text-[var(--color-text-dark)] font-semibold hover:underline">
+          <Link href="/community" className="font-syne text-sm text-[var(--color-text-dark)] font-semibold hover:underline">
             ← Retour à la communauté
           </Link>
         </div>
@@ -149,7 +149,7 @@ export default function ThreadDetailPage() {
         >
           <Link
             href="/community"
-            className="inline-flex items-center gap-1.5 text-white/60 hover:text-white font-inter text-sm mb-5 transition-colors"
+            className="inline-flex items-center gap-1.5 text-white/60 hover:text-white font-syne text-sm mb-5 transition-colors"
           >
             <Icon icon="mdi:arrow-left" className="text-base" />
             Communauté
@@ -159,9 +159,9 @@ export default function ThreadDetailPage() {
           {thread.trend && (
             <div className="flex items-center gap-2 mb-3">
               <Icon icon="mdi:link-variant" className="text-white/40 text-sm" />
-              <span className="font-inter text-xs text-white/50 truncate">{thread.trend.title}</span>
+              <span className="font-syne text-xs text-white/50 truncate">{thread.trend.title}</span>
               {trendStatus && (
-                <span className={`flex-shrink-0 text-xs font-inter font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>
+                <span className={`flex-shrink-0 text-xs font-syne font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>
                   {trendStatus.label}
                 </span>
               )}
@@ -179,7 +179,7 @@ export default function ThreadDetailPage() {
                 <p className="font-syne font-bold text-sm text-white">
                   {thread.author.username ?? 'Utilisateur'}
                 </p>
-                <p className="font-inter text-xs text-white/40">{formatDate(thread.created_at)}</p>
+                <p className="font-syne text-xs text-white/40">{formatDate(thread.created_at)}</p>
               </div>
             </div>
 
@@ -190,7 +190,7 @@ export default function ThreadDetailPage() {
                 className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors disabled:opacity-40"
               >
                 <Icon icon={liked ? 'mdi:heart' : 'mdi:heart-outline'} className="text-white text-sm" />
-                <span className="font-inter text-xs text-white">{likeCount}</span>
+                <span className="font-syne text-xs text-white">{likeCount}</span>
               </button>
               {token && (
                 <button
@@ -218,7 +218,7 @@ export default function ThreadDetailPage() {
 
           {/* Corps du forum */}
           <div className="anim-fade-up bg-white rounded-2xl px-5 py-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)]" style={{ animationDelay: '80ms' }}>
-            <p className="font-inter text-gray-700 text-base leading-relaxed whitespace-pre-wrap">
+            <p className="font-syne text-gray-700 text-base leading-relaxed whitespace-pre-wrap">
               {thread.body}
             </p>
           </div>

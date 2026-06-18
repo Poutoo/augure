@@ -78,7 +78,7 @@ function InlineReplyInput({ targetUsername, onPost, onCancel, posting }: InlineR
     <div className="mt-3 ml-0 flex flex-col gap-2">
       <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-xl">
         <Icon icon="mdi:reply" className="text-gray-400 text-sm flex-shrink-0" />
-        <span className="font-inter text-xs text-gray-500 flex-1">
+        <span className="font-syne text-xs text-gray-500 flex-1">
           Réponse à <strong>{targetUsername}</strong>
         </span>
         <button onClick={onCancel}>
@@ -92,7 +92,7 @@ function InlineReplyInput({ targetUsername, onPost, onCancel, posting }: InlineR
           onChange={e => setBody(e.target.value)}
           placeholder={`Répondre à @${targetUsername}…`}
           rows={2}
-          className="flex-1 resize-none font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
+          className="flex-1 resize-none font-syne text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
           onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) onPost(body); }}
         />
         <button
@@ -165,11 +165,11 @@ function CommentItem({
               Certifié
             </span>
           )}
-          <span className="font-inter text-xs text-gray-400">
+          <span className="font-syne text-xs text-gray-400">
             {formatRelativeTime(comment.created_at)}
           </span>
         </div>
-        <p className={`font-inter text-sm mt-1 leading-relaxed ${comment.is_deleted ? 'text-gray-400 italic' : 'text-gray-700'}`}>
+        <p className={`font-syne text-sm mt-1 leading-relaxed ${comment.is_deleted ? 'text-gray-400 italic' : 'text-gray-700'}`}>
           {comment.body}
         </p>
         {!comment.is_deleted && (
@@ -180,7 +180,7 @@ function CommentItem({
               className={`flex items-center gap-1 transition-colors disabled:opacity-40 ${liked ? 'text-[var(--color-text-dark)]' : 'text-gray-400 hover:text-[var(--color-text-dark)]'}`}
             >
               <Icon icon={liked ? 'mdi:heart' : 'mdi:heart-outline'} className="text-sm" />
-              <span className="font-inter text-xs">{likeCount}</span>
+              <span className="font-syne text-xs">{likeCount}</span>
             </button>
             {!isReply && token && (
               <button
@@ -188,7 +188,7 @@ function CommentItem({
                 className={`flex items-center gap-1 transition-colors ${isReplyTarget ? 'text-[var(--color-text-dark)]' : 'text-gray-400 hover:text-[var(--color-text-dark)]'}`}
               >
                 <Icon icon="mdi:reply-outline" className="text-sm" />
-                <span className="font-inter text-xs">Répondre</span>
+                <span className="font-syne text-xs">Répondre</span>
               </button>
             )}
           </div>
@@ -362,7 +362,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
       <div className="flex items-center gap-2">
         <h3 className="font-syne font-bold text-base text-[var(--color-text-dark)]">Commentaires</h3>
         {total > 0 && (
-          <span className="font-inter text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{total}</span>
+          <span className="font-syne text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{total}</span>
         )}
       </div>
 
@@ -374,7 +374,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
             onChange={e => setBody(e.target.value)}
             placeholder="Ajouter un commentaire…"
             rows={2}
-            className="flex-1 resize-none font-inter text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
+            className="flex-1 resize-none font-syne text-sm px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-[var(--color-text-dark)] bg-white placeholder-gray-400 transition-colors"
             onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handlePost(); }}
           />
           <button
@@ -387,7 +387,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
         </div>
       ) : !token ? (
         <div className="bg-gray-50 rounded-2xl px-4 py-4 text-center border border-gray-100">
-          <p className="font-inter text-sm text-gray-500">
+          <p className="font-syne text-sm text-gray-500">
             <Link href="/login" className="text-[var(--color-text-dark)] font-semibold hover:underline">
               Connectez-vous
             </Link>{' '}
@@ -396,14 +396,14 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
         </div>
       ) : isLocked ? (
         <div className="bg-gray-50 rounded-2xl px-4 py-3 text-center border border-gray-100">
-          <p className="font-inter text-sm text-gray-400">Ce fil est fermé aux nouveaux commentaires.</p>
+          <p className="font-syne text-sm text-gray-400">Ce fil est fermé aux nouveaux commentaires.</p>
         </div>
       ) : null}
 
       {/* Comment list */}
       {fetchError ? (
         <div className="bg-red-50 rounded-2xl px-4 py-4 text-center border border-red-100">
-          <p className="font-inter text-sm text-red-400">
+          <p className="font-syne text-sm text-red-400">
             Impossible de charger les commentaires. Vérifiez que le serveur est démarré.
           </p>
         </div>
@@ -421,7 +421,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <p className="font-inter text-sm text-gray-400 text-center py-6">
+        <p className="font-syne text-sm text-gray-400 text-center py-6">
           Aucun commentaire pour l&apos;instant. Soyez le premier !
         </p>
       ) : (
@@ -444,7 +444,7 @@ export default function TrendComments({ trendId, threadId, isLocked = false }: T
             <button
               onClick={handleLoadMore}
               disabled={loadingMore}
-              className="font-inter text-sm text-gray-400 hover:text-[var(--color-text-dark)] text-center py-2 transition-colors"
+              className="font-syne text-sm text-gray-400 hover:text-[var(--color-text-dark)] text-center py-2 transition-colors"
             >
               {loadingMore ? 'Chargement…' : `Voir plus (${total - comments.length})`}
             </button>

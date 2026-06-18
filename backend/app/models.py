@@ -165,8 +165,8 @@ class TrendSnapshot(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    trend_slug: Mapped[str] = mapped_column(
-        String(255), ForeignKey("trends.slug", ondelete="CASCADE"), nullable=False, index=True
+    trend_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("trends.id", ondelete="CASCADE"), nullable=False, index=True
     )
     views_count: Mapped[int] = mapped_column(BigInteger, nullable=False)
     recorded_at: Mapped[datetime] = mapped_column(

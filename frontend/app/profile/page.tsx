@@ -83,8 +83,8 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 function SaveFeedback({ error, success }: { error: string | null; success: boolean }) {
-  if (error) return <p className="mt-2 text-sm font-inter text-red-600 flex items-center gap-1"><Icon icon="mdi:alert-circle-outline" /> {error}</p>;
-  if (success) return <p className="mt-2 text-sm font-inter text-green-600 flex items-center gap-1"><Icon icon="mdi:check-circle-outline" /> Sauvegardé !</p>;
+  if (error) return <p className="mt-2 text-sm font-syne text-red-600 flex items-center gap-1"><Icon icon="mdi:alert-circle-outline" /> {error}</p>;
+  if (success) return <p className="mt-2 text-sm font-syne text-green-600 flex items-center gap-1"><Icon icon="mdi:check-circle-outline" /> Sauvegardé !</p>;
   return null;
 }
 
@@ -340,7 +340,7 @@ export default function ProfilePage() {
           </button>
         </div>
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-        {avatarError && <p className="text-sm text-red-500 font-inter flex items-center gap-1"><Icon icon="mdi:alert-circle-outline" /> {avatarError}</p>}
+        {avatarError && <p className="text-sm text-red-500 font-syne flex items-center gap-1"><Icon icon="mdi:alert-circle-outline" /> {avatarError}</p>}
         <div className="text-center">
           <div className="flex items-center justify-center gap-2">
             <p className="font-syne font-bold text-xl text-[var(--color-text-dark)]">{user.username ? `@${user.username}` : user.email}</p>
@@ -383,7 +383,7 @@ export default function ProfilePage() {
 
           <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '0ms' }}>
             <SectionTitle>Informations</SectionTitle>
-            <label className="block font-inter text-sm text-gray-500 mb-1">Nom d&apos;utilisateur</label>
+            <label className="block font-syne text-sm text-gray-500 mb-1">Nom d&apos;utilisateur</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -391,7 +391,7 @@ export default function ProfilePage() {
                 onChange={e => { setUsername(e.target.value); setUsernameSuccess(false); setUsernameError(null); }}
                 onKeyDown={e => e.key === 'Enter' && handleSaveUsername()}
                 placeholder="ex: mariedup"
-                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 font-inter text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
+                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 font-syne text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
               />
               <button onClick={handleSaveUsername} disabled={usernameLoading || !username.trim()} className="px-4 py-2.5 rounded-xl bg-[var(--color-primary)] text-white font-syne font-semibold text-sm disabled:opacity-40 hover:opacity-80 transition-opacity">
                 {usernameLoading ? <Icon icon="mdi:loading" className="animate-spin text-base" /> : 'Sauver'}
@@ -424,25 +424,25 @@ export default function ProfilePage() {
 
           <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '240ms' }}>
             <SectionTitle>Audience cible</SectionTitle>
-            <p className="font-inter text-xs text-gray-500 uppercase tracking-wide mb-2">Âge</p>
+            <p className="font-syne text-xs text-gray-500 uppercase tracking-wide mb-2">Âge</p>
             <div className="flex flex-wrap gap-2 mb-4">
               {AGE_RANGES.map((label, idx) => (
                 <button key={AGE_SLUGS[idx]} onClick={() => setAges(prev => toggle(prev, AGE_SLUGS[idx]))} className={`px-3 py-1.5 rounded-lg border-2 font-syne font-semibold text-xs transition-all ${ages.includes(AGE_SLUGS[idx]) ? 'border-[var(--color-text-dark)] bg-[var(--color-text-dark)] text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>{label}</button>
               ))}
             </div>
-            <p className="font-inter text-xs text-gray-500 uppercase tracking-wide mb-2">Réseaux sociaux</p>
+            <p className="font-syne text-xs text-gray-500 uppercase tracking-wide mb-2">Réseaux sociaux</p>
             <div className="flex flex-wrap gap-2 mb-4">
               {NETWORKS.map((label, idx) => (
                 <button key={NET_SLUGS[idx]} onClick={() => setNetworks(prev => toggle(prev, NET_SLUGS[idx]))} className={`px-3 py-1.5 rounded-lg border-2 font-syne font-semibold text-xs transition-all ${networks.includes(NET_SLUGS[idx]) ? 'border-[var(--color-text-dark)] bg-[var(--color-text-dark)] text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>{label}</button>
               ))}
             </div>
-            <p className="font-inter text-xs text-gray-500 uppercase tracking-wide mb-2">Géographie</p>
+            <p className="font-syne text-xs text-gray-500 uppercase tracking-wide mb-2">Géographie</p>
             <div className="flex flex-wrap gap-2 mb-4">
               {GEOS.map((label, idx) => (
                 <button key={GEO_SLUGS[idx]} onClick={() => setGeos(prev => toggle(prev, GEO_SLUGS[idx]))} className={`px-3 py-1.5 rounded-lg border-2 font-syne font-semibold text-xs transition-all ${geos.includes(GEO_SLUGS[idx]) ? 'border-[var(--color-text-dark)] bg-[var(--color-text-dark)] text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>{label}</button>
               ))}
             </div>
-            <p className="font-inter text-xs text-gray-500 uppercase tracking-wide mb-2">Genre</p>
+            <p className="font-syne text-xs text-gray-500 uppercase tracking-wide mb-2">Genre</p>
             <div className="flex flex-wrap gap-2 mb-6">
               {GENDERS.map(g => (
                 <button key={g.slug} onClick={() => setGender(g.slug)} className={`px-3 py-1.5 rounded-lg border-2 font-syne font-semibold text-xs transition-all ${gender === g.slug ? 'border-[var(--color-text-dark)] bg-[var(--color-text-dark)] text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>{g.label}</button>
@@ -457,11 +457,11 @@ export default function ProfilePage() {
           <section className="anim-fade-up rounded-2xl bg-white p-5 shadow-sm border border-gray-100" style={{ animationDelay: '320ms' }}>
             <SectionTitle>Compte</SectionTitle>
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="font-inter text-sm text-gray-500">Email</span>
-              <span className="font-inter text-sm text-gray-800">{user.email}</span>
+              <span className="font-syne text-sm text-gray-500">Email</span>
+              <span className="font-syne text-sm text-gray-800">{user.email}</span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="font-inter text-sm text-gray-500">Abonnement</span>
+              <span className="font-syne text-sm text-gray-500">Abonnement</span>
               <span className={`font-syne font-semibold text-sm ${user.plan !== 'freemium' ? 'text-[var(--color-text-dark)]' : 'text-gray-600'}`}>{planLabel}</span>
             </div>
             <button onClick={handleLogout} className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-red-100 text-red-500 font-syne font-semibold text-sm hover:bg-red-50 transition-colors">
@@ -507,12 +507,12 @@ export default function ProfilePage() {
                         {thread.trend && (
                           <div className="flex items-center gap-1.5 mb-1">
                             <Icon icon="mdi:link-variant" className="text-xs text-gray-400" />
-                            <span className="font-inter text-xs text-gray-400 truncate">{thread.trend.title}</span>
-                            {trendStatus && <span className={`flex-shrink-0 text-xs font-inter font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>{trendStatus.label}</span>}
+                            <span className="font-syne text-xs text-gray-400 truncate">{thread.trend.title}</span>
+                            {trendStatus && <span className={`flex-shrink-0 text-xs font-syne font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>{trendStatus.label}</span>}
                           </div>
                         )}
                         <h3 className="font-syne font-bold text-[var(--color-text-dark)] text-sm leading-snug line-clamp-2">{thread.title}</h3>
-                        <p className="font-inter text-xs text-gray-400 mt-1">{thread.author.username ?? 'Utilisateur'} · liké {formatRelative(liked_at)}</p>
+                        <p className="font-syne text-xs text-gray-400 mt-1">{thread.author.username ?? 'Utilisateur'} · liké {formatRelative(liked_at)}</p>
                       </div>
                     </Link>
                   );
@@ -532,13 +532,13 @@ export default function ProfilePage() {
                     <div className="bg-white rounded-2xl px-4 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
                       <div className="flex items-start gap-2 mb-2">
                         <Icon icon="mdi:heart" className="text-sm text-red-400 mt-0.5 flex-shrink-0" />
-                        <p className="font-inter text-sm text-[var(--color-text-dark)] line-clamp-3">{comment.body}</p>
+                        <p className="font-syne text-sm text-[var(--color-text-dark)] line-clamp-3">{comment.body}</p>
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Icon icon={context_type === 'thread' ? 'mdi:forum-outline' : 'mdi:trending-up'} className="text-xs text-gray-400" />
-                        <span className="font-inter text-xs text-gray-400 truncate">{context_title}</span>
-                        <span className="font-inter text-xs text-gray-300">·</span>
-                        <span className="font-inter text-xs text-gray-400">{comment.author.username ?? 'Utilisateur'}</span>
+                        <span className="font-syne text-xs text-gray-400 truncate">{context_title}</span>
+                        <span className="font-syne text-xs text-gray-300">·</span>
+                        <span className="font-syne text-xs text-gray-400">{comment.author.username ?? 'Utilisateur'}</span>
                       </div>
                     </div>
                   </Link>
@@ -579,10 +579,10 @@ export default function ProfilePage() {
                           <div className="bg-white rounded-2xl px-4 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
                             <div className="flex items-center gap-1.5 mb-1">
                               <Icon icon="mdi:forum-outline" className="text-xs text-gray-400" />
-                              <span className="font-inter text-xs text-gray-400">Forum</span>
+                              <span className="font-syne text-xs text-gray-400">Forum</span>
                             </div>
                             <h3 className="font-syne font-bold text-sm text-[var(--color-text-dark)] line-clamp-2">{item.thread.title}</h3>
-                            <p className="font-inter text-xs text-gray-400 mt-1">{item.thread.author.username ?? 'Utilisateur'}</p>
+                            <p className="font-syne text-xs text-gray-400 mt-1">{item.thread.author.username ?? 'Utilisateur'}</p>
                           </div>
                         </Link>
                       );
@@ -597,8 +597,8 @@ export default function ProfilePage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5 mb-0.5">
                                   <Icon icon="mdi:trending-up" className="text-xs text-gray-400" />
-                                  <span className="font-inter text-xs text-gray-400">Trend</span>
-                                  {trendStatus && <span className={`text-xs font-inter font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>{trendStatus.label}</span>}
+                                  <span className="font-syne text-xs text-gray-400">Trend</span>
+                                  {trendStatus && <span className={`text-xs font-syne font-semibold px-2 py-0.5 rounded-full ${trendStatus.badge}`}>{trendStatus.label}</span>}
                                 </div>
                                 <h3 className="font-syne font-bold text-sm text-[var(--color-text-dark)] truncate">{item.trend_title}</h3>
                               </div>
@@ -626,7 +626,7 @@ export default function ProfilePage() {
                     placeholder="Nom de la collection"
                     autoFocus
                     maxLength={100}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 font-inter text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors mb-3"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 font-syne text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors mb-3"
                   />
                   <div className="flex gap-2">
                     <button onClick={() => { setShowCreateCol(false); setNewColName(''); }} className="flex-1 py-2.5 rounded-xl border border-gray-200 font-syne font-semibold text-sm text-gray-600">Annuler</button>
@@ -672,7 +672,7 @@ export default function ProfilePage() {
                       {/* Info */}
                       <div className="absolute bottom-0 left-0 right-0 px-3 py-2.5">
                         <p className="font-syne font-bold text-white text-sm leading-tight truncate drop-shadow">{col.name}</p>
-                        <p className="font-inter text-xs text-white/60 mt-0.5">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
+                        <p className="font-syne text-xs text-white/60 mt-0.5">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
                       </div>
                       {/* Delete button — z-10 pour passer au-dessus */}
                       <button
@@ -703,7 +703,7 @@ export default function ProfilePage() {
                 Supprimer &ldquo;{colToDelete.name}&rdquo; ?
               </h3>
             </div>
-            <p className="font-inter text-sm text-gray-500 mb-6">
+            <p className="font-syne text-sm text-gray-500 mb-6">
               Tous les éléments enregistrés dans cette collection seront perdus. Cette action est irréversible.
             </p>
             <div className="flex gap-3">

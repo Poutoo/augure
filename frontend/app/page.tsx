@@ -45,7 +45,7 @@ export default function Home() {
         <section className="mt-6">
           <div className="flex items-center justify-between mb-4 px-4 md:px-8">
             <h2 className="font-syne font-bold text-xl text-[var(--color-text-dark)]">Top tendances</h2>
-            <Link href="/search" className="font-inter text-sm font-semibold text-[var(--color-primary)] hover:underline">
+            <Link href="/search" className="font-syne text-sm font-semibold text-[var(--color-primary)] hover:underline">
               Tout voir
             </Link>
           </div>
@@ -92,7 +92,7 @@ export default function Home() {
         <section className="mt-6 px-4 md:px-8">
           <div className="bg-white rounded-2xl px-5 py-4 flex items-center justify-between shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
             <span className="font-syne font-bold text-[var(--color-text-dark)] text-base">Pour votre audience</span>
-            <Link href="/profile" className="font-inter text-sm text-gray-400 hover:text-[var(--color-text-dark)] transition-colors whitespace-nowrap">
+            <Link href="/profile" className="font-syne text-sm text-gray-400 hover:text-[var(--color-text-dark)] transition-colors whitespace-nowrap">
               Voir mon audience →
             </Link>
           </div>
@@ -116,7 +116,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <p className="font-inter text-gray-400 text-center py-8">Aucune tendance pour cette catégorie.</p>
+            <p className="font-syne text-gray-400 text-center py-8">Aucune tendance pour cette catégorie.</p>
           )}
         </section>
 

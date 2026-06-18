@@ -29,7 +29,7 @@ export default function GlossaryPage() {
         </Link>
 
         <h1 className="anim-fade-up font-syne font-bold text-4xl text-[var(--color-text-dark)] mb-4">Glossaire</h1>
-        <p className="anim-fade-up font-inter text-gray-600 text-lg mb-8" style={{ animationDelay: '40ms' }}>Toutes les tendances décryptées par Augure.</p>
+        <p className="anim-fade-up font-syne text-gray-600 text-lg mb-8" style={{ animationDelay: '40ms' }}>Toutes les tendances décryptées par Augure.</p>
 
         <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
           <SearchBar />

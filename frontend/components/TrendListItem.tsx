@@ -18,11 +18,11 @@ export default function TrendListItem({ trend }: TrendListItemProps) {
           </h3>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             {trend.badges?.map((badge, i) => (
-              <span key={i} className="text-gray-400 font-inter font-medium text-xs uppercase tracking-wide">
+              <span key={i} className="text-gray-400 font-syne font-medium text-xs uppercase tracking-wide">
                 {badge}
               </span>
             ))}
-            <span className="font-inter text-xs text-gray-400">
+            <span className="font-syne text-xs text-gray-400">
               {trend.age_range ?? ''}{trend.region ? ` · ${trend.region}` : ''}
             </span>
           </div>

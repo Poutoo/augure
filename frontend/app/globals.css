@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background-app: #F7F7FA;
-  --color-text-dark: #0C0C0E;
-  --color-primary: #0C0C0E;
+  /* ── Design tokens officiels ── */
+  --color-noir:           #0C0C0F;
+  --color-gris-fonce:     #3D3D3D;
+  --color-gris-moyen:     #6B6B7B;
+  --color-gris-clair:     #D5D5D5;
+  --color-gris-tres-clair: #F2F2F8;
+  --color-blanc:          #FFFFFF;
+  /* ── Alias fonctionnels ── */
+  --color-background-app: #FFFFFF;
+  --color-text-dark:      #0C0C0F;
+  --color-primary:        #0C0C0F;
   --font-syne: var(--font-syne);
-  --font-inter: var(--font-inter);
 }
 
 * {
@@ -40,12 +47,12 @@ body {
 .badge-status {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
-  font-family: var(--font-inter);
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-family: var(--font-syne);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
   white-space: nowrap;
 }
