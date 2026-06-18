@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Syne, Inter } from "next/font/google";
+import { Syne } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import TrendDetailModal from "@/components/TrendDetailModal";
@@ -11,12 +11,6 @@ const syne = Syne({
   variable: "--font-syne",
   subsets: ["latin"],
   weight: ["500", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -44,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${syne.variable} ${inter.variable} h-full antialiased`}
+      className={`${syne.variable} h-full antialiased`}
       style={{ overflowX: 'hidden' }}
     >
       <body className="min-h-full flex flex-col font-syne bg-[var(--color-background-app)] pb-16 md:pb-0 overflow-x-hidden">

@@ -149,7 +149,7 @@ export default function TrendDetailModal() {
                 {/* Titre + meta */}
                 <div className="anim-fade-up">
                   {(trend.region || trend.created_at) && (
-                    <p className="font-inter text-xs font-medium text-gray-400 uppercase tracking-widest mb-1.5">
+                    <p className="font-syne text-xs font-medium text-gray-400 uppercase tracking-widest mb-1.5">
                       {trend.created_at ? `Depuis ${new Date(trend.created_at).getFullYear()}` : ''}
                       {trend.region ? ` · ${trend.region}` : ''}
                     </p>
@@ -159,12 +159,12 @@ export default function TrendDetailModal() {
                   </h2>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {trend.age_range && (
-                      <span className="px-3.5 py-1.5 bg-gray-100 text-gray-600 font-inter text-xs font-semibold rounded-full">
+                      <span className="px-3.5 py-1.5 bg-gray-100 text-gray-600 font-syne text-xs font-semibold rounded-full">
                         {trend.age_range}
                       </span>
                     )}
                     {trend.region && (
-                      <span className="px-3.5 py-1.5 bg-gray-100 text-gray-600 font-inter text-xs font-semibold rounded-full">
+                      <span className="px-3.5 py-1.5 bg-gray-100 text-gray-600 font-syne text-xs font-semibold rounded-full">
                         {trend.region}
                       </span>
                     )}
@@ -182,7 +182,7 @@ export default function TrendDetailModal() {
                       </h3>
                       <div className="flex flex-wrap gap-2.5">
                         {trend.platforms.map((p, i) => (
-                          <span key={i} className="px-4 py-2 bg-white text-gray-800 font-inter text-sm font-semibold rounded-xl border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                          <span key={i} className="px-4 py-2 bg-white text-gray-800 font-syne text-sm font-semibold rounded-xl border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
                             {p}
                           </span>
                         ))}
@@ -195,7 +195,7 @@ export default function TrendDetailModal() {
                 {/* Définition */}
                 <div className="anim-fade-up" style={{ animationDelay: '80ms' }}>
                   <h3 className="font-syne font-bold text-xl text-gray-900 mb-2.5">Définition</h3>
-                  <p className="font-inter text-gray-600 text-base leading-relaxed">{trend.description}</p>
+                  <p className="font-syne text-gray-600 text-base leading-relaxed">{trend.description}</p>
                 </div>
 
                 <hr className="border-gray-100" />
@@ -203,7 +203,7 @@ export default function TrendDetailModal() {
                 {/* Contexte */}
                 <div className="anim-fade-up" style={{ animationDelay: '160ms' }}>
                   <h3 className="font-syne font-bold text-xl text-gray-900 mb-2.5">Contexte & Origine</h3>
-                  <p className="font-inter text-gray-600 text-base leading-relaxed">{trend.context}</p>
+                  <p className="font-syne text-gray-600 text-base leading-relaxed">{trend.context}</p>
                 </div>
 
                 <hr className="border-gray-100" />
@@ -216,7 +216,7 @@ export default function TrendDetailModal() {
                   <div className="flex flex-col gap-3">
                     {usageKeys.map((usage, idx) => (
                       <div key={idx} className="bg-black/5 p-4 rounded-2xl border-l-4 border-[var(--color-text-dark)]">
-                        <p className="font-inter text-sm text-gray-800 leading-relaxed font-medium">{usage}</p>
+                        <p className="font-syne text-sm text-gray-800 leading-relaxed font-medium">{usage}</p>
                       </div>
                     ))}
                   </div>
@@ -234,7 +234,7 @@ export default function TrendDetailModal() {
                             <p className="font-syne font-black text-3xl text-[var(--color-text-dark)] tracking-tight mb-1">
                               {stat.value}
                             </p>
-                            <p className="font-inter text-xs text-gray-400 leading-tight">{stat.label}</p>
+                            <p className="font-syne text-xs text-gray-400 leading-tight">{stat.label}</p>
                           </div>
                         ))}
                       </div>

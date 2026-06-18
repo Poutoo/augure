@@ -70,7 +70,7 @@ function SearchPageInner() {
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Rechercher une tendance..."
-              className="flex-1 min-w-0 bg-transparent outline-none font-inter text-[15px] text-[var(--color-text-dark)] placeholder:text-gray-400"
+              className="flex-1 min-w-0 bg-transparent outline-none font-syne text-[15px] text-[var(--color-text-dark)] placeholder:text-gray-400"
             />
             {query && (
               <button onClick={() => setQuery('')} className="flex-shrink-0">
@@ -97,12 +97,12 @@ function SearchPageInner() {
         </div>
 
         <div className="flex items-center justify-between px-4 md:px-8 py-3">
-          <p className="font-inter text-sm text-gray-500">
+          <p className="font-syne text-sm text-gray-500">
             {loading ? '…' : <><span className="font-semibold text-[var(--color-text-dark)]">{filteredTrends.length}</span> tendance{filteredTrends.length > 1 ? 's' : ''} trouvée{filteredTrends.length > 1 ? 's' : ''}</>}
           </p>
           <button
             onClick={toggleSort}
-            className="flex items-center gap-1.5 font-inter text-sm font-semibold text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors"
+            className="flex items-center gap-1.5 font-syne text-sm font-semibold text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors"
           >
             {sortLabel[sortMode]}
             <Icon icon="mdi:swap-vertical" className="text-base" />
@@ -126,7 +126,7 @@ function SearchPageInner() {
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Icon icon="mdi:magnify-close" className="text-5xl text-gray-200 mb-4" />
               <p className="font-syne font-semibold text-gray-400">Aucune tendance trouvée</p>
-              <p className="font-inter text-sm text-gray-300 mt-1">Essayez un autre filtre ou mot-clé.</p>
+              <p className="font-syne text-sm text-gray-300 mt-1">Essayez un autre filtre ou mot-clé.</p>
             </div>
           )}
         </div>

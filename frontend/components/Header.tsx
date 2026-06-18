@@ -76,7 +76,7 @@ export default function Header({ dark = false }: { dark?: boolean }) {
         <Link href="/" className="flex items-center gap-0.5">
           <Image src={dark ? '/logo-white.svg' : '/logo-black.svg'} alt="Augure" width={110} height={26} priority style={{ height: 'auto' }} />
         </Link>
-        <p className={`font-inter text-sm mt-0.5 ml-0.5 ${dark ? 'text-white/50' : 'text-gray-500'}`}>Découvrez ce qui buzz</p>
+        <p className={`font-syne text-sm mt-0.5 ml-0.5 ${dark ? 'text-white/50' : 'text-gray-500'}`}>Découvrez ce qui buzz</p>
       </div>
 
       <div ref={containerRef} className="relative flex-shrink-0">
@@ -100,14 +100,14 @@ export default function Header({ dark = false }: { dark?: boolean }) {
             <Link
               href="/profile"
               onClick={() => setOpen(false)}
-              className="w-full flex items-center gap-2.5 px-4 py-3.5 font-inter text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2.5 px-4 py-3.5 font-syne text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <Icon icon="mdi:account-outline" className="text-base text-gray-400" />
               Mon profil
             </Link>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-4 py-3.5 font-inter text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-100"
+              className="w-full flex items-center gap-2.5 px-4 py-3.5 font-syne text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-100"
             >
               <Icon icon="mdi:logout" className="text-base text-gray-400" />
               Se déconnecter

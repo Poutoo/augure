@@ -13,7 +13,7 @@ export default function TopTrendCard({ trend }: TopTrendCardProps) {
     <Link href={`?trendId=${trend.id}`} scroll={false} className="block flex-shrink-0 w-44">
       <div className="bg-[var(--color-text-dark)] rounded-2xl p-4 h-52 flex flex-col justify-between hover:bg-black transition-colors">
         <div>
-          <p className="font-inter text-xs text-gray-400 mb-1">
+          <p className="font-syne text-xs text-gray-400 mb-1">
             N°{String(trend.rank ?? '–').padStart(2, '0')}
           </p>
           <span className={`inline-flex mb-3 ${s.badge}`}>
@@ -27,11 +27,11 @@ export default function TopTrendCard({ trend }: TopTrendCardProps) {
 
         <div>
           {trend.category && (
-            <span className="inline-block px-2.5 py-1 bg-white/10 text-white font-inter text-xs rounded-full mb-3">
+            <span className="inline-block px-2.5 py-1 bg-white/10 text-white font-syne text-xs rounded-full mb-3">
               {trend.category}
             </span>
           )}
-          <p className="font-inter text-xs text-gray-500">
+          <p className="font-syne text-xs text-gray-500">
             {trend.region ?? '–'} · {trend.age_range ?? '–'}
           </p>
         </div>

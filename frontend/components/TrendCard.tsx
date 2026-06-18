@@ -25,7 +25,7 @@ export default function TrendCard({ trend }: TrendCardProps) {
 
         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-50">
           <Icon icon="mdi:clock-outline" className="text-gray-400" />
-          <span className="font-inter text-sm text-gray-500">
+          <span className="font-syne text-sm text-gray-500">
             Dernière mise à jour : {new Date(trend.created_at).toLocaleDateString('fr-FR')}
           </span>
         </div>

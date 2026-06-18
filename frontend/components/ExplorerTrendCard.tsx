@@ -14,7 +14,7 @@ export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
       <div className="flex items-start gap-4 py-5 border-b border-gray-100 last:border-0 active:opacity-70 transition-opacity">
         <div className="flex-1 min-w-0">
           {trend.category && (
-            <p className="font-inter font-semibold text-xs text-[var(--color-primary)] uppercase tracking-widest mb-1">
+            <p className="font-syne font-semibold text-xs text-[var(--color-primary)] uppercase tracking-widest mb-1">
               {trend.category}
             </p>
           )}
@@ -26,7 +26,7 @@ export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
           {trend.platforms && trend.platforms.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {trend.platforms.map((platform, i) => (
-                <span key={i} className="px-2.5 py-0.5 bg-gray-100 text-gray-600 font-inter text-xs rounded-md">
+                <span key={i} className="px-2.5 py-0.5 bg-gray-100 text-gray-600 font-syne text-xs rounded-md">
                   {platform}
                 </span>
               ))}
@@ -39,7 +39,7 @@ export default function ExplorerTrendCard({ trend }: ExplorerTrendCardProps) {
               {s.label}
             </span>
             {(trend.age_range || trend.region) && (
-              <span className="font-inter text-sm text-gray-400">
+              <span className="font-syne text-sm text-gray-400">
                 {trend.age_range ?? ''}{trend.region ? ` · ${trend.region}` : ''}
               </span>
             )}

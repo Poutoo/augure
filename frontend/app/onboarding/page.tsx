@@ -167,7 +167,7 @@ export default function OnboardingPage() {
                 <Icon icon="mdi:arrow-left" className="text-lg text-[var(--color-text-dark)]" />
               </button>
             ) : <div />}
-            <span className="font-inter text-sm text-gray-400">Étape {step} sur {progressTotal}</span>
+            <span className="font-syne text-sm text-gray-400">Étape {step} sur {progressTotal}</span>
           </div>
         </div>
       )}
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Quel est votre rôle ?
               </h1>
-              <p className="font-inter text-sm text-gray-400 mb-6">
+              <p className="font-syne text-sm text-gray-400 mb-6">
                 Sélectionnez votre métier pour personnaliser votre expérience.
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
                     </div>
                     <div className="mt-1">
                       <div className="font-syne font-bold text-sm leading-tight">{r.label}</div>
-                      <div className={`font-inter text-xs mt-0.5 ${role === r.value ? "text-white/60" : "text-gray-400"}`}>
+                      <div className={`font-syne text-xs mt-0.5 ${role === r.value ? "text-white/60" : "text-gray-400"}`}>
                         {r.desc}
                       </div>
                     </div>
@@ -223,7 +223,7 @@ export default function OnboardingPage() {
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Vos centres d&apos;intérêt
               </h1>
-              <p className="font-inter text-sm text-gray-400 mb-6">
+              <p className="font-syne text-sm text-gray-400 mb-6">
                 Sélectionnez au moins un domaine qui vous parle.
               </p>
               <div className="flex flex-wrap gap-2.5">
@@ -251,7 +251,7 @@ export default function OnboardingPage() {
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Votre audience
               </h1>
-              <p className="font-inter text-sm text-gray-400 mb-5">
+              <p className="font-syne text-sm text-gray-400 mb-5">
                 Augure filtrera les tendances selon ces critères.
               </p>
               <div className="anim-fade-up" style={{ animationDelay: '0ms' }}>
@@ -275,7 +275,7 @@ export default function OnboardingPage() {
                     <button
                       key={g.slug}
                       onClick={() => setGender(prev => prev === g.slug ? "" : g.slug)}
-                      className={`px-4 py-2 rounded-xl border-2 font-inter text-sm font-medium transition-all ${gender === g.slug
+                      className={`px-4 py-2 rounded-xl border-2 font-syne text-sm font-medium transition-all ${gender === g.slug
                         ? "bg-black border-black text-white"
                         : "bg-white border-gray-200 hover:border-gray-400 text-[var(--color-text-dark)]"
                         }`}
@@ -287,7 +287,7 @@ export default function OnboardingPage() {
               </Section>
               <button
                 onClick={() => setShowAdvanced(p => !p)}
-                className="flex items-center gap-2 font-inter text-sm font-semibold text-gray-500 hover:text-black transition-colors mt-1 mb-3"
+                className="flex items-center gap-2 font-syne text-sm font-semibold text-gray-500 hover:text-black transition-colors mt-1 mb-3"
               >
                 <div className="h-px flex-1 bg-gray-200" />
                 <span>AVANCÉ</span>
@@ -316,33 +316,33 @@ export default function OnboardingPage() {
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">
                 Vos informations
               </h1>
-              <p className="font-inter text-sm text-gray-400 mb-6">
+              <p className="font-syne text-sm text-gray-400 mb-6">
                 Dernière étape avant de découvrir vos tendances.
               </p>
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Pseudo</label>
+                  <label className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Pseudo</label>
                   <input
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     placeholder="Votre pseudo"
-                    className="w-full px-4 py-4 rounded-2xl border border-gray-200 bg-white font-inter text-sm text-[var(--color-text-dark)] placeholder-gray-300 focus:outline-none focus:border-black transition-colors"
+                    className="w-full px-4 py-4 rounded-2xl border border-gray-200 bg-white font-syne text-sm text-[var(--color-text-dark)] placeholder-gray-300 focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Adresse email</label>
+                  <label className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Adresse email</label>
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleCreateAccount()}
                     placeholder="adresse@gmail.com"
-                    className="w-full px-4 py-4 rounded-2xl border border-gray-200 bg-white font-inter text-sm text-[var(--color-text-dark)] placeholder-gray-300 focus:outline-none focus:border-black transition-colors"
+                    className="w-full px-4 py-4 rounded-2xl border border-gray-200 bg-white font-syne text-sm text-[var(--color-text-dark)] placeholder-gray-300 focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Mot de passe</label>
+                  <label className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Mot de passe</label>
                   <div className="relative">
                     <input
                       type={showPwd ? "text" : "password"}
@@ -350,7 +350,7 @@ export default function OnboardingPage() {
                       onChange={e => setPassword(e.target.value)}
                       onKeyDown={e => e.key === "Enter" && handleCreateAccount()}
                       placeholder="8 caractères minimum"
-                      className="w-full px-4 py-4 rounded-2xl border border-gray-200 bg-white font-inter text-sm text-[var(--color-text-dark)] placeholder-gray-300 focus:outline-none focus:border-black transition-colors pr-12"
+                      className="w-full px-4 py-4 rounded-2xl border border-gray-200 bg-white font-syne text-sm text-[var(--color-text-dark)] placeholder-gray-300 focus:outline-none focus:border-black transition-colors pr-12"
                     />
                     <button
                       type="button"
@@ -364,7 +364,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
               {error && (
-                <div className="mt-4 px-4 py-3 rounded-xl bg-black/5 font-inter text-sm text-[var(--color-text-dark)]">
+                <div className="mt-4 px-4 py-3 rounded-xl bg-black/5 font-syne text-sm text-[var(--color-text-dark)]">
                   {error}
                 </div>
               )}
@@ -383,7 +383,7 @@ export default function OnboardingPage() {
               </button>
 
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-1">Paiement</h1>
-              <p className="font-inter text-sm text-gray-400 mb-6">
+              <p className="font-syne text-sm text-gray-400 mb-6">
                 Abonnement {plan === "premium" ? "Premium · 14,99€" : "Business · 89,99€"}/mois
               </p>
 
@@ -403,15 +403,15 @@ export default function OnboardingPage() {
                 </div>
                 <p className="font-mono text-white text-lg tracking-[0.18em] mb-4">4242 4242 4242 4242</p>
                 <div className="flex justify-between items-end">
-                  <span className="font-inter text-white/70 text-sm">{username || "Titulaire"}</span>
-                  <span className="font-inter text-white/70 text-sm">12/26</span>
+                  <span className="font-syne text-white/70 text-sm">{username || "Titulaire"}</span>
+                  <span className="font-syne text-white/70 text-sm">12/26</span>
                 </div>
               </div>
 
               {/* Form — pre-filled, read-only (simulation) */}
               <div className="flex flex-col gap-3">
                 <div>
-                  <label className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Numéro de carte</label>
+                  <label className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Numéro de carte</label>
                   <input
                     readOnly
                     value="4242 4242 4242 4242"
@@ -420,7 +420,7 @@ export default function OnboardingPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Expiration</label>
+                    <label className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Expiration</label>
                     <input
                       readOnly
                       value="12/26"
@@ -428,7 +428,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div>
-                    <label className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">CVV</label>
+                    <label className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">CVV</label>
                     <input
                       readOnly
                       value="123"
@@ -438,7 +438,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <p className="font-inter text-xs text-gray-400 text-center mt-3 mb-6">
+              <p className="font-syne text-xs text-gray-400 text-center mt-3 mb-6">
                 Carte de test — le paiement est entièrement simulé
               </p>
 
@@ -464,7 +464,7 @@ export default function OnboardingPage() {
               <h1 className="font-syne font-bold text-3xl text-[var(--color-text-dark)] mb-3">
                 Votre espace est prêt.
               </h1>
-              <p className="font-inter text-sm text-gray-500 leading-relaxed mb-8">
+              <p className="font-syne text-sm text-gray-500 leading-relaxed mb-8">
                 Augure a configuré votre fil selon votre audience.<br />
                 Les tendances qui comptent pour vous apparaissent en premier.
               </p>
@@ -475,7 +475,7 @@ export default function OnboardingPage() {
               </div>
               <div className="rounded-2xl border border-gray-200 overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-100">
-                  <div className="font-inter text-xs text-gray-400 mb-0.5">Plan</div>
+                  <div className="font-syne text-xs text-gray-400 mb-0.5">Plan</div>
                   <div className="flex items-center gap-2">
                     {plan && (
                       <span className={`px-3 py-0.5 rounded-full text-xs font-syne font-bold ${PLAN_META[plan as keyof typeof PLAN_META]?.badge ?? "bg-gray-100 text-gray-700"}`}>
@@ -488,13 +488,13 @@ export default function OnboardingPage() {
                   </div>
                 </div>
                 <div className="px-5 py-4 border-b border-gray-100">
-                  <div className="font-inter text-xs text-gray-400 mb-0.5">Rôle</div>
+                  <div className="font-syne text-xs text-gray-400 mb-0.5">Rôle</div>
                   <div className="font-syne font-bold text-[var(--color-text-dark)]">
                     {ROLES.find(r => r.value === role)?.label ?? role}
                   </div>
                 </div>
                 <div className="px-5 py-4 border-b border-gray-100">
-                  <div className="font-inter text-xs text-gray-400 mb-0.5">Audience cible</div>
+                  <div className="font-syne text-xs text-gray-400 mb-0.5">Audience cible</div>
                   <div className="font-syne font-bold text-[var(--color-text-dark)]">
                     {[
                       ages.map(a => AGE_RANGES[AGE_SLUGS.indexOf(a)]).join(", "),
@@ -503,10 +503,10 @@ export default function OnboardingPage() {
                   </div>
                 </div>
                 <div className="px-5 py-4">
-                  <div className="font-inter text-xs text-gray-400 mb-2">Centres d&apos;intérêt</div>
+                  <div className="font-syne text-xs text-gray-400 mb-2">Centres d&apos;intérêt</div>
                   <div className="flex flex-wrap gap-2">
                     {interests.map(slug => (
-                      <span key={slug} className="px-3 py-1 rounded-full bg-gray-100 font-inter text-sm text-[var(--color-text-dark)] font-medium capitalize">
+                      <span key={slug} className="px-3 py-1 rounded-full bg-gray-100 font-syne text-sm text-[var(--color-text-dark)] font-medium capitalize">
                         {INTERESTS.find(i => i.slug === slug)?.label ?? slug}
                       </span>
                     ))}
@@ -547,7 +547,7 @@ export default function OnboardingPage() {
                   FREEMIUM
                 </span>
                 <div className="mt-3 font-syne font-bold text-2xl text-[var(--color-text-dark)]">Gratuit</div>
-                <div className="font-inter text-xs text-gray-400 mt-0.5">7 recherches / jour · Fiches basiques</div>
+                <div className="font-syne text-xs text-gray-400 mt-0.5">7 recherches / jour · Fiches basiques</div>
               </button>
 
               {/* Premium — recommandé */}
@@ -564,7 +564,7 @@ export default function OnboardingPage() {
                   <Icon icon="mdi:star-four-points" className="text-[10px]" /> PREMIUM · RECOMMANDÉ
                 </span>
                 <div className="mt-3 font-syne font-bold text-2xl italic text-white">14,99€</div>
-                <div className="font-inter text-xs text-white/50 mt-0.5">Par mois · Recherches illimitées</div>
+                <div className="font-syne text-xs text-white/50 mt-0.5">Par mois · Recherches illimitées</div>
               </button>
 
               {/* Business */}
@@ -576,7 +576,7 @@ export default function OnboardingPage() {
                   BUSINESS
                 </span>
                 <div className="mt-3 font-syne font-bold text-2xl italic text-[var(--color-text-dark)]">89,99€</div>
-                <div className="font-inter text-xs text-gray-400 mt-0.5">Par mois · Équipes jusqu&apos;à 5 membres</div>
+                <div className="font-syne text-xs text-gray-400 mt-0.5">Par mois · Équipes jusqu&apos;à 5 membres</div>
               </button>
             </div>
 
@@ -585,7 +585,7 @@ export default function OnboardingPage() {
               {/* En-tête */}
               <div className="grid pb-2 border-b border-gray-100" style={{ gridTemplateColumns: "1fr 44px 44px 44px" }}>
                 <div />
-                <div className="font-inter text-[10px] text-gray-400 text-center">F</div>
+                <div className="font-syne text-[10px] text-gray-400 text-center">F</div>
                 <div className="font-syne text-[10px] font-semibold text-[var(--color-text-dark)] text-center">P</div>
                 <div className="font-syne text-[10px] font-semibold text-[var(--color-text-dark)] text-center">B</div>
               </div>
@@ -597,13 +597,13 @@ export default function OnboardingPage() {
                   className="grid items-center py-2.5 border-b border-gray-50"
                   style={{ gridTemplateColumns: "1fr 44px 44px 44px" }}
                 >
-                  <div className="font-inter text-sm text-gray-600 pr-2">{f.label}</div>
+                  <div className="font-syne text-sm text-gray-600 pr-2">{f.label}</div>
                   {(["freemium", "premium", "business"] as const).map(col => {
                     const val = f[col];
                     return (
                       <div key={col} className="flex justify-center">
                         {typeof val === "string"
-                          ? <span className="font-inter text-xs font-semibold text-[var(--color-text-dark)]">{val}</span>
+                          ? <span className="font-syne text-xs font-semibold text-[var(--color-text-dark)]">{val}</span>
                           : val
                             ? <Icon icon="mdi:check" className="text-base text-[var(--color-text-dark)]" />
                             : <span className="text-gray-300 font-bold leading-none text-sm">—</span>
@@ -646,20 +646,20 @@ export default function OnboardingPage() {
                   : "Continuer avec Premium"
               }
             </button>
-            <p className="font-inter text-xs text-white/40 text-center mb-5">
+            <p className="font-syne text-xs text-white/40 text-center mb-5">
               {plan === "freemium" ? "Passez à Premium à tout moment" : "Changez ou annulez à tout moment"}
             </p>
             {plan !== "freemium" && (
               <button
                 onClick={async () => { setPlan("freemium"); await callSavePlan("freemium"); setStep(7); }}
-                className="w-full font-inter text-xs text-white/40 hover:text-white/70 transition-colors text-center mb-6"
+                className="w-full font-syne text-xs text-white/40 hover:text-white/70 transition-colors text-center mb-6"
               >
                 Continuer avec Freemium (gratuit)
               </button>
             )}
             <div className="flex justify-center gap-6">
               {["Abonnement", "Termes", "Privacy"].map(l => (
-                <span key={l} className="font-inter text-xs text-white/25">{l}</span>
+                <span key={l} className="font-syne text-xs text-white/25">{l}</span>
               ))}
             </div>
           </div>
@@ -670,7 +670,7 @@ export default function OnboardingPage() {
       {step < 5 && (
         <div className="flex-shrink-0 px-5 pb-8 pt-2 max-w-lg mx-auto w-full">
           {step < 4 && error && (
-            <div className="mb-3 px-4 py-3 rounded-xl bg-black/5 font-inter text-sm text-[var(--color-text-dark)]">
+            <div className="mb-3 px-4 py-3 rounded-xl bg-black/5 font-syne text-sm text-[var(--color-text-dark)]">
               {error}
             </div>
           )}
@@ -710,7 +710,7 @@ export default function OnboardingPage() {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mb-5">
-      <div className="font-inter text-xs font-bold text-gray-500 uppercase tracking-widest mb-2.5">{label}</div>
+      <div className="font-syne text-xs font-bold text-gray-500 uppercase tracking-widest mb-2.5">{label}</div>
       {children}
     </div>
   );
@@ -728,7 +728,7 @@ function PillGroup({ items, slugs, selected, onToggle }: {
           <button
             key={slug}
             onClick={() => onToggle(slug)}
-            className={`px-3.5 py-2 rounded-xl border font-inter text-sm transition-all ${active
+            className={`px-3.5 py-2 rounded-xl border font-syne text-sm transition-all ${active
               ? "bg-black border-black text-white font-semibold"
               : "bg-white border-gray-200 hover:border-gray-400 text-[var(--color-text-dark)]"
               }`}

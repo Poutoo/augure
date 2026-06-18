@@ -104,7 +104,7 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-syne font-semibold text-sm text-[var(--color-text-dark)] truncate">{col.name}</p>
-                    <p className="font-inter text-xs text-gray-400">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
+                    <p className="font-syne text-xs text-gray-400">{col.item_count} item{col.item_count !== 1 ? 's' : ''}</p>
                   </div>
                   {toggling === col.id ? (
                     <Icon icon="mdi:loading" className="text-gray-400 animate-spin flex-shrink-0" />
@@ -117,7 +117,7 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
               ))}
 
               {collections.length === 0 && !showCreate && (
-                <p className="text-center font-inter text-sm text-gray-400 py-4">Aucune collection pour l&apos;instant</p>
+                <p className="text-center font-syne text-sm text-gray-400 py-4">Aucune collection pour l&apos;instant</p>
               )}
             </div>
           )}
@@ -135,7 +135,7 @@ export default function CollectionPickerSheet({ token, threadId, trendId, onClos
                 placeholder="Nom de la collection"
                 autoFocus
                 maxLength={100}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 font-inter text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 font-syne text-sm focus:outline-none focus:border-[var(--color-text-dark)] transition-colors"
               />
 
               <div className="flex gap-2">
