@@ -24,7 +24,8 @@ Projet développé dans le cadre de la Compétition B3 2026 — Digital Campus P
 8. [Lancement en local](#8-lancement-en-local)
 9. [Ingestion de données](#9-ingestion-de-données)
 10. [Retour d'expérience (REX)](#10-retour-dexperience)
-11. [Équipe](#11-equipe)
+11. [Documentation technique](#11-documentation-technique)
+12. [Équipe](#12-equipe)
 
 ---
 
@@ -209,7 +210,11 @@ augure/
 │   └── trend_enricher.py           # Enrichissement éditorial des tendances en base
 │
 ├── docs/
-│   └── benchmark_V1.md             # Analyse comparative des choix de stack
+│   ├── benchmark_V1.md             # Analyse comparative des choix de stack (V1)
+│   ├── benchmark_v2.md             # Analyse comparative mise à jour (V2)
+│   ├── design_system.md            # Tokens de design, typographie, composants UI
+│   ├── database_deep_dive.md       # Dictionnaire des tables, contraintes, indexation
+│   └── plans_and_permissions.md    # Logique des forfaits, guards FastAPI, route guards Next.js
 │
 ├── maquette/                       # Exports visuels Figma (PNG / SVG)
 ├── docker-compose.yml              # Orchestration multi-services (DB + Front + Scraper)
@@ -567,7 +572,21 @@ Cette expérience a été extrêmement formatrice sur la réalité de la Data En
 
 ---
 
-## 11. Équipe
+## 11. Documentation technique
+
+Le dossier [`docs/`](docs/) contient des documents techniques approfondis destinés à l'évaluation du jury et à la maintenabilité du projet.
+
+| Fichier | Contenu |
+| :--- | :--- |
+| [`docs/design_system.md`](docs/design_system.md) | Tokens de design officiels (palette achromatique, typographie Syne, specs des composants UI) |
+| [`docs/database_deep_dive.md`](docs/database_deep_dive.md) | Dictionnaire complet des 13 tables PostgreSQL, contraintes d'unicité, stratégie d'indexation et analyse ILIKE |
+| [`docs/plans_and_permissions.md`](docs/plans_and_permissions.md) | Architecture des forfaits (Freemium / Premium / Business), guards FastAPI via `Depends()`, rate limiting 7 recherches/jour, affichage conditionnel Next.js |
+| [`docs/benchmark_V1.md`](docs/benchmark_V1.md) | Analyse comparative des choix de stack — version initiale |
+| [`docs/benchmark_v2.md`](docs/benchmark_v2.md) | Analyse comparative mise à jour |
+
+---
+
+## 12. Équipe
 
 | Pôle | Membres |
 | :--- | :--- |
@@ -576,6 +595,8 @@ Cette expérience a été extrêmement formatrice sur la réalité de la Data En
 | UX / Product & Research (UXPO) | Aurélien |
 | Web Design (WD) | Léa, Aristide |
 | Développement & Architecture (DEV) | Mathilde, Thibault |
+
+---
 
 ---
 

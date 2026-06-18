@@ -6,11 +6,12 @@ Ce document détaille la conception relationnelle de la base de données Postgre
 
 ## 1. Vue d'ensemble du schéma
 
-Le schéma repose sur **12 tables** organisées en trois domaines fonctionnels :
+Le schéma repose sur **13 tables** organisées en trois domaines fonctionnels :
 
 - **Utilisateurs** : `users`, `interests`, `user_interests`
 - **Tendances** : `trends`, `trend_tags`, `trends_snapshots`, `banned_hashtags`
 - **Communauté** : `threads`, `comments`, `likes`, `favorite_collections`, `favorite_items`
+- **Monitoring** : `search_logs`
 
 ```
 users ──────────────────────────────────────────────────┐
@@ -151,6 +152,28 @@ Liste noire des hashtags exclus du scraping. La clé primaire est directement le
 | `tag` | `VARCHAR(100)` | PK | Hashtag banni |
 | `reason` | `VARCHAR(50)` | nullable | Motif : `algorithme`, `temporel`, `macro`, `format` |
 | `added_at` | `TIMESTAMPTZ` | NOT NULL, default `now()` | Date d'ajout |
+
+---
+
+### `search_logs`
+Table de monitoring technique utilisée par le rate limiter pour compter les appels quotidiens des utilisateurs Freemium. Elle n'est pas exposée à l'application cliente — c'est une table d'infrastructure.
+
+| Colonne | Type | Contraintes | Description |
+|---|---|---|---|
+| `id` | `UUID` | PK, default `uuid4` | Identifiant |
+| `user_id` | `UUID` | FK → `users.id` CASCADE, **INDEX** | Utilisateur ayant effectué la recherche |
+| `searched_at` | `TIMESTAMPTZ` | NOT NULL, default `now()`, **INDEX** | Horodatage de la recherche |
+
+L'index sur `searched_at` est essentiel : la requête de comptage filtre systématiquement sur `date(searched_at) = today`, et sans index un full scan serait effectué à chaque appel.
+
+```sql
+-- Requête exécutée par check_search_quota()
+SELECT COUNT(id) FROM search_logs
+WHERE user_id = $1
+  AND DATE(searched_at) = CURRENT_DATE;
+```
+
+En production, ce compteur migre vers Redis (`search_count:{user_id}:{date}`, TTL 86 400 s) pour éliminer les écritures base à chaque requête.
 
 ---
 
